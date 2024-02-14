@@ -17,8 +17,8 @@ import { useRouter } from "next/navigation";
 
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" })
+  email: z.string().email({ message: "Entrez une adresse courriel valide" }),
+  password: z.string().min(6, { message: "Le mot de passe doit comporter au moins 6 caractères" })
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
@@ -46,9 +46,9 @@ export default function UserAuthForm() {
         const data = await res.json();
         if (res.ok) {
           toast({
-            title: "Success!",
+            title: "succès!",
             variant: "default",
-            description: "You have successfully logged in"
+            description: "Vous êtes connecté avec succès!"
           });
           // redirect to dashboard
           router.push("/dashboard");
@@ -56,7 +56,7 @@ export default function UserAuthForm() {
       })
       .catch((error) => {
         return toast({
-          title: "Whoops!",
+          title: "Désolé!",
           variant: "destructive",
           description: error.message
         });
@@ -81,7 +81,7 @@ export default function UserAuthForm() {
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="Enter your email..."
+                    placeholder="Entrez votre email..."
                     disabled={formState.isLoading}
                     {...form.register("email")}
                   />
@@ -99,7 +99,7 @@ export default function UserAuthForm() {
                 <FormControl>
                   <Input
                     type="password"
-                    placeholder="Enter your password..."
+                    placeholder="Entrez votre mot de passe..."
                     disabled={formState.isLoading}
                     {...form.register("password")}
                   />
@@ -111,7 +111,7 @@ export default function UserAuthForm() {
 
           <Button disabled={form.formState.isLoading} className="ml-auto w-full" type="submit">
             {
-              form.formState.isLoading ? "Loading..." : "Login"
+              form.formState.isLoading ? "Chargement..." : "Connexion"
             }
           </Button>
         </form>
