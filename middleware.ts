@@ -1,6 +1,7 @@
-// Protecting routes with next-auth
-// https://next-auth.js.org/configuration/nextjs#middleware
-// https://nextjs.org/docs/app/building-your-application/routing/middleware
+import { NextRequest } from "next/server";
 
-export { default } from "next-auth/middleware";
+export function middleware(request: NextRequest) {
+  // todo nothing for now
+}
+
 export const config = { matcher: ["/dashboard/:path*"] };

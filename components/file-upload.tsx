@@ -21,8 +21,7 @@ export default function FileUpload({
 }: ImageUploadProps) {
   const { toast } = useToast();
   const onDeleteFile = (key: string) => {
-    const files = value;
-    let filteredFiles = files.filter((item) => item.key !== key);
+    let filteredFiles = value.filter((item) => item.key !== key);
     onRemove(filteredFiles);
   };
   const onUpdateFile = (newFiles: UploadFileResponse[]) => {
@@ -62,7 +61,7 @@ export default function FileUpload({
         {value.length < IMG_MAX_LIMIT && (
           <UploadDropzone<OurFileRouter>
             className="dark:bg-zinc-800 py-2 ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300"
-            endpoint="imageUploader"
+            endpoint="videoUpload"
             config={{ mode: "auto" }}
             content={{
               allowedContent({ isUploading }) {

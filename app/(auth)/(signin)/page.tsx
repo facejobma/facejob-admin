@@ -1,9 +1,6 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import UserAuthForm from "@/components/forms/user-auth-form";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+import { Logo } from "@/components/ui/logo";
 
 export const metadata: Metadata = {
   title: "Authentication",
@@ -17,7 +14,7 @@ export default function AuthenticationPage() {
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex bg-hero">
         <div className="absolute inset-0 bg-zinc-900" />
         <div className="relative z-20 flex items-center">
-          <Image src={"/facejobLogo.png"} width={126} height={62} alt={"face job logo"}/>
+          <Logo />
         </div>
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
@@ -30,7 +27,7 @@ export default function AuthenticationPage() {
           </blockquote>
         </div>
       </div>
-      <div className="p-4 lg:p-8 h-full flex items-center">
+      <div className="p-4 lg:p-8 h-full flex items-center bg-gray-950">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
@@ -41,5 +38,5 @@ export default function AuthenticationPage() {
         </div>
       </div>
     </div>
-);
+  );
 }
