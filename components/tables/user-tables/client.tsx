@@ -18,10 +18,7 @@ export const UserClient: React.FC<ProductsClientProps> = ({ data }) => {
   return (
     <>
       <div className="flex items-start justify-between">
-        <Heading
-          title={`Users (${data.length})`}
-          description="Manage users (Client side table functionalities.)"
-        />
+        <Heading title={`Candidats (${data.length})`} description="Manage users" />
         <Button
           className="text-xs md:text-sm"
           onClick={() => router.push(`/dashboard/user/new`)}
