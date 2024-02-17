@@ -6,7 +6,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,40 +15,43 @@ import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 
-
 const formSchema = z.object({
   email: z.string().email({ message: "Entrez une adresse courriel valide" }),
-  password: z.string().min(6, { message: "Le mot de passe doit comporter au moins 6 caractères" })
+  password: z.string().min(6, {
+    message: "Le mot de passe doit comporter au moins 6 caractères",
+  }),
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserAuthForm() {
-
-
   const { toast } = useToast();
   const router = useRouter();
 
   const form = useForm<UserFormValue>({
-    resolver: zodResolver(formSchema)
+    resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: UserFormValue) => {
-
     fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/admin/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
       .then(async (res) => {
         const data = await res.json();
+
+        const { token } = data;
+
+        localStorage.setItem('authToken', token);
+
         if (res.ok) {
           toast({
             title: "succès!",
             variant: "default",
-            description: "Vous êtes connecté avec succès!"
+            description: "Vous êtes connecté avec succès!",
           });
           // redirect to dashboard
           router.push("/dashboard");
@@ -58,11 +61,9 @@ export default function UserAuthForm() {
         return toast({
           title: "Désolé!",
           variant: "destructive",
-          description: error.message
+          description: error.message,
         });
-
       });
-
   };
 
   return (
@@ -109,10 +110,12 @@ export default function UserAuthForm() {
             )}
           />
 
-          <Button disabled={form.formState.isLoading} className="ml-auto w-full" type="submit">
-            {
-              form.formState.isLoading ? "Chargement..." : "Connexion"
-            }
+          <Button
+            disabled={form.formState.isLoading}
+            className="ml-auto w-full"
+            type="submit"
+          >
+            {form.formState.isLoading ? "Chargement..." : "Connexion"}
           </Button>
         </form>
       </Form>
