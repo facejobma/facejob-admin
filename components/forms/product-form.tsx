@@ -49,7 +49,7 @@ const formSchema = z.object({
     .string()
     .min(3, { message: "Sector must be at least 3 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
-  tel: z.array(z.string().min(10, { message: "Invalid phone number" })),
+  tel: z.string().min(10, { message: "Invalid phone number" }),
   bio: z.string().min(3, { message: "Bio must be at least 3 characters" }),
 });
 
@@ -75,9 +75,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         first_name: "",
         sector: "",
         email: "",
-        tel: [],
+        tel: "",
         bio: "",
-        imgUrl: [],
       };
 
   const form = useForm<ProductFormValues>({
@@ -85,50 +84,56 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     defaultValues,
   });
 
-  // useEffect(() => {
-  //   const fetchCandidateData = async () => {
-  //     if (!initialData && params.id) {
-  //       try {
-  //         const response = await fetch(
-  //           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidate/${params.id}`,
-  //         );
-
-  //         if (response.ok) {
-  //           const data = await response.json();
-  //           form.reset(data);
-  //         } else {
-  //           throw new Error("Failed to fetch candidate data");
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching candidate data:", error);
-  //       }
-  //     }
-  //   };
-
-  //   fetchCandidateData();
-  // }, [initialData, params.id, form]);
-
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
-      // Handle form submission (update or create)
-      // ...
 
-      // Display success toast
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
+      // Extract candidate ID from params
+      const candidateId = params.userId;
+      const authToken = localStorage.getItem("authToken");
 
-      // Redirect to the dashboard
-      router.push(`/dashboard/products`);
+      console.log("candidateId, ", candidateId);
+
+      // Send a request to the API endpoint
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidate/updateId/${candidateId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      // Check if the request was successful
+      if (response.ok) {
+        // Display success toast
+        toast({
+          title: "Success",
+          variant: "default",
+          description: "Candidate data saved successfully!",
+        });
+
+        // Redirect to the dashboard or candidate details page
+        if (candidateId) {
+          router.push(`/dashboard/candidate/${candidateId}`);
+        } else {
+          router.push("/dashboard/products");
+        }
+      } else {
+        // If the request was not successful, display an error toast
+        throw new Error("Failed to save candidate data");
+      }
     } catch (error: any) {
       // Display error toast
       toast({
+        title: "Error",
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description:
+          error.message || "An error occurred while saving candidate data.",
       });
     } finally {
       setLoading(false);
@@ -214,7 +219,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
-          {/* ... (other form fields) */}
           <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}

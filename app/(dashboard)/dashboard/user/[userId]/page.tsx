@@ -35,7 +35,7 @@ export default function Page() {
           const authToken = localStorage.getItem("authToken");
 
           const response = await fetch(
-            `http://localhost:8000/api/candidate/${userId}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidate/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${authToken}`,
