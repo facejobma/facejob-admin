@@ -44,10 +44,10 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: "bio",
     header: "BIO",
   },
-  {
-    accessorKey: "status",
-    header: "STATUS",
-  },
+  // {
+  //   accessorKey: "status",
+  //   header: "STATUS",
+  // },
   {
     id: "actions",
     cell: ({ row }) => <CellAction data={row.original} />,

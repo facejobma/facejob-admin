@@ -45,6 +45,7 @@
     "eslint-config-next": "^14.0.1",
     "lucide-react": "^0.291.0",
     "next": "^14.0.1",
+    "next-navigation": "^1.0.6",
     "next-themes": "^0.2.1",
     "postcss": "8.4.31",
     "react": "^18.2.0",

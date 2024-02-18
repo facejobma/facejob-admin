@@ -1,6 +1,6 @@
 "use client";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Trash } from "lucide-react";
@@ -25,10 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-// import FileUpload from "@/components/FileUpload";
 import { useToast } from "../ui/use-toast";
 import FileUpload from "../file-upload";
+
 const ImgSchema = z.object({
   fileName: z.string(),
   name: z.string(),
@@ -39,20 +38,19 @@ const ImgSchema = z.object({
   fileUrl: z.string(),
   url: z.string(),
 });
+
 export const IMG_MAX_LIMIT = 3;
+
 const formSchema = z.object({
-  name: z
+  first_name: z
     .string()
-    .min(3, { message: "Product Name must be at least 3 characters" }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: "You can only add up to 3 images" })
-    .min(1, { message: "At least one image must be added." }),
-  description: z
+    .min(3, { message: "First Name must be at least 3 characters" }),
+  sector: z
     .string()
-    .min(3, { message: "Product description must be at least 3 characters" }),
-  price: z.coerce.number(),
-  category: z.string().min(1, { message: "Please select a category" }),
+    .min(3, { message: "Sector must be at least 3 characters" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  tel: z.array(z.string().min(10, { message: "Invalid phone number" })),
+  bio: z.string().min(3, { message: "Bio must be at least 3 characters" }),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -69,22 +67,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
-  const title = initialData ? "Edit product" : "Create product";
-  const description = initialData ? "Edit a product." : "Add a new product";
-  const toastMessage = initialData ? "Product updated." : "Product created.";
-  const action = initialData ? "Save changes" : "Create";
 
   const defaultValues = initialData
     ? initialData
     : {
-        name: "",
-        description: "",
-        price: 0,
+        first_name: "",
+        sector: "",
+        email: "",
+        tel: [],
+        bio: "",
         imgUrl: [],
-        category: "",
       };
 
   const form = useForm<ProductFormValues>({
@@ -92,23 +85,46 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     defaultValues,
   });
 
+  // useEffect(() => {
+  //   const fetchCandidateData = async () => {
+  //     if (!initialData && params.id) {
+  //       try {
+  //         const response = await fetch(
+  //           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidate/${params.id}`,
+  //         );
+
+  //         if (response.ok) {
+  //           const data = await response.json();
+  //           form.reset(data);
+  //         } else {
+  //           throw new Error("Failed to fetch candidate data");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error fetching candidate data:", error);
+  //       }
+  //     }
+  //   };
+
+  //   fetchCandidateData();
+  // }, [initialData, params.id, form]);
+
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
-      } else {
-        // const res = await axios.post(`/api/products/create-product`, data);
-        // console.log("product", res);
-      }
-      router.refresh();
+      // Handle form submission (update or create)
+      // ...
+
+      // Display success toast
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+
+      // Redirect to the dashboard
       router.push(`/dashboard/products`);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
     } catch (error: any) {
+      // Display error toast
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -119,31 +135,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const onDelete = async () => {
-    try {
-      setLoading(true);
-      //   await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
-      router.refresh();
-      router.push(`/${params.storeId}/products`);
-    } catch (error: any) {
-    } finally {
-      setLoading(false);
-      setOpen(false);
-    }
-  };
-
-  const triggerImgUrlValidation = () => form.trigger("imgUrl");
+  function setOpen(arg0: boolean): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <>
-      {/* <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      /> */}
       <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
+        <Heading
+          title="Candidate Form"
+          description="Edit or Create a Candidate"
+        />
         {initialData && (
           <Button
             disabled={loading}
@@ -163,32 +165,67 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         >
           <FormField
             control={form.control}
-            name="imgUrl"
+            name="first_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Images</FormLabel>
+                <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
+                  <Input
+                    disabled={loading}
+                    placeholder="Candidate's first name"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="sector"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sector</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Candidate's sector"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Candidate's email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* ... (other form fields) */}
           <div className="md:grid md:grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="name"
+              name="tel"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Phone Number</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Product name"
+                      placeholder="Candidate's phone number"
                       {...field}
                     />
                   </FormControl>
@@ -198,70 +235,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="description"
+              name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Bio</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Product description"
+                      placeholder="Candidate's bio"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input type="number" disabled={loading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a category"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {/* @ts-ignore  */}
-                      {categories.map((category) => (
-                        <SelectItem key={category._id} value={category._id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
           <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
+            Save
           </Button>
         </form>
       </Form>
