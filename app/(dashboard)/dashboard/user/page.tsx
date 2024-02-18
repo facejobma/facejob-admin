@@ -9,10 +9,8 @@ const breadcrumbItems = [{ title: "Candidat", link: "/dashboard/candidat" }];
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const { toast } = useToast();
-  // todo : to be stored on cookies
-  const authToken = localStorage && localStorage.getItem("authToken");
 
-  // todo : server render this data
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -20,7 +18,6 @@ export default function UsersPage() {
           process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/candidates",
           {
             headers: {
-              Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
           },
@@ -44,7 +41,7 @@ export default function UsersPage() {
     };
 
     fetchData();
-  }, [authToken, toast]);
+  }, [toast]);
 
   return (
     <>

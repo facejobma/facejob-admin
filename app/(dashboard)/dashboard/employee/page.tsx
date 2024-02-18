@@ -25,7 +25,7 @@ export default async function page({ searchParams }: paramsProps) {
 
   const res = await fetch(
     `https://api.slingacademy.com/v1/sample-data/users?offset=${offset}&limit=${pageLimit}` +
-      (country ? `&search=${country}` : ""),
+    (country ? `&search=${country}` : "")
   );
   const employeeRes = await res.json();
   const totalUsers = employeeRes.total_users; //1000
@@ -39,14 +39,14 @@ export default async function page({ searchParams }: paramsProps) {
         <div className="flex items-start justify-between">
           <Heading
             title={`Employee (${totalUsers})`}
-            description="Manage employees (Server side table functionalities.)"
+            description="Management des employees"
           />
 
           <Link
             href={"/dashboard/employee/new"}
             className={cn(buttonVariants({ variant: "default" }))}
           >
-            <Plus className="mr-2 h-4 w-4" /> Add New
+            <Plus className="mr-2 h-4 w-4" /> Update New
           </Link>
         </div>
         <Separator />
