@@ -105,7 +105,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        }
+        },
       );
 
       // Check if the request was successful
@@ -140,6 +140,49 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
+  const onDelete = async () => {
+    try {
+      setLoading(true);
+
+      // Extract candidate ID from params
+      const candidateId = params.userId;
+      const authToken = localStorage.getItem("authToken");
+
+      // Send a request to delete the candidate
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidate/delete/${candidateId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          variant: "default",
+          description: "Candidate deleted successfully!",
+        });
+
+        router.push("/dashboard/products");
+      } else {
+        throw new Error("Failed to delete candidate");
+      }
+    } catch (error: any) {
+      // Display error toast
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description:
+          error.message || "An error occurred while deleting the candidate.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   function setOpen(arg0: boolean): void {
     throw new Error("Function not implemented.");
   }
@@ -156,7 +199,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             disabled={loading}
             variant="destructive"
             size="sm"
-            onClick={() => setOpen(true)}
+            onClick={onDelete} // Attach the onDelete function to the delete button
           >
             <Trash className="h-4 w-4" />
           </Button>

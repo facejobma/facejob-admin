@@ -1,4 +1,3 @@
-"use client";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +10,7 @@ import {
 import { User } from "@/constants/data";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CellActionProps {
   data: User;
@@ -22,14 +21,43 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  const onConfirm = async () => {};
+  const onDelete = async () => {
+    try {
+      setLoading(true);
+
+      const authToken = localStorage.getItem("authToken");
+
+      console.log("Data.id, ", data.id);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/candidate/delete/${data.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authToken}`, 
+          },
+        },
+      );
+
+      if (response.ok) {
+        console.log("Candidate deleted successfully!");
+      } else {
+        console.error("Failed to delete candidate");
+      }
+    } catch (error) {
+      console.error("An error occurred while deleting the candidate:", error);
+    } finally {
+      setLoading(false);
+      setOpen(false);
+    }
+  };
 
   return (
     <>
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={onConfirm}
+        onConfirm={onDelete} 
         loading={loading}
       />
       <DropdownMenu modal={false}>

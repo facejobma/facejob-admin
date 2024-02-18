@@ -21,9 +21,9 @@ export default function UsersPage() {
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json"
-            }
-          }
+              "Content-Type": "application/json",
+            },
+          },
         );
         const data = await response.json();
         // const users = {
@@ -38,7 +38,7 @@ export default function UsersPage() {
         toast({
           title: "Whoops!",
           variant: "destructive",
-          description: "Erreur lors de la récupération des données."
+          description: "Erreur lors de la récupération des données.",
         });
       }
     };
