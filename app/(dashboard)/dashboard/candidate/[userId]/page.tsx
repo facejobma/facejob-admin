@@ -20,11 +20,11 @@ export default function Page() {
   );
   const { userId } = useParams();
 
-  console.log("userId, ", userId);
+
 
   const breadcrumbItems = [
-    { title: "User", link: "/dashboard/user" },
-    { title: "Create", link: "/dashboard/user/create" },
+    { title: "User", link: "/dashboard/candidate" },
+    { title: "Create", link: "/dashboard/candidate/create" },
   ];
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function Page() {
           // Set the candidate data in the state
           setCandidateData({ first_name, sector, email, tel, bio });
         } catch (error) {
-          console.error("Error fetching candidate data:", error);
+          //todo handle this error
         }
       };
 

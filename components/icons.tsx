@@ -15,6 +15,7 @@ import {
   LayoutDashboardIcon,
   Loader2,
   LogIn,
+  LogOut,
   LucideIcon,
   LucideProps,
   Moon,
@@ -28,7 +29,7 @@ import {
   User,
   User2Icon,
   UserX2Icon,
-  X,
+  X
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -79,4 +80,5 @@ export const Icons = {
   ),
   twitter: Twitter,
   check: Check,
+  logout: LogOut
 };

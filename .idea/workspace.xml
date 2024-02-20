@@ -4,10 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="update user component">
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/employee/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/employee/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/user-tables/client.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/user-tables/client.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="remove localstorage">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/employee/[employeeId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/[employeeId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/employee/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/kanban/page.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/user/[userId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/[userId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/user/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/uploadthing/core.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/uploadthing/core.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/icons.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/icons.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/kanban/board-column.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/kanban/column-action.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/kanban/kanban-board.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/kanban/new-section-dialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/kanban/new-task-dialog.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/kanban/task-card.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/constants/data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/constants/data.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,24 +46,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/sohaib/Desktop/facejob_admin",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "/home/sohaib/Desktop/facejob_admin/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/sohaib/Desktop/facejob_admin&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/sohaib/Desktop/facejob_admin/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/public" />
@@ -76,7 +88,9 @@
       <workItem from="1708157726069" duration="108000" />
       <workItem from="1708157835632" duration="1044000" />
       <workItem from="1708267354568" duration="599000" />
-      <workItem from="1708275045276" duration="1214000" />
+      <workItem from="1708275045276" duration="1508000" />
+      <workItem from="1708347443293" duration="441000" />
+      <workItem from="1708443490501" duration="1180000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -102,7 +116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708158276309</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="remove localstorage">
+      <option name="closed" value="true" />
+      <created>1708276542979</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1708276542979</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -113,6 +135,7 @@
     <MESSAGE value="todo complete SessionProvider.tsx" />
     <MESSAGE value="translate to french" />
     <MESSAGE value="update user component" />
-    <option name="LAST_COMMIT_MESSAGE" value="update user component" />
+    <MESSAGE value="remove localstorage" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove localstorage" />
   </component>
 </project>
