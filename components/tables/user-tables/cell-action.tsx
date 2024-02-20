@@ -34,7 +34,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`, 
+            Authorization: `Bearer ${authToken}`,
           },
         },
       );
@@ -57,7 +57,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
-        onConfirm={onDelete} 
+        onConfirm={onDelete}
         loading={loading}
       />
       <DropdownMenu modal={false}>

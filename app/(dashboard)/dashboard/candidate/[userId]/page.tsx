@@ -5,6 +5,7 @@ import BreadCrumb from "@/components/breadcrumb";
 import { ProductForm } from "@/components/forms/product-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface CandidateData {
   first_name: string;
@@ -20,8 +21,6 @@ export default function Page() {
   );
   const { userId } = useParams();
 
-
-
   const breadcrumbItems = [
     { title: "User", link: "/dashboard/candidate" },
     { title: "Create", link: "/dashboard/candidate/create" },
@@ -32,7 +31,7 @@ export default function Page() {
       // Fetch candidate data using userId
       const fetchCandidateData = async () => {
         try {
-          const authToken = localStorage.getItem("authToken");
+          const authToken = Cookies.get("authToken");
 
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/candidate/${userId}`,
@@ -45,10 +44,8 @@ export default function Page() {
           );
           const data = await response.json();
 
-          // Assuming your API response contains properties like firstName, sector, email, tel
           const { first_name, sector, email, tel, bio } = data;
 
-          // Set the candidate data in the state
           setCandidateData({ first_name, sector, email, tel, bio });
         } catch (error) {
           //todo handle this error

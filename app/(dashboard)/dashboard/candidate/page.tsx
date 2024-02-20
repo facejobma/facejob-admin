@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
 import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
+import Cookies from "js-cookie";
 
-const breadcrumbItems = [{ title: "Candidat", link: "/dashboard/candidat" }];
+const breadcrumbItems = [{ title: "Candidat", link: "/dashboard/candidate" }];
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const { toast } = useToast();
-
+  const authToken = Cookies.get("authToken");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,6 +19,7 @@ export default function UsersPage() {
           process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/candidates",
           {
             headers: {
+              Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
           },
@@ -41,7 +43,7 @@ export default function UsersPage() {
     };
 
     fetchData();
-  }, [toast]);
+  }, [authToken]);
 
   return (
     <>

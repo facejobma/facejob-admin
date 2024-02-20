@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Entrez une adresse courriel valide" }),
@@ -45,7 +46,7 @@ export default function UserAuthForm() {
 
         const { token } = data;
 
-        localStorage.setItem('authToken', token);
+        Cookies.set("authToken", token, { expires: 7 });
 
         if (res.ok) {
           toast({

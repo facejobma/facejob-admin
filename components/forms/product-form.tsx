@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "../ui/use-toast";
 import FileUpload from "../file-upload";
+import Cookies from "js-cookie";
 
 const ImgSchema = z.object({
   fileName: z.string(),
@@ -90,7 +91,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
       // Extract candidate ID from params
       const candidateId = params.userId;
-      const authToken = localStorage.getItem("authToken");
+      const authToken = Cookies.get("authToken");
 
       console.log("candidateId, ", candidateId);
 
