@@ -4,22 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="remove localstorage">
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="remove some pages">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/employee/[employeeId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/[employeeId]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/employee/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/kanban/page.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/user/[userId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/[userId]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/user/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/uploadthing/core.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/uploadthing/core.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/icons.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/icons.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/kanban/board-column.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/kanban/column-action.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/kanban/kanban-board.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/kanban/new-section-dialog.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/kanban/new-task-dialog.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/kanban/task-card.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants/data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/constants/data.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,7 +76,8 @@
       <workItem from="1708267354568" duration="599000" />
       <workItem from="1708275045276" duration="1508000" />
       <workItem from="1708347443293" duration="441000" />
-      <workItem from="1708443490501" duration="1180000" />
+      <workItem from="1708443490501" duration="1299000" />
+      <workItem from="1708465402157" duration="6000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -124,7 +111,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708276542979</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="remove some pages">
+      <option name="closed" value="true" />
+      <created>1708444876361</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1708444876361</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -136,6 +131,7 @@
     <MESSAGE value="translate to french" />
     <MESSAGE value="update user component" />
     <MESSAGE value="remove localstorage" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove localstorage" />
+    <MESSAGE value="remove some pages" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove some pages" />
   </component>
 </project>
