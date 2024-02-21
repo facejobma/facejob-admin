@@ -1,6 +1,5 @@
-"use client";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Trash } from "lucide-react";
@@ -18,17 +17,9 @@ import {
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-// import FileUpload from "@/components/FileUpload";
 import { useToast } from "../ui/use-toast";
-import FileUpload from "../file-upload";
+import Cookies from "js-cookie";
+
 const ImgSchema = z.object({
   fileName: z.string(),
   name: z.string(),
@@ -39,20 +30,21 @@ const ImgSchema = z.object({
   fileUrl: z.string(),
   url: z.string(),
 });
+
 export const IMG_MAX_LIMIT = 3;
+
 const formSchema = z.object({
-  name: z
+  company_name: z
     .string()
-    .min(3, { message: "Product Name must be at least 3 characters" }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: "You can only add up to 3 images" })
-    .min(1, { message: "At least one image must be added." }),
+    .min(3, { message: "Company Name must be at least 3 characters" }),
+  secteur: z
+    .string()
+    .min(3, { message: "secteur must be at least 3 characters" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  phone: z.string().min(10, { message: "Invalid phone number" }),
   description: z
     .string()
-    .min(3, { message: "Product description must be at least 3 characters" }),
-  price: z.coerce.number(),
-  category: z.string().min(1, { message: "Please select a category" }),
+    .min(3, { message: "Description must be at least 3 characters" }),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -69,22 +61,16 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
-  const title = initialData ? "Edit product" : "Create product";
-  const description = initialData ? "Edit a product." : "Add a new product";
-  const toastMessage = initialData ? "Product updated." : "Product created.";
-  const action = initialData ? "Save changes" : "Create";
 
   const defaultValues = initialData
     ? initialData
     : {
-        name: "",
+        company_name: "",
+        secteur: "",
+        email: "",
+        phone: "",
         description: "",
-        price: 0,
-        imgUrl: [],
-        category: "",
       };
 
   const form = useForm<ProductFormValues>({
@@ -95,24 +81,44 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
+
+      const enterpriseId = params.enterpriseId;
+      const authToken = Cookies.get("authToken");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/updateId/${enterpriseId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        },
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          variant: "default",
+          description: "Enterprise data saved successfully!",
+        });
+
+        if (enterpriseId) {
+          router.push(`/dashboard/entreprise/${enterpriseId}`);
+        } else {
+          router.push("/dashboard/entreprise");
+        }
       } else {
-        // const res = await axios.post(`/api/products/create-product`, data);
-        // console.log("product", res);
+        throw new Error("Failed to save enterprise data");
       }
-      router.refresh();
-      router.push(`/dashboard/products`);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
     } catch (error: any) {
       toast({
+        title: "Error",
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description:
+          error.message || "An error occurred while saving enterprise data.",
       });
     } finally {
       setLoading(false);
@@ -122,34 +128,60 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true);
-      //   await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
-      router.refresh();
-      router.push(`/${params.storeId}/products`);
+
+      const enterpriseId = params.enterpriseId;
+      const authToken = Cookies.get("authToken");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entreprise/delete/${enterpriseId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          variant: "default",
+          description: "Enterprise deleted successfully!",
+        });
+
+        router.push("/dashboard/entreprise");
+      } else {
+        throw new Error("Failed to delete enterprise");
+      }
     } catch (error: any) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description:
+          error.message || "An error occurred while deleting the enterprise.",
+      });
     } finally {
       setLoading(false);
-      setOpen(false);
     }
   };
 
-  const triggerImgUrlValidation = () => form.trigger("imgUrl");
+  function setOpen(arg0: boolean): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <>
-      {/* <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      /> */}
       <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
+        <Heading
+          title="Enterprise Form"
+          description="Edit or Create an Enterprise"
+        />
         {initialData && (
           <Button
             disabled={loading}
             variant="destructive"
             size="sm"
-            onClick={() => setOpen(true)}
+            onClick={onDelete}
           >
             <Trash className="h-4 w-4" />
           </Button>
@@ -163,105 +195,91 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
         >
           <FormField
             control={form.control}
-            name="imgUrl"
+            name="company_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Images</FormLabel>
+                <FormLabel>Company Name</FormLabel>
                 <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
+                  <Input
+                    disabled={loading}
+                    placeholder="Enterprise's company name"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Product name"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Product description"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input type="number" disabled={loading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
+          <FormField
+            control={form.control}
+            name="secteur"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Secteur</FormLabel>
+                <FormControl>
+                  <Input
                     disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a category"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {/* @ts-ignore  */}
-                      {categories.map((category) => (
-                        <SelectItem key={category._id} value={category._id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    placeholder="Enterprise's secteur"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Enterprise's email"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Enterprise's phone number"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Enterprise's description"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
+            Save
           </Button>
         </form>
       </Form>
