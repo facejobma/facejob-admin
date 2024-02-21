@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { UserEnterprise } from "@/components/tables/user-tables/entreprises";
 
 const breadcrumbItems = [
-  { title: "Enterprise", link: "/dashboard/entreprise" },
+  { title: "Entreprise", link: "/dashboard/entreprise" },
 ];
 
 export default function UsersPage() {

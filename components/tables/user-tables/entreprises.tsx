@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { Employee } from "@/constants/data";
+import { Entreprise } from "@/constants/data";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { columns } from "@/components/tables/employee-tables/columns";
 import { FC } from "react";
 
 interface ProductsClientProps {
-  data: Employee[];
+  data: Entreprise[];
 }
 
 export const UserEnterprise: FC<ProductsClientProps> = ({ data }) => {

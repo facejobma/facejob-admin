@@ -10,14 +10,14 @@ export type User = {
   bio: string;
 };
 
-export type Employee = {
+export type Entreprise = {
   id: number;
   company_name: string;
   secteur: string;
   email: string;
   phone: string;
   adresse: string;
-  site_web: string; // Consider using a proper date type if possible
+  site_web: string;
   effectif: string;
   description: string;
 };
