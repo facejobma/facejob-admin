@@ -43,6 +43,10 @@ const ImgSchema = z.object({
 export const IMG_MAX_LIMIT = 3;
 
 const formSchema = z.object({
+  imgUrl: z
+    .array(ImgSchema)
+    .max(IMG_MAX_LIMIT, { message: "You can only add up to 3 images" })
+    .min(1, { message: "At least one image must be added." }),
   first_name: z
     .string()
     .min(3, { message: "First Name must be at least 3 characters" }),
@@ -78,6 +82,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         email: "",
         tel: "",
         bio: "",
+        imgUrl: [],
       };
 
   const form = useForm<ProductFormValues>({
@@ -212,6 +217,23 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
+          <FormField
+            control={form.control}
+            name="imgUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Images</FormLabel>
+                <FormControl>
+                  <FileUpload
+                    onChange={field.onChange}
+                    onRemove={field.onChange}
+                    value={field.value || []}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="first_name"

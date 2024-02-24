@@ -1,4 +1,3 @@
-
 import { NavItem } from "@/types";
 
 export type User = {
@@ -11,6 +10,7 @@ export type User = {
 };
 
 export type Entreprise = {
+  logo: string;
   id: number;
   company_name: string;
   secteur: string;

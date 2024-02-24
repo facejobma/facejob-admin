@@ -21,12 +21,15 @@ export const columns: ColumnDef<User>[] = [
         aria-label="Select row"
       />
     ),
-    enableSorting: false,
-    enableHiding: false,
+    // enableSorting: false,
+    // enableHiding: false,
   },
   {
     accessorKey: "first_name",
     header: "NOM COMPLETE",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "sector",

@@ -19,7 +19,10 @@ export const UserClient: FC<ProductsClientProps> = ({ data }) => {
   return (
     <>
       <div className="flex items-start justify-between">
-        <Heading title={`Candidats (${data.length})`} description="Management des candidats" />
+        <Heading
+          title={`Candidats (${data.length})`}
+          description="Management des candidats"
+        />
         <Button
           className="text-xs md:text-sm"
           onClick={() => router.push(`/dashboard/user/update`)}
@@ -28,7 +31,7 @@ export const UserClient: FC<ProductsClientProps> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="name" columns={columns} data={data} />
+      <DataTable searchKey="first_name" columns={columns} data={data} />
     </>
   );
 };

@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { EntrepriseForm } from "@/components/forms/entreprise-form";
 
 interface EnterpriseData {
+  logo: string;
   company_name: string;
   secteur: string;
   email: string;
@@ -56,6 +57,7 @@ export default function Page() {
             site_web,
             effectif,
             description,
+            logo,
           } = data;
 
           setEnterpriseData({
@@ -67,9 +69,11 @@ export default function Page() {
             site_web,
             effectif,
             description,
+            logo
           });
         } catch (error) {
-          // TODO: Handle this error
+          console.log(error);
+          
         }
       };
 

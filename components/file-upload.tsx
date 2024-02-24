@@ -9,10 +9,11 @@ import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 
 interface ImageUploadProps {
-  onChange?: any;
+  onChange: (newFiles: UploadFileResponse[]) => void;
   onRemove: (value: UploadFileResponse[]) => void;
   value: UploadFileResponse[];
 }
+
 
 export default function FileUpload({
   onChange,

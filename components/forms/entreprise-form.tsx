@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Trash } from "lucide-react";
@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 import { useToast } from "../ui/use-toast";
 import Cookies from "js-cookie";
+import FileUpload from "../file-upload";
 
 const ImgSchema = z.object({
   fileName: z.string(),
@@ -34,6 +35,10 @@ const ImgSchema = z.object({
 export const IMG_MAX_LIMIT = 3;
 
 const formSchema = z.object({
+  imgUrl: z
+    .array(ImgSchema)
+    .max(IMG_MAX_LIMIT, { message: "You can only add up to 3 images" })
+    .min(1, { message: "At least one image must be added." }),
   company_name: z
     .string()
     .min(3, { message: "Company Name must be at least 3 characters" }),
@@ -71,6 +76,7 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
         email: "",
         phone: "",
         description: "",
+        imgUrl: [],
       };
 
   const form = useForm<ProductFormValues>({
@@ -133,7 +139,7 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/entreprise/delete/${enterpriseId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/entreprise/delete/${enterpriseId}`,
         {
           method: "DELETE",
           headers: {
@@ -165,9 +171,11 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  function setOpen(arg0: boolean): void {
-    throw new Error("Function not implemented.");
-  }
+  // function setOpen(arg0: boolean): void {
+  //   throw new Error("Function not implemented.");
+  // }
+
+  const triggerImgUrlValidation = () => form.trigger("imgUrl");
 
   return (
     <>
@@ -193,6 +201,23 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
+          <FormField
+            control={form.control}
+            name="imgUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Images</FormLabel>
+                <FormControl>
+                  <FileUpload
+                    onChange={field.onChange}
+                    onRemove={field.onChange}
+                    value={field.value || []}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="company_name"
