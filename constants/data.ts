@@ -42,6 +42,12 @@ export const navItems: NavItem[] = [
     label: "employee",
   },
   {
+    title: "Requests",
+    href: "/dashboard/requests",
+    icon: "request",
+    label: "request",
+  },
+  {
     title: "Logout",
     href: "/",
     icon: "logout",

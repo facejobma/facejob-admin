@@ -35,13 +35,15 @@ export function DashboardNav({ items, setOpen }: DashboardNavProps) {
             >
               <span
                 className={cn(
-                  "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                  path === item.href ? "bg-accent" : "transparent",
+                  "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition duration-300 ease-in-out",
+                  path === item.href
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-accent hover:text-accent-foreground",
                   item.disabled && "cursor-not-allowed opacity-80",
                 )}
               >
-                <Icon className="mr-2 h-4 w-4" />
-                <span>{item.title}</span>
+                <Icon className="mr-2 h-5 w-5" />
+                <span className="flex-shrink-0">{item.title}</span>
               </span>
             </Link>
           )

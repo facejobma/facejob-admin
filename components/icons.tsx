@@ -28,8 +28,11 @@ import {
   Twitter,
   User,
   User2Icon,
-  UserX2Icon,
-  X
+  // UserX2Icon,
+  X,
+  Building2,
+  CheckSquare,
+  ArrowLeft
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -45,7 +48,8 @@ export const Icons = {
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
   trash: Trash,
-  employee: UserX2Icon,
+  employee: Building2,
+  request: CheckSquare,
   post: FileText,
   page: File,
   media: Image,
@@ -56,6 +60,7 @@ export const Icons = {
   warning: AlertTriangle,
   user: User,
   arrowRight: ArrowRight,
+  arrowLeft: ArrowLeft,
   help: HelpCircle,
   pizza: Pizza,
   sun: SunMedium,
@@ -80,5 +85,5 @@ export const Icons = {
   ),
   twitter: Twitter,
   check: Check,
-  logout: LogOut
+  logout: LogOut,
 };
