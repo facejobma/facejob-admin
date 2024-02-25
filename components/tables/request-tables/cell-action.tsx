@@ -89,8 +89,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <XSquare className="mr-2 h-4 w-4" /> Decline
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => {
-            }}
+            onClick={() => router.push(`/dashboard/requests/${data.id}`)}
           >
             <View className="mr-2 h-4 w-4" /> Consult
           </DropdownMenuItem>
