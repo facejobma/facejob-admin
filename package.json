@@ -34,17 +34,17 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@tanstack/react-table": "^8.10.7",
     "@types/node": "20.11.19",
-    "@types/react": "18.2.21",
+    "@types/react": "18.2.58",
     "@types/react-dom": "18.2.7",
     "@uploadthing/react": "^5.7.0",
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
-    "eslint": "8.56.0",
+    "eslint": "8.57.0",
     "eslint-config-next": "^14.0.1",
     "js-cookie": "^3.0.5",
-    "lucide-react": "^0.291.0",
+    "lucide-react": "^0.341.0",
     "next": "^14.0.1",
     "next-navigation": "^1.0.6",
     "next-themes": "^0.2.1",
@@ -53,7 +53,7 @@
     "react-day-picker": "^8.9.1",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
-    "recharts": "^2.9.2",
+    "recharts": "^2.12.1",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
@@ -66,7 +66,7 @@
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
     "@types/uuid": "^9.0.7",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
     "prettier": "3.2.5"
   }
 }
