@@ -20,6 +20,7 @@ export type Entreprise = {
   site_web: string;
   effectif: string;
   description: string;
+  isVerified: string;
 };
 
 export const navItems: NavItem[] = [

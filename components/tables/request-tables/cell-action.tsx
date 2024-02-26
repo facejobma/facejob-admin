@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
+import Cookies from "js-cookie";
 
 interface CellActionProps {
   data: Entreprise;
@@ -25,7 +26,7 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const authToken = Cookies.get("authToken");
 
   const onDelete = async () => {
     try {
@@ -58,6 +59,33 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
+  const onVerify = async (isVerified: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/accept/${data.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isVerified,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        console.log("Candidate deleted successfully!");
+      } else {
+        console.error("Failed to delete candidate");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <AlertModal
@@ -78,12 +106,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <DropdownMenuItem
             onClick={() => {
+              onVerify("Accepted");
             }}
           >
             <CheckSquare className="mr-2 h-4 w-4" /> Accept
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
+              onVerify("Declined");
             }}
           >
             <XSquare className="mr-2 h-4 w-4" /> Decline
@@ -94,14 +124,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <View className="mr-2 h-4 w-4" /> Consult
           </DropdownMenuItem>
-          {/* <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/candidate/${data.id}`)}
-          >
-            <Edit className="mr-2 h-4 w-4" /> Update
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4" /> Delete
-          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

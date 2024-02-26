@@ -1,4 +1,3 @@
-"use client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Entreprise } from "@/constants/data";
 import { ColumnDef } from "@tanstack/react-table";
@@ -25,8 +24,8 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'company_name',
-    header: 'Company Name',
+    accessorKey: "company_name",
+    header: "Company Name",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true,
@@ -44,8 +43,21 @@ export const columns: ColumnDef<Entreprise>[] = [
     header: "TEL",
   },
   {
-    accessorKey: "status",
+    accessorKey: "isVerified",
     header: "Status",
+    // cell: ({ value }) => (
+    //   <span
+    //     className={
+    //       value === "Accepted"
+    //         ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
+    //         : value === "Declined"
+    //         ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
+    //         : "text-gray-600" // Default style for other values
+    //     }
+    //   >
+    //     {value}
+    //   </span>
+    // ),
   },
   {
     id: "actions",

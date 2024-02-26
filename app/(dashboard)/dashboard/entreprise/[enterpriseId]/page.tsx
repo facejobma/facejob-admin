@@ -17,6 +17,7 @@ interface EnterpriseData {
   site_web: string;
   effectif: string;
   description: string;
+  status: string;
 }
 
 export default function Page() {
@@ -27,7 +28,7 @@ export default function Page() {
 
   const breadcrumbItems = [
     { title: "Entreprise", link: "/dashboard/entreprise" },
-    { title: "Create", link: "/dashboard/entreprise/create" },
+    { title: "Update", link: "/dashboard/entreprise/update" },
   ];
 
   useEffect(() => {
@@ -58,6 +59,7 @@ export default function Page() {
             effectif,
             description,
             logo,
+            status,
           } = data;
 
           setEnterpriseData({
@@ -69,11 +71,11 @@ export default function Page() {
             site_web,
             effectif,
             description,
-            logo
+            logo,
+            status,
           });
         } catch (error) {
           console.log(error);
-          
         }
       };
 
