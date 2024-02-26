@@ -4,14 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="clean not needed component">
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="fix some issues">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/forms/product-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/product-form.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/cell-action.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/request-tables/cell-action.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/client.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/user-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/user-tables/cell-action.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +81,7 @@
       <workItem from="1708892128552" duration="17000" />
       <workItem from="1708957411420" duration="38000" />
       <workItem from="1708957465791" duration="894000" />
+      <workItem from="1708959176954" duration="694000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -128,7 +123,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708444876361</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fix some issues">
+      <option name="closed" value="true" />
+      <created>1708959323134</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1708959323134</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -141,6 +144,7 @@
     <MESSAGE value="update user component" />
     <MESSAGE value="remove localstorage" />
     <MESSAGE value="remove some pages" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove some pages" />
+    <MESSAGE value="fix some issues" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix some issues" />
   </component>
 </project>
