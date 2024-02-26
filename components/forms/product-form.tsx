@@ -1,6 +1,6 @@
 "use client";
 import * as z from "zod";
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Trash } from "lucide-react";
@@ -10,21 +10,14 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { useToast } from "../ui/use-toast";
 import FileUpload from "../file-upload";
 import Cookies from "js-cookie";
@@ -37,7 +30,7 @@ const ImgSchema = z.object({
   fileKey: z.string(),
   key: z.string(),
   fileUrl: z.string(),
-  url: z.string(),
+  url: z.string()
 });
 
 export const IMG_MAX_LIMIT = 3;
@@ -55,7 +48,7 @@ const formSchema = z.object({
     .min(3, { message: "Sector must be at least 3 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   tel: z.string().min(10, { message: "Invalid phone number" }),
-  bio: z.string().min(3, { message: "Bio must be at least 3 characters" }),
+  bio: z.string().min(3, { message: "Bio must be at least 3 characters" })
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -66,9 +59,8 @@ interface ProductFormProps {
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
-  initialData,
-  categories,
-}) => {
+                                                          initialData
+                                                        }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -77,17 +69,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const defaultValues = initialData
     ? initialData
     : {
-        first_name: "",
-        sector: "",
-        email: "",
-        tel: "",
-        bio: "",
-        imgUrl: [],
-      };
+      first_name: "",
+      sector: "",
+      email: "",
+      tel: "",
+      bio: "",
+      imgUrl: []
+    };
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues
   });
 
   const onSubmit = async (data: ProductFormValues) => {
@@ -98,7 +90,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       const candidateId = params.userId;
       const authToken = Cookies.get("authToken");
 
-      console.log("candidateId, ", candidateId);
 
       // Send a request to the API endpoint
       const response = await fetch(
@@ -108,19 +99,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           headers: {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify(data),
-        },
+          body: JSON.stringify(data)
+        }
       );
 
       // Check if the request was successful
       if (response.ok) {
         // Display success toast
         toast({
-          title: "Success",
+          title: "succès",
           variant: "default",
-          description: "Candidate data saved successfully!",
+          description: "Candidate data saved successfully!"
         });
 
         // Redirect to the dashboard or candidate details page
@@ -131,7 +122,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         }
       } else {
         // If the request was not successful, display an error toast
-        throw new Error("Failed to save candidate data");
+        toast({
+          title: "Whoops !",
+          variant: "destructive",
+          description: "Erreur lors de la récupération des données."
+        });
       }
     } catch (error: any) {
       // Display error toast
@@ -139,7 +134,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         title: "Error",
         variant: "destructive",
         description:
-          error.message || "An error occurred while saving candidate data.",
+          error.message || "An error occurred while saving candidate data."
       });
     } finally {
       setLoading(false);
@@ -160,21 +155,25 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        },
+            Authorization: `Bearer ${authToken}`
+          }
+        }
       );
 
       if (response.ok) {
         toast({
           title: "Success",
           variant: "default",
-          description: "Candidate deleted successfully!",
+          description: "Candidate deleted successfully!"
         });
 
         router.push("/dashboard/products");
       } else {
-        throw new Error("Failed to delete candidate");
+        toast({
+          title: "Whoops !",
+          variant: "destructive",
+          description: "Erreur lors de la suppression du candidat."
+        });
       }
     } catch (error: any) {
       // Display error toast
@@ -182,7 +181,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         title: "Error",
         variant: "destructive",
         description:
-          error.message || "An error occurred while deleting the candidate.",
+          error.message || "An error occurred while deleting the candidate."
       });
     } finally {
       setLoading(false);

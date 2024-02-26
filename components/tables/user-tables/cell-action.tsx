@@ -5,12 +5,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { User } from "@/constants/data";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CellActionProps {
   data: User;
@@ -20,6 +21,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const onDelete = async () => {
     try {
@@ -27,20 +29,23 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
       const authToken = localStorage.getItem("authToken");
 
-      console.log("Data.id, ", data.id);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/candidate/delete/${data.id}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        },
+            Authorization: `Bearer ${authToken}`
+          }
+        }
       );
 
       if (response.ok) {
-        console.log("Candidate deleted successfully!");
+        toast({
+          title: "Success !",
+          variant: "default",
+          description: "le candidat est supprimé avec succès "
+        });
       } else {
         console.error("Failed to delete candidate");
       }

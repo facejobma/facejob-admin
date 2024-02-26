@@ -4,8 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="remove some pages">
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="clean not needed component">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/product-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/product-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/cell-action.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/request-tables/cell-action.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/client.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/user-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/user-tables/cell-action.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +45,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/sohaib/Desktop/facejob_admin&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/sohaib/Desktop/badeel_morocco&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -78,6 +84,9 @@
       <workItem from="1708347443293" duration="441000" />
       <workItem from="1708443490501" duration="1299000" />
       <workItem from="1708465402157" duration="6000" />
+      <workItem from="1708892128552" duration="17000" />
+      <workItem from="1708957411420" duration="38000" />
+      <workItem from="1708957465791" duration="894000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />

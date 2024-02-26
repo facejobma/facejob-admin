@@ -25,13 +25,7 @@ export default function UsersPage() {
           },
         );
         const data = await response.json();
-        // const users = {
-        //   nomComplete: data.first_name + " " + data.last_name,
-        //   secteur: data.sector,
-        //   email: data.email,
-        //   tel: data.tel,
-        //   bio: data.bio,
-        // };
+
         setUsers(data);
       } catch (error) {
         toast({
@@ -43,7 +37,7 @@ export default function UsersPage() {
     };
 
     fetchData();
-  }, [authToken]);
+  }, [authToken, toast]);
 
   return (
     <>
