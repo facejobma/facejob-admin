@@ -45,19 +45,19 @@ export const columns: ColumnDef<Entreprise>[] = [
   {
     accessorKey: "isVerified",
     header: "Status",
-    // cell: ({ value }) => (
-    //   <span
-    //     className={
-    //       value === "Accepted"
-    //         ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
-    //         : value === "Declined"
-    //         ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
-    //         : "text-gray-600" // Default style for other values
-    //     }
-    //   >
-    //     {value}
-    //   </span>
-    // ),
+    cell: ({ row }) => (
+      <div
+        className={
+          row.original.isVerified === "Accepted"
+            ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
+            : row.original.isVerified === "Declined"
+              ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
+              : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
+        }
+      >
+        {row.original.isVerified}
+      </div>
+    ),
   },
   {
     id: "actions",

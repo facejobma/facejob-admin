@@ -32,6 +32,7 @@ export function DataTable<TData, TValue>({
   searchKey,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
+  const [selectValue, setSelectValue] = useState<string>("");
   const table = useReactTable({
     data,
     columns,
@@ -43,14 +44,33 @@ export function DataTable<TData, TValue>({
     table.getColumn(searchKey)?.setFilterValue(searchValue);
   }, [searchKey, searchValue]);
 
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSelectValue(selectedValue);
+
+    table.setGlobalFilter(selectedValue);
+  };
+
   return (
     <>
-      <Input
-        placeholder={`Search ${searchKey}...`}
-        value={searchValue}
-        onChange={(event) => setSearchValue(event.target.value)}
-        className="w-full md:max-w-sm"
-      />
+      <div className="flex space-x-2">
+        <Input
+          placeholder={`Search ${searchKey}...`}
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.target.value)}
+          className="w-full md:max-w-sm"
+        />
+        <select
+          value={selectValue || ""}
+          onChange={handleSelectChange}
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+        >
+          {/* <option value="">All</option> */}
+          <option value="Pending">Pending</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Declined">Declined</option>
+        </select>
+      </div>
       <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
         <Table className="relative">
           <TableHeader>
