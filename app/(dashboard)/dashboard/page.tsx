@@ -1,3 +1,4 @@
+"use client";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { Overview } from "@/components/overview";
 import { RecentSales } from "@/components/recent-sales";
@@ -10,8 +11,36 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { Statistiques } from "@/types";
 
-export default function page() {
+
+function OverViewTab() {
+  const [stats, setStats] = useState({} as Statistiques);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    async function getStats() {
+      await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/statics")
+        .then((response) => response.json())
+        .then((result) => {
+          setStats(result);
+        })
+        .catch((error) => {
+            toast({
+              title: "Whoops!",
+              variant: "destructive",
+              description: error.message
+            });
+          }
+        );
+    }
+
+    getStats();
+  }, [toast]);
+
+
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -31,11 +60,11 @@ export default function page() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Total Revenue
+                    Total des secteurs
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -51,16 +80,16 @@ export default function page() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">
-                    +20.1% from last month
-                  </p>
+                  <div className="text-2xl font-bold">{stats.secteurs}</div>
+                  {/*<p className="text-xs text-muted-foreground">*/}
+                  {/*  +20.1% from last month*/}
+                  {/*</p>*/}
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Subscriptions
+                    Total des postules
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -78,15 +107,15 @@ export default function page() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+2350</div>
-                  <p className="text-xs text-muted-foreground">
-                    +180.1% from last month
-                  </p>
+                  <div className="text-2xl font-bold">{stats.postules}</div>
+                  {/*<p className="text-xs text-muted-foreground">*/}
+                  {/*  +180.1% from last month*/}
+                  {/*</p>*/}
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
+                  <CardTitle className="text-sm font-medium">Total d&apos;offres</CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -102,16 +131,18 @@ export default function page() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
-                  <p className="text-xs text-muted-foreground">
-                    +19% from last month
-                  </p>
+                  <div className="text-2xl font-bold">{
+                    stats.offres
+                  }</div>
+                  {/*<p className="text-xs text-muted-foreground">*/}
+                  {/*  +19% from last month*/}
+                  {/*</p>*/}
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
-                    Active Now
+                    Nombre de candidats
                   </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -127,10 +158,34 @@ export default function page() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+573</div>
-                  <p className="text-xs text-muted-foreground">
-                    +201 since last hour
-                  </p>
+                  <div className="text-2xl font-bold">{
+                    stats.users
+                  }</div>
+                  {/*<p className="text-xs text-muted-foreground">*/}
+                  {/*  +201 since last hour*/}
+                  {/*</p>*/}
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Nombre d&apos;entreprises
+                  </CardTitle>
+
+                  <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none"
+                       xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M9 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7H15M9 7V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7M9 7H15"
+                      stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{
+                    stats.entreprises
+                  }</div>
+                  {/*<p className="text-xs text-muted-foreground">*/}
+                  {/*  +201 since last hour*/}
+                  {/*</p>*/}
                 </CardContent>
               </Card>
             </div>
@@ -160,4 +215,8 @@ export default function page() {
       </div>
     </ScrollArea>
   );
+}
+
+export default function page() {
+  return <OverViewTab />;
 }
