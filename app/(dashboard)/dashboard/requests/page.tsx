@@ -6,9 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { EnterpriseRequests } from "@/components/tables/request-tables/requests";
 
-const breadcrumbItems = [
-  { title: "Requests", link: "/dashboard/requests" },
-];
+const breadcrumbItems = [{ title: "Requests", link: "/dashboard/requests" }];
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);

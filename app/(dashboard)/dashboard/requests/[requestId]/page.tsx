@@ -26,7 +26,7 @@ export default function Page() {
   const { requestId } = useParams();
 
   const breadcrumbItems = [
-    { title: "Entreprise", link: "/dashboard/request" },
+    { title: "Entreprise", link: "/dashboard/requests" },
     { title: "Consult", link: "/dashboard/requests/Consult" },
   ];
 

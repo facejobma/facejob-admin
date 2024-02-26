@@ -16,7 +16,7 @@ import {
   View,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface CellActionProps {
   data: Entreprise;
@@ -25,18 +25,16 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const authToken = localStorage.getItem("authToken");
   const router = useRouter();
 
   const onDelete = async () => {
     try {
       setLoading(true);
-
-      const authToken = localStorage.getItem("authToken");
-
       console.log("Data.id, ", data.id);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/candidate/delete/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/candidate/accept/${data.id}`,
         {
           method: "DELETE",
           headers: {
@@ -58,6 +56,30 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
+  const onAccept = async () => {
+    try {
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/candidate/delete/${data.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        console.log("Candidate deleted successfully!");
+      } else {
+        console.error("Failed to delete candidate");
+      }
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <>
       <AlertModal
@@ -76,16 +98,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          <DropdownMenuItem
-            onClick={() => {
-            }}
-          >
+          <DropdownMenuItem onClick={() => {}}>
             <CheckSquare className="mr-2 h-4 w-4" /> Accept
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-            }}
-          >
+          <DropdownMenuItem onClick={() => {}}>
             <XSquare className="mr-2 h-4 w-4" /> Decline
           </DropdownMenuItem>
           <DropdownMenuItem
