@@ -26,6 +26,11 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
 }
 
+interface OptionData {
+  id: number;
+  name: string;
+}
+
 export function CandidateDataTable<TData, TValue>({
   columns,
   data,
@@ -33,12 +38,23 @@ export function CandidateDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
+  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+      .then((response) => response.json())
+      .then((data) => setSecteurOptions(data))
+      .catch((error) => {
+        throw new Error("Error fetching secteur options:", error);
+      });
+  }, []);
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
@@ -66,9 +82,11 @@ export function CandidateDataTable<TData, TValue>({
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Secteur</option>
-          <option value="Pending">Pending</option>
-          <option value="Accepted">Accepted</option>
-          <option value="Declined">Declined</option>
+          {secteurOptions.map((option) => (
+            <option key={option.id} value={option.name}>
+              {option.name}
+            </option>
+          ))}
         </select>
       </div>
       <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
