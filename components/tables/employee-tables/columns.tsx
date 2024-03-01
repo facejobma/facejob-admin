@@ -3,6 +3,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Entreprise } from "@/constants/data";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
+import { TableCell } from "@/components/ui/table";
+import Image from "next/image";
 
 export const columns: ColumnDef<Entreprise>[] = [
   {
@@ -23,6 +25,22 @@ export const columns: ColumnDef<Entreprise>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: "logo",
+    header: "Logo",
+    cell: ({ row }) => (
+      <TableCell>
+        <div className="w-10 h-10 relative rounded-full overflow-hidden">
+          <Image
+            src={row.original.logo}
+            alt={`${row.original.company_name} Logo`}
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
+      </TableCell>
+    ),
   },
   {
     accessorKey: 'company_name',
