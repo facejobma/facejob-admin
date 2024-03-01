@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { DataTable } from "@/components/ui/data-table";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { User } from "@/constants/data";
@@ -8,6 +7,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { columns } from "./columns";
 import { FC } from "react";
+import { CandidateDataTable } from "@/components/ui/candidate-table";
 
 interface ProductsClientProps {
   data: User[];
@@ -31,7 +31,7 @@ export const UserClient: FC<ProductsClientProps> = ({ data }) => {
         </Button>
       </div>
       <Separator />
-      <DataTable searchKey="first_name" columns={columns} data={data} />
+      <CandidateDataTable searchKey="first_name" columns={columns} data={data} />
     </>
   );
 };

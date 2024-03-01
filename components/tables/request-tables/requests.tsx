@@ -14,7 +14,6 @@ interface EntrepriseProps {
 }
 
 export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
-  // const router = useRouter();
 
   return (
     <>

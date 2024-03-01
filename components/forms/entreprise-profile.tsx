@@ -1,5 +1,5 @@
-import { Entreprise } from "@/constants/data";
 import Image from "next/image";
+import { CheckCircle, XCircle } from "lucide-react";
 
 interface EnterpriseData {
   logo: string;
@@ -11,11 +11,16 @@ interface EnterpriseData {
   site_web: string;
   effectif: string;
   description: string;
+  isVerified: string;
 }
 
 export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
   initialData,
 }) => {
+  const isPending = initialData.isVerified === "Pending";
+  const isAccepted = initialData.isVerified === "Accepted";
+  const isDeclined = initialData.isVerified === "Declined";
+
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto mt-8 p-6">
       <div className="flex items-center justify-center">
@@ -29,7 +34,9 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
         </div>
       </div>
 
-      <p className="text-gray-600 text-center mt-4">{initialData.description}</p>
+      <p className="text-gray-600 text-center mt-4">
+        {initialData.description}
+      </p>
 
       <div className="mt-6">
         <div className="mb-4">
@@ -45,7 +52,9 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Website</h2>
-          <p className="text-blue-500 hover:underline">{initialData.site_web}</p>
+          <p className="text-blue-500 hover:underline">
+            {initialData.site_web}
+          </p>
         </div>
 
         <div>
@@ -55,12 +64,30 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
       </div>
 
       <div className="flex justify-end mt-6 space-x-4">
-        <button className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600">
-          Accept
-        </button>
-        <button className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600">
-          Decline
-        </button>
+        {isPending && (
+          <>
+            <button className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600">
+              Accept
+            </button>
+            <button className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600">
+              Decline
+            </button>
+          </>
+        )}
+
+        {isAccepted && (
+          <div className="flex items-center space-x-2">
+            <CheckCircle className="text-green-500 h-6 w-6" />
+            <span className="text-green-500">Accepted</span>
+          </div>
+        )}
+
+        {isDeclined && (
+          <div className="flex items-center space-x-2">
+            <XCircle className="text-red-500 h-6 w-6" />
+            <span className="text-red-500">Declined</span>
+          </div>
+        )}
       </div>
     </div>
   );

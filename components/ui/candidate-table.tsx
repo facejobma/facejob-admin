@@ -26,13 +26,13 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
 }
 
-export function DataTable<TData, TValue>({
+export function CandidateDataTable<TData, TValue>({
   columns,
   data,
   searchKey,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [selectValue, setSelectValue] = useState<string>("Pending");
+  const [selectValue, setSelectValue] = useState<string>("");
   const table = useReactTable({
     data,
     columns,
@@ -44,13 +44,11 @@ export function DataTable<TData, TValue>({
     table.getColumn(searchKey)?.setFilterValue(searchValue);
   }, [searchKey, searchValue]);
 
-  useEffect(() => {
-    table.setGlobalFilter(selectValue);
-  }, [selectValue]);
-
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
+
+    table.setGlobalFilter(selectedValue);
   };
 
   return (
@@ -65,8 +63,9 @@ export function DataTable<TData, TValue>({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
+          <option value="">Secteur</option>
           <option value="Pending">Pending</option>
           <option value="Accepted">Accepted</option>
           <option value="Declined">Declined</option>

@@ -17,6 +17,7 @@ interface EnterpriseData {
   site_web: string;
   effectif: string;
   description: string;
+  isVerified: string;
 }
 
 export default function Page() {
@@ -58,6 +59,7 @@ export default function Page() {
             effectif,
             description,
             logo,
+            isVerified
           } = data;
 
           setEnterpriseData({
@@ -70,6 +72,7 @@ export default function Page() {
             effectif,
             description,
             logo,
+            isVerified
           });
         } catch (error) {
           // console.log(error);

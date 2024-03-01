@@ -5,7 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Entreprise } from "@/constants/data";
 import {
@@ -13,11 +13,12 @@ import {
   XSquare,
   // Edit,
   MoreHorizontal,
-  View
+  View,
 } from "lucide-react";
 
 import { useState } from "react";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface CellActionProps {
   data: Entreprise;
@@ -27,6 +28,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const authToken = Cookies.get("authToken");
+  const router = useRouter();
 
   const onDelete = async () => {
     try {
@@ -34,16 +36,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
       const authToken = localStorage.getItem("authToken");
 
-
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/candidate/delete/${data.id}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`
-          }
-        }
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
       );
 
       if (response.ok) {
@@ -120,6 +120,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
+              router.push(`/dashboard/requests/${data.id}`);
             }}
           >
             <View className="mr-2 h-4 w-4" /> Consult
