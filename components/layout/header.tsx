@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { MobileSidebar } from "./mobile-sidebar";
 import { UserNav } from "./user-nav";
 import { Logo } from "@/components/ui/logo";
+import Notification from "@/components/layout/Notification";
 
 export default function Header() {
   return (
@@ -15,7 +16,8 @@ export default function Header() {
           <MobileSidebar />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-5">
+          <Notification />
           <UserNav />
           <ThemeToggle />
         </div>

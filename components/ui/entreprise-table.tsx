@@ -19,6 +19,7 @@ import {
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
+import { Circles } from "react-loader-spinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -39,6 +40,8 @@ export function EntrepriseDataTable<TData, TValue>({
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const table = useReactTable({
     data,
     columns,
@@ -47,10 +50,16 @@ export function EntrepriseDataTable<TData, TValue>({
   });
 
   useEffect(() => {
+    setLoading(true);
+
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
-      .then((data) => setSecteurOptions(data))
+      .then((data) => {
+        setSecteurOptions(data);
+        setLoading(false);
+      })
       .catch((error) => {
+        setLoading(false);
         throw new Error("Error fetching secteur options:", error);
       });
   }, []);
@@ -88,55 +97,60 @@ export function EntrepriseDataTable<TData, TValue>({
           ))}
         </select>
       </div>
-      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-        <Table className="relative">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getFilteredRowModel().rows.length ? (
-              table.getFilteredRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
+      {loading ? (
+        <div className="flex items-center justify-center h-[calc(80vh-220px)]">
+          <Circles
+            height="80"
+            width="80"
+            color="#4fa94d"
+            ariaLabel="circles-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+        </div>
+      ) : (
+        <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
+          <Table className="relative">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getFilteredRowModel().rows.length ? (
+                table.getFilteredRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : null }
+            </TableBody>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      )}
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}

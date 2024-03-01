@@ -32,7 +32,8 @@ import {
   X,
   Building2,
   CheckSquare,
-  ArrowLeft
+  ArrowLeft,
+  GanttChartSquare,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -50,6 +51,7 @@ export const Icons = {
   trash: Trash,
   employee: Building2,
   request: CheckSquare,
+  jobReview: GanttChartSquare,
   post: FileText,
   page: File,
   media: Image,
