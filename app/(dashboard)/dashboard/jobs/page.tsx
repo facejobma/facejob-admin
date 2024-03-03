@@ -4,7 +4,7 @@ import BreadCrumb from "@/components/breadcrumb";
 // import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
-import { EnterpriseRequests } from "@/components/tables/request-tables/requests";
+import { JobRequests } from "@/components/tables/job-tables/requests";
 
 const breadcrumbItems = [{ title: "Requests", link: "/dashboard/requests" }];
 
@@ -50,7 +50,7 @@ export default function UsersPage() {
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <EnterpriseRequests data={users} />
+        <JobRequests data={users} />
       </div>
     </>
   );

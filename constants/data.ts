@@ -23,6 +23,17 @@ export type Entreprise = {
   isVerified: string;
 };
 
+export type Job = {
+  id: number;
+  titre: string;
+  description: string;
+  date_debut: string;
+  date_fin: string;
+  secteur: string;
+  entreprise: string;
+  isVerified: string;
+};
+
 export const navItems: NavItem[] = [
   {
     title: "Dashboard",
@@ -52,7 +63,13 @@ export const navItems: NavItem[] = [
     title: "Job Review",
     href: "/dashboard/jobs",
     icon: "jobReview",
-    label: "request",
+    label: "jobReview",
+  },
+  {
+    title: "Candidate Videos",
+    href: "/dashboard/candidate-videos",
+    icon: "candidateVideos",
+    label: "candidateVideos",
   },
   {
     title: "Logout",
