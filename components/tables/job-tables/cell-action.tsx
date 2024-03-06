@@ -31,7 +31,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onVerify = async (isVerified: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/accept/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/job/accept/${data.id}`,
         {
           method: "PUT",
           headers: {
@@ -89,7 +89,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              router.push(`/dashboard/requests/${data.id}`);
+              router.push(`/dashboard/jobs/${data.id}`);
             }}
           >
             <View className="mr-2 h-4 w-4" /> Consult

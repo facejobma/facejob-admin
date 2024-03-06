@@ -26,22 +26,6 @@ export const columns: ColumnDef<Job>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  // {
-  //   accessorKey: "logo",
-  //   header: "Logo",
-  //   cell: ({ row }) => (
-  //     <TableCell>
-  //       <div className="w-10 h-10 relative rounded-full overflow-hidden">
-  //         <Image
-  //           src={row.original.logo}
-  //           alt={`${row.original.company_name} Logo`}
-  //           layout="fill"
-  //           objectFit="cover"
-  //         />
-  //       </div>
-  //     </TableCell>
-  //   ),
-  // },
   {
     accessorKey: "titre",
     header: "TITRE",
@@ -50,11 +34,11 @@ export const columns: ColumnDef<Job>[] = [
     enableHiding: true,
   },
   {
-    accessorKey: "entreprise",
+    accessorKey: "company_name",
     header: "ENTREPRISE",
   },
   {
-    accessorKey: "secteur",
+    accessorKey: "secteur_name",
     header: "SECTEUR",
   },
   {

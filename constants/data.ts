@@ -29,8 +29,8 @@ export type Job = {
   description: string;
   date_debut: string;
   date_fin: string;
-  secteur: string;
-  entreprise: string;
+  company_name: number;
+  secteur_name: number;
   isVerified: string;
 };
 

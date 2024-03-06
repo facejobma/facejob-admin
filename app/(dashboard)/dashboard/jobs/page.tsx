@@ -14,10 +14,12 @@ export default function UsersPage() {
   const authToken = Cookies.get("authToken");
 
   useEffect(() => {
+    // console.log("token, ", authToken);
+
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/offre/all",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/offres",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -26,13 +28,6 @@ export default function UsersPage() {
           },
         );
         const data = await response.json();
-        // const users = {
-        //   nomComplete: data.first_name + " " + data.last_name,
-        //   secteur: data.sector,
-        //   email: data.email,
-        //   tel: data.tel,
-        //   bio: data.bio,
-        // };
         setJobs(data);
       } catch (error) {
         toast({

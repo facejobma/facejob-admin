@@ -61,9 +61,9 @@ export function JobDataTable<TData, TValue>({
     table.getColumn(searchKey)?.setFilterValue(searchValue);
   }, [searchKey, searchValue]);
 
-  useEffect(() => {
-    table.setGlobalFilter(selectValue);
-  }, [selectValue]);
+  // useEffect(() => {
+  //   table.setGlobalFilter(selectValue);
+  // }, [selectValue]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;

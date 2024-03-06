@@ -5,41 +5,36 @@ import BreadCrumb from "@/components/breadcrumb";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
-import { EntrepriseForm } from "@/components/forms/entreprise-form";
+import { JobForm } from "@/components/forms/job-form";
 
-interface EnterpriseData {
-  logo: string;
-  company_name: string;
-  secteur: string;
-  email: string;
-  phone: string;
-  adresse: string;
-  site_web: string;
-  effectif: string;
+interface JobData {
+  id: number;
+  titre: string;
   description: string;
-  status: string;
+  date_debut: string;
+  date_fin: string;
+  company_name: number;
+  secteur_name: number;
+  isVerified: string;
 }
 
 export default function Page() {
-  const [enterpriseData, setEnterpriseData] = useState<EnterpriseData | null>(
-    null,
-  );
-  const { enterpriseId } = useParams();
+  const [jobData, setJobData] = useState<JobData | null>(null);
+  const { jobId } = useParams();
 
   const breadcrumbItems = [
-    { title: "Entreprise", link: "/dashboard/entreprise" },
-    { title: "Update", link: "/dashboard/entreprise/update" },
+    { title: "Job", link: "/dashboard/jobs" },
+    { title: "Consult", link: `/dashboard/jobs/${jobId}` },
   ];
 
   useEffect(() => {
-    if (enterpriseId) {
-      // Fetch enterprise data using enterpriseId
-      const fetchEnterpriseData = async () => {
+    if (jobId) {
+      const fetchJobData = async () => {
         try {
           const authToken = Cookies.get("authToken");
 
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/${enterpriseId}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/offres/${jobId}`,
             {
               headers: {
                 Authorization: `Bearer ${authToken}`,
@@ -50,51 +45,43 @@ export default function Page() {
           const data = await response.json();
 
           const {
-            company_name,
-            secteur,
-            email,
-            phone,
-            adresse,
-            site_web,
-            effectif,
+            id,
+            titre,
             description,
-            logo,
-            status,
+            date_debut,
+            date_fin,
+            company_name,
+            secteur_name,
+            isVerified,
           } = data;
 
-          setEnterpriseData({
-            company_name,
-            secteur,
-            email,
-            phone,
-            adresse,
-            site_web,
-            effectif,
+          setJobData({
+            id,
+            titre,
             description,
-            logo,
-            status,
+            date_debut,
+            date_fin,
+            company_name,
+            secteur_name,
+            isVerified,
           });
         } catch (error) {
-          console.log(error);
+          // console.log(error);
         }
       };
 
-      fetchEnterpriseData();
+      fetchJobData();
     }
-  }, [enterpriseId]);
+  }, [jobId]);
 
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-5">
         <BreadCrumb items={breadcrumbItems} />
-        {enterpriseData ? (
-          <EntrepriseForm
-            categories={[
-              { _id: "shirts", name: "shirts" },
-              { _id: "pants", name: "pants" },
-            ]}
-            initialData={enterpriseData}
-            key={enterpriseId as string}
+        {jobData ? (
+          <JobForm
+            initialData={jobData}
+            key={jobId as string}
           />
         ) : (
           <p>Loading...</p>
