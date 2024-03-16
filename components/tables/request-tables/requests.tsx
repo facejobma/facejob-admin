@@ -11,7 +11,6 @@ interface EntrepriseProps {
 }
 
 export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
-
   return (
     <>
       <div className="flex items-start justify-between">

@@ -4,22 +4,20 @@ import BreadCrumb from "@/components/breadcrumb";
 // import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
-import { JobRequests } from "@/components/tables/job-tables/requests";
+import { EnterpriseRequests } from "@/components/tables/request-tables/requests";
 
-const breadcrumbItems = [{ title: "Jobs", link: "/dashboard/jobs" }];
+const breadcrumbItems = [{ title: "Videos", link: "/dashboard/candidate-videos" }];
 
 export default function UsersPage() {
-  const [jobs, setJobs] = useState([]);
+  const [users, setUsers] = useState([]);
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
   useEffect(() => {
-    // console.log("token, ", authToken);
-
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/offres",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/entreprises",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -28,7 +26,14 @@ export default function UsersPage() {
           },
         );
         const data = await response.json();
-        setJobs(data);
+        // const users = {
+        //   nomComplete: data.first_name + " " + data.last_name,
+        //   secteur: data.sector,
+        //   email: data.email,
+        //   tel: data.tel,
+        //   bio: data.bio,
+        // };
+        setUsers(data);
       } catch (error) {
         toast({
           title: "Whoops!",
@@ -45,7 +50,7 @@ export default function UsersPage() {
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <JobRequests data={jobs} />
+        <EnterpriseRequests data={users} />
       </div>
     </>
   );

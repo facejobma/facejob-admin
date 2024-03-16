@@ -3,8 +3,8 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { Job } from "@/constants/data";
 import { FC } from "react";
-import { columns } from "./columns";
 import { JobDataTable } from "@/components/ui/job-table";
+import { columns } from "@/components/tables/job-tables/columns";
 
 interface JobProps {
   data: Job[];
