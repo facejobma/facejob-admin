@@ -61,22 +61,22 @@ export const columns: ColumnDef<Entreprise>[] = [
     accessorKey: "phone",
     header: "TEL",
   },
-  {
-    accessorKey: "adresse",
-    header: "ADRESSE",
-  },
-  {
-    accessorKey: "site_web",
-    header: "SITE WEB",
-  },
+  // {
+  //   accessorKey: "adresse",
+  //   header: "ADRESSE",
+  // },
+  // {
+  //   accessorKey: "site_web",
+  //   header: "SITE WEB",
+  // },
   {
     accessorKey: "effectif",
     header: "EFFECTIF",
   },
-  {
-    accessorKey: "description",
-    header: "DESCRIPTION",
-  },
+  // {
+  //   accessorKey: "description",
+  //   header: "DESCRIPTION",
+  // },
   {
     id: "actions",
     cell: ({ row }) => <CellAction data={row.original} />,
