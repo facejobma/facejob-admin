@@ -4,9 +4,11 @@ import BreadCrumb from "@/components/breadcrumb";
 // import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
-import { EnterpriseRequests } from "@/components/tables/request-tables/requests";
+import { CVRequests } from "@/components/tables/cv-tables/requests";
 
-const breadcrumbItems = [{ title: "Videos", link: "/dashboard/candidate-videos" }];
+const breadcrumbItems = [
+  { title: "Videos", link: "/dashboard/candidate-videos" },
+];
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -17,7 +19,7 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/entreprises",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/candidate-videos",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -50,7 +52,7 @@ export default function UsersPage() {
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <EnterpriseRequests data={users} />
+        <CVRequests data={users} />
       </div>
     </>
   );
