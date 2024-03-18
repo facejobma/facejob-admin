@@ -37,7 +37,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       const authToken = localStorage.getItem("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/cv-candidat/delete/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/delete_cv/${data.id}`,
         {
           method: "DELETE",
           headers: {
@@ -62,7 +62,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onVerify = async (isVerified: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/accept_cv/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/verify/${data.id}`,
         {
           method: "PUT",
           headers: {

@@ -37,8 +37,7 @@ export type Job = {
 export type CV = {
   id: number;
   link: string;
-  est_valider: number;
-  est_traiter: number;
+  isVerified: string;
   candidat_name: string;
   secteur_name: string;
 };

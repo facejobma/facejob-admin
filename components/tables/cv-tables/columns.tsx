@@ -53,36 +53,19 @@ export const columns: ColumnDef<CV>[] = [
     header: "SECTEUR",
   },
   {
-    accessorKey: "est_valider",
-    header: "IS VALIDATED",
+    accessorKey: "isVerified",
+    header: "Status",
     cell: ({ row }) => (
       <div
         className={
-          row.original.est_valider === 1
+          row.original.isVerified === "Accepted"
             ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
-            : row.original.est_valider === 0
+            : row.original.isVerified === "Declined"
               ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
               : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
         }
       >
-        {row.original.est_valider}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "est_traiter",
-    header: "IS PROCESSED",
-    cell: ({ row }) => (
-      <div
-        className={
-          row.original.est_traiter === 1
-            ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
-            : row.original.est_traiter === 0
-              ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
-              : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
-        }
-      >
-        {row.original.est_traiter}
+        {row.original.isVerified}
       </div>
     ),
   },
