@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { Modal } from "@/components/ui/modal";
 
 interface CellActionProps {
   data: CV;
@@ -28,6 +29,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const authToken = Cookies.get("authToken");
+  const [showPreview, setShowPreview] = useState(false);
   const router = useRouter();
 
   const onDelete = async () => {
@@ -86,6 +88,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
+  const onPreview = () => {
+    setShowPreview(true);
+  };
+
+  const onClosePreview = () => {
+    setShowPreview(false);
+  };
+
   return (
     <>
       <AlertModal
@@ -94,6 +104,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         onConfirm={onDelete}
         loading={loading}
       />
+      <Modal
+        isOpen={showPreview}
+        onClose={onClosePreview}
+        title={"Preview CV Video"}
+        description={"Take a closer look at the candidate's CV video to gain insights into their qualifications and skills."}
+      >
+        <video controls src={data.link} className="w-full h-full" />
+      </Modal>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -118,13 +136,16 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <XSquare className="mr-2 h-4 w-4" /> Decline
           </DropdownMenuItem>
-          <DropdownMenuItem
+          <DropdownMenuItem onClick={onPreview}>
+            <View className="mr-2 h-4 w-4" /> Preview
+          </DropdownMenuItem>
+          {/* <DropdownMenuItem
             onClick={() => {
               router.push(`/dashboard/requests/${data.id}`);
             }}
           >
             <View className="mr-2 h-4 w-4" /> Consult
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
     </>
