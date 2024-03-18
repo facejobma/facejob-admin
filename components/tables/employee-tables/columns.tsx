@@ -24,7 +24,7 @@ export const columns: ColumnDef<Entreprise>[] = [
       />
     ),
     enableSorting: false,
-    enableHiding: false,
+    enableHiding: false
   },
   {
     accessorKey: "logo",
@@ -40,26 +40,32 @@ export const columns: ColumnDef<Entreprise>[] = [
           />
         </div>
       </TableCell>
-    ),
+    )
   },
   {
-    accessorKey: 'company_name',
-    header: 'Company Name',
+    accessorKey: "id",
+    header: "Id d'entreprise",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
+  }, {
+    accessorKey: "company_name",
+    header: "Company Name",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true
   },
   {
     accessorKey: "secteur",
-    header: "SECTEUR",
+    header: "SECTEUR"
   },
   {
     accessorKey: "email",
-    header: "EMAIL",
+    header: "EMAIL"
   },
   {
     accessorKey: "phone",
-    header: "TEL",
+    header: "TEL"
   },
   // {
   //   accessorKey: "adresse",
@@ -71,14 +77,14 @@ export const columns: ColumnDef<Entreprise>[] = [
   // },
   {
     accessorKey: "effectif",
-    header: "EFFECTIF",
+    header: "EFFECTIF"
   },
-  // {
-  //   accessorKey: "description",
-  //   header: "DESCRIPTION",
-  // },
+  {
+    accessorKey: "balance",
+    header: "NOMBRE_POINTS"
+  },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />,
-  },
+    cell: ({ row }) => <CellAction data={row.original} />
+  }
 ];

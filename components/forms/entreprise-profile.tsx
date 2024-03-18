@@ -12,6 +12,7 @@ interface EnterpriseData {
   effectif: string;
   description: string;
   isVerified: string;
+  balance: string;
 }
 
 export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
@@ -46,8 +47,8 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
         </div>
 
         <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Address</h2>
-          <p className="text-gray-600">{initialData.adresse}</p>
+          <h2 className="text-lg font-semibold mb-2">Nombre de Points</h2>
+          <p className="text-gray-600">{initialData.balance}</p>
         </div>
 
         <div className="mb-4">
