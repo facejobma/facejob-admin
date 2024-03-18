@@ -29,9 +29,17 @@ export type Job = {
   description: string;
   date_debut: string;
   date_fin: string;
-  company_name: number;
-  secteur_name: number;
+  company_name: string;
+  secteur_name: string;
   isVerified: string;
+};
+
+export type CV = {
+  id: number;
+  link: string;
+  isVerified: string;
+  candidat_name: string;
+  secteur_name: string;
 };
 
 export const navItems: NavItem[] = [

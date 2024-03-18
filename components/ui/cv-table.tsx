@@ -27,12 +27,7 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
 }
 
-interface OptionData {
-  id: number;
-  name: string;
-}
-
-export function DataTable<TData, TValue>({
+export function CVTable<TData, TValue>({
   columns,
   data,
   searchKey,
@@ -40,7 +35,6 @@ export function DataTable<TData, TValue>({
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("Pending");
   const [loading, setLoading] = useState<boolean>(true);
-  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -48,7 +42,6 @@ export function DataTable<TData, TValue>({
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
-        setSecteurOptions(data);
         setLoading(false);
       })
       .catch((error) => {
@@ -86,7 +79,6 @@ export function DataTable<TData, TValue>({
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full md:max-w-sm"
         />
-
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
@@ -95,18 +87,6 @@ export function DataTable<TData, TValue>({
           <option value="Pending">Pending</option>
           <option value="Accepted">Accepted</option>
           <option value="Declined">Declined</option>
-        </select>
-        <select
-          value={selectValue || ""}
-          onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
-        >
-          <option value="">Secteur</option>
-          {secteurOptions.map((option) => (
-            <option key={option.id} value={option.name}>
-              {option.name}
-            </option>
-          ))}
         </select>
       </div>
       {loading ? (
