@@ -18,17 +18,18 @@ interface EnterpriseData {
   effectif: string;
   description: string;
   isVerified: string;
+  balance: string;
 }
 
 export default function Page() {
   const [enterpriseData, setEnterpriseData] = useState<EnterpriseData | null>(
-    null,
+    null
   );
   const { requestId } = useParams();
 
   const breadcrumbItems = [
     { title: "Entreprise", link: "/dashboard/requests" },
-    { title: "Consult", link: "/dashboard/requests/Consult" },
+    { title: "Consult", link: "/dashboard/requests/Consult" }
   ];
 
   useEffect(() => {
@@ -43,9 +44,9 @@ export default function Page() {
             {
               headers: {
                 Authorization: `Bearer ${authToken}`,
-                "Content-Type": "application/json",
-              },
-            },
+                "Content-Type": "application/json"
+              }
+            }
           );
           const data = await response.json();
 
@@ -59,7 +60,8 @@ export default function Page() {
             effectif,
             description,
             logo,
-            isVerified
+            isVerified,
+            balance
           } = data;
 
           setEnterpriseData({
@@ -72,7 +74,8 @@ export default function Page() {
             effectif,
             description,
             logo,
-            isVerified
+            isVerified,
+            balance
           });
         } catch (error) {
           // console.log(error);
