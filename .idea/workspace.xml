@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add payment methode">
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add balance to entreprsie type">
+      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/00000000000.xd" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilot/chatSessions/00000000000.xd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/xd.lck" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilot/chatSessions/xd.lck" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/payments/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/payments/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-add-balance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,6 +96,9 @@
       <workItem from="1710789156562" duration="1752000" />
       <workItem from="1710790923680" duration="733000" />
       <workItem from="1710799081296" duration="2659000" />
+      <workItem from="1710845079104" duration="173000" />
+      <workItem from="1710886173722" duration="2081000" />
+      <workItem from="1710893457862" duration="2736000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -153,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710800859372</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="add balance to entreprsie type">
+      <option name="closed" value="true" />
+      <created>1710845206863</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1710845206863</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -168,14 +187,15 @@
     <MESSAGE value="remove some pages" />
     <MESSAGE value="fix some issues" />
     <MESSAGE value="add payment methode" />
-    <option name="LAST_COMMIT_MESSAGE" value="add payment methode" />
+    <MESSAGE value="add balance to entreprsie type" />
+    <option name="LAST_COMMIT_MESSAGE" value="add balance to entreprsie type" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/components/forms/entreprise-profile.tsx</url>
-          <line>67</line>
+          <line>56</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

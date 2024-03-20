@@ -1,19 +1,8 @@
 import Image from "next/image";
 import { CheckCircle, XCircle } from "lucide-react";
+import { EnterpriseData } from "@/types";
 
-interface EnterpriseData {
-  logo: string;
-  company_name: string;
-  secteur: string;
-  email: string;
-  phone: string;
-  adresse: string;
-  site_web: string;
-  effectif: string;
-  description: string;
-  isVerified: string;
-  balance: string;
-}
+
 
 export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
   initialData,
@@ -47,8 +36,8 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
         </div>
 
         <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Nombre de Points</h2>
-          <p className="text-gray-600">{initialData.balance}</p>
+          <h2 className="text-lg font-semibold mb-2">Pannel actuelle</h2>
+          <p className="text-gray-600">{initialData.plan}</p>
         </div>
 
         <div className="mb-4">

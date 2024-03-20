@@ -6,20 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { EntrepriseProfile } from "@/components/forms/entreprise-profile";
+import { EnterpriseData } from "@/types";
 
-interface EnterpriseData {
-  logo: string;
-  company_name: string;
-  secteur: string;
-  email: string;
-  phone: string;
-  adresse: string;
-  site_web: string;
-  effectif: string;
-  description: string;
-  isVerified: string;
-  balance: string;
-}
 
 export default function Page() {
   const [enterpriseData, setEnterpriseData] = useState<EnterpriseData | null>(
@@ -61,7 +49,7 @@ export default function Page() {
             description,
             logo,
             isVerified,
-            balance
+            plan
           } = data;
 
           setEnterpriseData({
@@ -75,7 +63,7 @@ export default function Page() {
             description,
             logo,
             isVerified,
-            balance
+            plan
           });
         } catch (error) {
           // console.log(error);

@@ -56,6 +56,13 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableHiding: true
   },
   {
+    accessorKey: "plan",
+    header: "Pannel",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true
+  },
+  {
     accessorKey: "secteur",
     header: "SECTEUR"
   },
@@ -67,22 +74,11 @@ export const columns: ColumnDef<Entreprise>[] = [
     accessorKey: "phone",
     header: "TEL"
   },
-  // {
-  //   accessorKey: "adresse",
-  //   header: "ADRESSE",
-  // },
-  // {
-  //   accessorKey: "site_web",
-  //   header: "SITE WEB",
-  // },
   {
     accessorKey: "effectif",
     header: "EFFECTIF"
   },
-  {
-    accessorKey: "balance",
-    header: "NOMBRE_POINTS"
-  },
+
   {
     id: "actions",
     cell: ({ row }) => <CellAction data={row.original} />

@@ -14,15 +14,27 @@ import { useToast } from "../ui/use-toast";
 import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import { Plan } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { Option } from "lucide-react";
+
 
 const formSchema = z.object({
   entrepriseId: z.string(),
-  balanceToAdd: z.string()
+  plan: z.nativeEnum(Plan)
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const AddBalanceToEntreprise: React.FC = () => {
+export const ChangePlanToEntreprise: React.FC = () => {
   const { toast } = useToast();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema)
@@ -33,7 +45,7 @@ export const AddBalanceToEntreprise: React.FC = () => {
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/${data.entrepriseId}/add-balance`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/${data.entrepriseId}/change-plan`,
         {
           method: "POST",
           headers: {
@@ -49,17 +61,17 @@ export const AddBalanceToEntreprise: React.FC = () => {
         toast({
           title: "Success",
           variant: "default",
-          description: "Balance added successfully!"
+          description: "plan added successfully!"
         });
       } else {
-        throw new Error("Failed to add balance");
+        throw new Error("Failed to add plan");
       }
     } catch (error: any) {
       toast({
         title: "Error",
         variant: "destructive",
         description:
-          error.message || "An error occurred while adding balance."
+          error.message || "An error occurred while adding plan."
       });
     }
   };
@@ -82,19 +94,30 @@ export const AddBalanceToEntreprise: React.FC = () => {
         />
         <FormField
           control={form.control}
-          name="balanceToAdd"
+          name="plan"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Balance to Add</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Plan to Add" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Plan</SelectLabel>
+                    {Object.values(Plan).map((value) => (
+                      <SelectItem key={value.toString()} value={value.toString()}>
+                        {value.toString()}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button className="ml-auto" type="submit">
-          Add Balance
+          Change plan
         </Button>
       </form>
     </Form>
