@@ -1,5 +1,5 @@
 import { Icons } from "@/components/icons";
-import * as z from "zod";
+
 
 export interface NavItem {
   title: string;
@@ -12,29 +12,29 @@ export interface NavItem {
 }
 
 
+export type Sales = {
+  entrepriseName: string;
+  entrepriseEmail: string;
+  amount: number;
+  date: string;
+}
 
-export interface Statistiques{
+export interface Statistiques {
   secteurs: number;
   postules: number;
   users: number;
   offres: number;
   entreprises: number;
+  sales: Sales;
 }
 
 export enum Plan {
   PannelGratuit = "Pannel gratuit",
   PannelDeBase = "Pannel de base",
-  PannelIntermédiaire = "Pannel Intérmédiaire",
+  PannelIntermediaire = "Pannel Intérmédiaire",
   PannelEssentiel = "Pannel Essentiel",
   PannelPremium = "Pannel Premium"
 }
-// export const Plan = z.enum([
-//   "Pannel gratuit",
-//   "Pannel de base",
-//   "Pannel Intérmédiaire",
-//   "Pannel Essentiel",
-//   "Pannel Premium"
-// ]);
 
 export interface EnterpriseData {
   logo: string;
@@ -48,4 +48,25 @@ export interface EnterpriseData {
   description: string;
   isVerified: string;
   plan: Plan;
+}
+
+
+export type PlanDetails = {
+  id: number;
+  name: string;
+  description: string;
+  monthly_price: number;
+  quarterly_price: number;
+  annual_price: number;
+  account_creation_included: number;
+  cv_video_access: number;
+  cv_video_consultations: number;
+  job_postings: number;
+  dedicated_support: number;
+  created_at: string;
+  updated_at: string;
+  popular: boolean;
+  exclusive: boolean;
+  isYearly: boolean;
+  isQuarterly: boolean;
 }

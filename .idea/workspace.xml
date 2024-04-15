@@ -4,15 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add balance to entreprsie type">
-      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/00000000000.xd" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilot/chatSessions/00000000000.xd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/xd.lck" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilot/chatSessions/xd.lck" afterDir="false" />
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add sales and pricing">
+      <change afterPath="$PROJECT_DIR$/app/pricing/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/plans/PlanDetailsComponent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/00000000000.xd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/blobs/version" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/xd.lck" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/payments/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/payments/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-add-balance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/recent-sales.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/recent-sales.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/skeleton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/skeleton.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,6 +26,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;sohaibMan&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/sohaibMan/facejob-admin.git&quot;,
+    &quot;accountId&quot;: &quot;9fdc2c58-6792-4b8f-8132-2bf2fdcbf206&quot;
+  }
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -47,7 +62,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/sohaib/Desktop/Freelance/facejob-admin&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/sohaib/Desktop/Freelance&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -60,11 +75,22 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/.." />
       <recent name="$PROJECT_DIR$/app/(dashboard)/dashboard" />
       <recent name="$PROJECT_DIR$/public" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/app" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-WS-241.14494.235" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -98,7 +124,22 @@
       <workItem from="1710799081296" duration="2659000" />
       <workItem from="1710845079104" duration="173000" />
       <workItem from="1710886173722" duration="2081000" />
-      <workItem from="1710893457862" duration="2736000" />
+      <workItem from="1710893457862" duration="3522000" />
+      <workItem from="1710939966147" duration="286000" />
+      <workItem from="1710976027272" duration="1374000" />
+      <workItem from="1711062950326" duration="803000" />
+      <workItem from="1711063769259" duration="2253000" />
+      <workItem from="1711374489787" duration="1487000" />
+      <workItem from="1711376208272" duration="6459000" />
+      <workItem from="1711391242670" duration="2638000" />
+      <workItem from="1711456095154" duration="44000" />
+      <workItem from="1711636846504" duration="48000" />
+      <workItem from="1712584675457" duration="366000" />
+      <workItem from="1712585067240" duration="225000" />
+      <workItem from="1712623025720" duration="6797000" />
+      <workItem from="1712963705778" duration="5163000" />
+      <workItem from="1713189567364" duration="604000" />
+      <workItem from="1713195270831" duration="1521000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -172,7 +213,31 @@
       <option name="project" value="LOCAL" />
       <updated>1710845206863</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="add change plan">
+      <option name="closed" value="true" />
+      <created>1710896388573</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1710896388573</updated>
+    </task>
+    <task id="LOCAL-00011" summary="add docker config">
+      <option name="closed" value="true" />
+      <created>1712965834394</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1712965834394</updated>
+    </task>
+    <task id="LOCAL-00012" summary="set output to standalone">
+      <option name="closed" value="true" />
+      <created>1712966389233</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1712966389233</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -188,7 +253,11 @@
     <MESSAGE value="fix some issues" />
     <MESSAGE value="add payment methode" />
     <MESSAGE value="add balance to entreprsie type" />
-    <option name="LAST_COMMIT_MESSAGE" value="add balance to entreprsie type" />
+    <MESSAGE value="add change plan" />
+    <MESSAGE value="add docker config" />
+    <MESSAGE value="set output to standalone" />
+    <MESSAGE value="add sales and pricing" />
+    <option name="LAST_COMMIT_MESSAGE" value="add sales and pricing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sales } from "@/types";
 
-export function RecentSales() {
+export function RecentSales(props: { sales: Sales }) {
   return (
     <div className="space-y-8">
       <div className="flex items-center">
