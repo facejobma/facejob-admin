@@ -39,6 +39,7 @@ export function EntrepriseDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
+  const [selectPanValue, setSelectPanValue] = useState<string>("");
   const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -48,6 +49,8 @@ export function EntrepriseDataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
+
+  const planOptions = ['Pannel gratuit', 'Pannel de base', 'Pannel Intérmédiare', 'Pannel Essentiel', 'Pannel premium']
 
   useEffect(() => {
     setLoading(true);
@@ -66,11 +69,18 @@ export function EntrepriseDataTable<TData, TValue>({
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue]);
+  }, [searchKey, searchValue, selectPanValue]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
+
+    table.setGlobalFilter(selectedValue);
+  };
+
+  const handleSelectPannelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSelectPanValue(selectedValue);
 
     table.setGlobalFilter(selectedValue);
   };
@@ -84,6 +94,18 @@ export function EntrepriseDataTable<TData, TValue>({
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full md:max-w-sm"
         />
+        <select
+          value={selectPanValue || ""}
+          onChange={handleSelectPannelChange}
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+        >
+          <option value="">Pannel</option>
+          {planOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}

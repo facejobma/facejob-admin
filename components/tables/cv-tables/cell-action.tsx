@@ -108,9 +108,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         isOpen={showPreview}
         onClose={onClosePreview}
         title={"Preview CV Video"}
-        description={"Take a closer look at the candidate's CV video to gain insights into their qualifications and skills."}
+        description={
+          "Take a closer look at the candidate's CV video to gain insights into their qualifications and skills."
+        }
       >
-        <video controls src={data.link} className="w-full h-full" />
+        <video src={data.link} className="w-full h-full" />
       </Modal>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
