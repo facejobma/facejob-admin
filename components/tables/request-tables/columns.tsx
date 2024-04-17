@@ -49,8 +49,8 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableHiding: true,
   },
   {
-    accessorKey: "secteur",
-    header: "SECTEUR",
+    accessorKey: "sector",
+    header: "sector",
   },
   {
     accessorKey: "email",

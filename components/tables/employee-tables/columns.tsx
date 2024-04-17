@@ -63,7 +63,7 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableHiding: true
   },
   {
-    accessorKey: "secteur",
+    accessorKey: "sector",
     header: "SECTEUR"
   },
   {

@@ -20,7 +20,7 @@ export type Sales = {
 }
 
 export interface Statistiques {
-  secteurs: number;
+  sectors: number;
   postules: number;
   users: number;
   offres: number;
@@ -39,7 +39,7 @@ export enum Plan {
 export interface EnterpriseData {
   logo: string;
   company_name: string;
-  secteur: string;
+  sector: string;
   email: string;
   phone: string;
   adresse: string;

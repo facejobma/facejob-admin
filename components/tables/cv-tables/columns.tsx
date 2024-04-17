@@ -49,8 +49,8 @@ export const columns: ColumnDef<CV>[] = [
     enableHiding: true,
   },
   {
-    accessorKey: "secteur_name",
-    header: "SECTEUR",
+    accessorKey: "sector_name",
+    header: "sector",
   },
   {
     accessorKey: "isVerified",

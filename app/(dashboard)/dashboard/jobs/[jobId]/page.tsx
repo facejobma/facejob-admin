@@ -14,7 +14,7 @@ interface JobData {
   date_debut: string;
   date_fin: string;
   company_name: number;
-  secteur_name: number;
+  sector_name: number;
   isVerified: string;
 }
 
@@ -51,7 +51,7 @@ export default function Page() {
             date_debut,
             date_fin,
             company_name,
-            secteur_name,
+            sector_name,
             isVerified,
           } = data;
 
@@ -62,7 +62,7 @@ export default function Page() {
             date_debut,
             date_fin,
             company_name,
-            secteur_name,
+            sector_name,
             isVerified,
           });
         } catch (error) {

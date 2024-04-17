@@ -3,24 +3,26 @@ import { NavItem } from "@/types";
 export type User = {
   id: number;
   nomComplete: string;
-  secteur: string;
+  sector: string;
   email: string;
   tel: string;
   bio: string;
 };
 
+export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
+
 export type Entreprise = {
   logo: string;
   id: number;
   company_name: string;
-  secteur: string;
+  sector: string;
   email: string;
   phone: string;
   adresse: string;
   site_web: string;
   effectif: string;
   description: string;
-  isVerified: string;
+  isVerified: EntrepriseStatus;
 };
 
 export type Job = {
@@ -30,7 +32,7 @@ export type Job = {
   date_debut: string;
   date_fin: string;
   company_name: string;
-  secteur_name: string;
+  sector_name: string;
   isVerified: string;
 };
 
@@ -39,7 +41,7 @@ export type CV = {
   link: string;
   isVerified: string;
   candidat_name: string;
-  secteur_name: string;
+  sector_name: string;
 };
 
 export const navItems: NavItem[] = [

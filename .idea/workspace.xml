@@ -5,17 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add sales and pricing">
-      <change afterPath="$PROJECT_DIR$/app/pricing/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/plans/PlanDetailsComponent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/00000000000.xd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/blobs/version" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilot/chatSessions/xd.lck" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate-videos/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/candidate-videos/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/[enterpriseId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/[enterpriseId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/entreprise/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/jobs/[jobId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/jobs/[jobId]/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/recent-sales.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/recent-sales.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/skeleton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/skeleton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/job-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/job-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/cv-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/cv-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/job-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/job-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/cell-action.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/request-tables/cell-action.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/request-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/request-tables/requests.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/request-tables/requests.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/user-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/user-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/candidate-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/candidate-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/data-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/data-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/entreprise-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/entreprise-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/job-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/job-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/constants/data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/constants/data.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -88,7 +100,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-WS-241.14494.235" />
+        <option value="bundled-js-predefined-1d06a55b98c1-2e7d6887c066-JavaScript-WS-241.15989.47" />
       </set>
     </attachedChunks>
   </component>
@@ -139,7 +151,13 @@
       <workItem from="1712623025720" duration="6797000" />
       <workItem from="1712963705778" duration="5163000" />
       <workItem from="1713189567364" duration="604000" />
-      <workItem from="1713195270831" duration="1521000" />
+      <workItem from="1713195270831" duration="2839000" />
+      <workItem from="1713202719383" duration="624000" />
+      <workItem from="1713206410796" duration="1498000" />
+      <workItem from="1713295147213" duration="4488000" />
+      <workItem from="1713360770549" duration="1073000" />
+      <workItem from="1713362887890" duration="5223000" />
+      <workItem from="1713369185837" duration="1907000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -237,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1712966389233</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="add sales and pricing">
+      <option name="closed" value="true" />
+      <created>1713199505787</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1713199505787</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

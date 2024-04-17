@@ -40,7 +40,7 @@ export default function Page() {
 
           const {
             company_name,
-            secteur,
+            sector,
             email,
             phone,
             adresse,
@@ -54,7 +54,7 @@ export default function Page() {
 
           setEnterpriseData({
             company_name,
-            secteur,
+            sector,
             email,
             phone,
             adresse,
