@@ -39,7 +39,8 @@ export function EntrepriseDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
-  const [sectorOptions, setsectorOptions] = useState<OptionData[]>([]);
+  const [selectPanValue, setSelectPanValue] = useState<string>("");
+  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const table = useReactTable({
@@ -49,28 +50,37 @@ export function EntrepriseDataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  const planOptions = ['Pannel gratuit', 'Pannel de base', 'Pannel Intérmédiare', 'Pannel Essentiel', 'Pannel premium']
+
   useEffect(() => {
     setLoading(true);
 
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
-        setsectorOptions(data);
+        setSecteurOptions(data);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching sector options:", error);
+        throw new Error("Error fetching secteur options:", error);
       });
   }, []);
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue, table]);
+  }, [searchKey, searchValue, selectPanValue]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
+
+    table.setGlobalFilter(selectedValue);
+  };
+
+  const handleSelectPannelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSelectPanValue(selectedValue);
 
     table.setGlobalFilter(selectedValue);
   };
@@ -85,12 +95,24 @@ export function EntrepriseDataTable<TData, TValue>({
           className="w-full md:max-w-sm"
         />
         <select
+          value={selectPanValue || ""}
+          onChange={handleSelectPannelChange}
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+        >
+          <option value="">Pannel</option>
+          {planOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <select
           value={selectValue || ""}
           onChange={handleSelectChange}
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">sector</option>
-          {sectorOptions.map((option) => (
+          <option value="">Secteur</option>
+          {secteurOptions.map((option) => (
             <option key={option.id} value={option.name}>
               {option.name}
             </option>
