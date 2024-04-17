@@ -11,15 +11,15 @@ import { Entreprise, EntrepriseStatus } from "@/constants/data";
 import {
   CheckSquare,
   XSquare,
-  // Edit,
   MoreHorizontal,
   View
 } from "lucide-react";
 
-import React, { useState } from "react";
+
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 
 interface CellActionProps {
@@ -86,13 +86,20 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       );
 
       if (response.ok) {
-        console.log("Entreprise deleted successfully!");
+        toast({
+          title: "Success!",
+          description: "Entreprise a été vérifiée avec succès."
+        });
         data.isVerified = isVerified;
       } else {
-        console.error("Failed to delete candidate");
+        data.isVerified = "Pending";
       }
     } catch (error) {
-      console.log(error);
+      toast({
+        title: "Whoops!",
+        variant: "destructive",
+        description: error?.toString() || "Erreur lors de la récupération des données."
+      });
     }
   };
 

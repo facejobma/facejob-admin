@@ -3,7 +3,7 @@ import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger,
+  AccordionTrigger
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { profileSchema, type ProfileFormValues } from "@/lib/form-schema";
@@ -38,9 +38,9 @@ interface ProfileFormType {
 }
 
 export const CreateProfileOne: React.FC<ProfileFormType> = ({
-  initialData,
-  categories,
-}) => {
+                                                              initialData,
+                                                              categories
+                                                            }) => {
   const params = useParams();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -65,25 +65,25 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
         startdate: "",
         enddate: "",
         jobcountry: "",
-        jobcity: "",
-      },
-    ],
+        jobcity: ""
+      }
+    ]
   };
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues,
-    mode: "onChange",
+    mode: "onChange"
   });
 
   const {
     control,
-    formState: { errors },
+    formState: { errors }
   } = form;
 
   const { append, remove, fields } = useFieldArray({
     control,
-    name: "jobs",
+    name: "jobs"
   });
 
   const onSubmit = async (data: ProfileFormValues) => {
@@ -117,7 +117,6 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
   };
 
   const processForm: SubmitHandler<ProfileFormValues> = (data) => {
-    console.log("data ==>", data);
     setData(data);
     // api call and reset
     // form.reset();
@@ -135,8 +134,8 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
         "email",
         "contactno",
         "country",
-        "city",
-      ],
+        "city"
+      ]
     },
     {
       id: "Step 2",
@@ -149,19 +148,19 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
           `jobs.${index}.startdate`,
           `jobs.${index}.enddate`,
           `jobs.${index}.jobcountry`,
-          `jobs.${index}.jobcity`,
+          `jobs.${index}.jobcity`
           // Add other field names as needed
         ])
-        .flat(),
+        .flat()
     },
-    { id: "Step 3", name: "Complete" },
+    { id: "Step 3", name: "Complete" }
   ];
 
   const next = async () => {
     const fields = steps[currentStep].fields;
 
     const output = await form.trigger(fields as FieldName[], {
-      shouldFocus: true,
+      shouldFocus: true
     });
 
     if (!output) return;
@@ -206,7 +205,8 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
           {steps.map((step, index) => (
             <li key={step.name} className="md:flex-1">
               {currentStep > index ? (
-                <div className="group flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
+                <div
+                  className="group flex w-full flex-col border-l-4 border-sky-600 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
                   <span className="text-sm font-medium text-sky-600 transition-colors ">
                     {step.id}
                   </span>
@@ -223,7 +223,8 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
                   <span className="text-sm font-medium">{step.name}</span>
                 </div>
               ) : (
-                <div className="group flex h-full w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
+                <div
+                  className="group flex h-full w-full flex-col border-l-4 border-gray-200 py-2 pl-4 transition-colors md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4">
                   <span className="text-sm font-medium text-gray-500 transition-colors">
                     {step.id}
                   </span>
@@ -244,7 +245,7 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
             className={cn(
               currentStep === 1
                 ? "md:inline-block w-full"
-                : "md:grid md:grid-cols-3 gap-8",
+                : "md:grid md:grid-cols-3 gap-8"
             )}
           >
             {currentStep === 0 && (
@@ -399,7 +400,7 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
                       <AccordionTrigger
                         className={cn(
                           "[&[data-state=closed]>button]:hidden [&[data-state=open]>.alert]:hidden relative !no-underline",
-                          errors?.jobs?.[index] && "text-red-700",
+                          errors?.jobs?.[index] && "text-red-700"
                         )}
                       >
                         {`Work Experience ${index + 1}`}
@@ -421,7 +422,7 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
                       <AccordionContent>
                         <div
                           className={cn(
-                            "md:grid md:grid-cols-3 gap-8 border p-4 rounded-md relative mb-4",
+                            "md:grid md:grid-cols-3 gap-8 border p-4 rounded-md relative mb-4"
                           )}
                         >
                           <FormField
@@ -577,7 +578,7 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
                         startdate: "",
                         enddate: "",
                         jobcountry: "",
-                        jobcity: "",
+                        jobcity: ""
                       })
                     }
                   >

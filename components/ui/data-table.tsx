@@ -5,7 +5,7 @@ import {
   getFilteredRowModel,
   useReactTable
 } from "@tanstack/react-table";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import {
   Table,
@@ -21,6 +21,7 @@ import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Circles } from "react-loader-spinner";
 import { toast } from "@/components/ui/use-toast";
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -41,7 +42,7 @@ export function DataTable<TData, TValue>({
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("Pending");
   const [loading, setLoading] = useState<boolean>(true);
-  const [sectorOptions, setsectorOptions] = useState<OptionData[]>([]);
+  const [sectorOptions, setSectorOptions] = useState<OptionData[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -49,7 +50,7 @@ export function DataTable<TData, TValue>({
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
-        setsectorOptions(data);
+        setSectorOptions(data);
         setLoading(false);
       })
       .catch((error) => {
@@ -95,7 +96,7 @@ export function DataTable<TData, TValue>({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
         >
           <option value="Pending">En attente</option>
           <option value="Accepted">Accepté</option>
@@ -104,7 +105,7 @@ export function DataTable<TData, TValue>({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
         >
           <option value="">sector</option>
           {sectorOptions.map((option) => (

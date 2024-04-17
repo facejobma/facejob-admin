@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
-// import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { CVRequests } from "@/components/tables/cv-tables/requests";
@@ -40,13 +39,13 @@ export default function UsersPage() {
     };
 
     fetchData();
-  }, [authToken]);
+  }, [authToken, toast]);
 
   return (
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <CVRequests data={users} />
+        <CVRequests data={users}  />
       </div>
     </>
   );
