@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
-import Cookies from "js-cookie";
 import { EntrepriseProfile } from "@/components/forms/entreprise-profile";
-import { EnterpriseData } from "@/types";
+import Cookies from "js-cookie";
+
 
 
 export default function Page() {
-  const [enterpriseData, setEnterpriseData] = useState<EnterpriseData | null>(
+  // todo fix any
+  const [enterpriseData, setEnterpriseData] = useState<any | null>(
     null
   );
   const { requestId } = useParams();
@@ -49,7 +50,6 @@ export default function Page() {
             description,
             logo,
             isVerified,
-            plan
           } = data;
 
           setEnterpriseData({
@@ -63,7 +63,6 @@ export default function Page() {
             description,
             logo,
             isVerified,
-            plan
           });
         } catch (error) {
           // console.log(error);

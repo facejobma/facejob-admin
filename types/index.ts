@@ -46,8 +46,9 @@ export interface EnterpriseData {
   site_web: string;
   effectif: string;
   description: string;
-  is_verified: string;
-  plan_end_data: Date;
+  isVerified: string;
+  plan_name: string;
+  // plan_end_data: Date;
   // plan: Plan;
 }
 

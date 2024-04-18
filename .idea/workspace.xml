@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="fix hot reloading">
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add duration to plan">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,6 +140,8 @@
       <workItem from="1713369185837" duration="2306000" />
       <workItem from="1713384511762" duration="3095000" />
       <workItem from="1713387967208" duration="475000" />
+      <workItem from="1713459684064" duration="7857000" />
+      <workItem from="1713469123175" duration="807000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -266,7 +271,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713387492333</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="add duration to plan">
+      <option name="closed" value="true" />
+      <created>1713468849904</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1713468849904</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -288,7 +301,8 @@
     <MESSAGE value="add sales and pricing" />
     <MESSAGE value="change secteur to sector" />
     <MESSAGE value="fix hot reloading" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix hot reloading" />
+    <MESSAGE value="add duration to plan" />
+    <option name="LAST_COMMIT_MESSAGE" value="add duration to plan" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

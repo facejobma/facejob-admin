@@ -37,7 +37,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Pannel actuelle</h2>
-          <p className="text-gray-600">{initialData.plan}</p>
+          <p className="text-gray-600">{initialData.plan_name}</p>
         </div>
 
         <div className="mb-4">
