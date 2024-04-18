@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
-// import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { UserEnterprise } from "@/components/tables/user-tables/entreprises";

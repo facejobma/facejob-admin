@@ -23,6 +23,8 @@ export type Entreprise = {
   effectif: string;
   description: string;
   isVerified: EntrepriseStatus;
+  plan_start_data: Date;
+  plan_end_data: Date;
 };
 
 export type Job = {

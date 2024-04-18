@@ -28,13 +28,13 @@ export interface Statistiques {
   sales: Sales;
 }
 
-export enum Plan {
-  PannelGratuit = "Pannel gratuit",
-  PannelDeBase = "Pannel de base",
-  PannelIntermediaire = "Pannel Intérmédiaire",
-  PannelEssentiel = "Pannel Essentiel",
-  PannelPremium = "Pannel Premium"
-}
+// export enum Plan {
+//   PannelGratuit = "Pannel gratuit",
+//   PannelDeBase = "Pannel de base",
+//   PannelIntermediaire = "Pannel Intérmédiaire",
+//   PannelEssentiel = "Pannel Essentiel",
+//   PannelPremium = "Pannel Premium"
+// }
 
 export interface EnterpriseData {
   logo: string;
@@ -46,8 +46,9 @@ export interface EnterpriseData {
   site_web: string;
   effectif: string;
   description: string;
-  isVerified: string;
-  plan: Plan;
+  is_verified: string;
+  plan_end_data: Date;
+  // plan: Plan;
 }
 
 
@@ -67,6 +68,7 @@ export type PlanDetails = {
   updated_at: string;
   popular: boolean;
   exclusive: boolean;
+  isMonthly: boolean;
   isYearly: boolean;
   isQuarterly: boolean;
 }

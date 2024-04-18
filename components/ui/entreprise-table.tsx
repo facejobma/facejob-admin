@@ -50,6 +50,7 @@ export function EntrepriseDataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  //todo make them dynamique
   const planOptions = ['Pannel gratuit', 'Pannel de base', 'Pannel Intérmédiare', 'Pannel Essentiel', 'Pannel premium']
 
   useEffect(() => {
