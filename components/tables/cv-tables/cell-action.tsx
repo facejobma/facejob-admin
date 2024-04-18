@@ -30,7 +30,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const authToken = Cookies.get("authToken");
   const [showPreview, setShowPreview] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
 
   const onDelete = async () => {
     try {
