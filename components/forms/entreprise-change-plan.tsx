@@ -14,7 +14,7 @@ import { useToast } from "../ui/use-toast";
 import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";
 import React, { useEffect, useState } from "react";
-import { Plan } from "@/types";
+import { PlanDetails } from "@/types";
 import {
   Select,
   SelectContent,
@@ -28,21 +28,28 @@ import {
 
 const formSchema = z.object({
   entrepriseId: z.string(),
-  plan: z.nativeEnum(Plan)
+  planId: z.string(),
+  duration: z.string()
 });
+
+const durations = [
+  { id: 3, name: "Mensuelle" },
+  { id: 12, name: "Annuelle" },
+  { id: 4, name: "Trimestrielle" }
+];
 
 type FormValues = z.infer<typeof formSchema>;
 
 export const ChangePlanToEntreprise: React.FC = () => {
     const { toast } = useToast();
-    const [plans, setPlans] = useState([] as Plan[]);
+    const authToken = Cookies.get("authToken");
+    const [plans, setPlans] = useState([] as PlanDetails[]);
+
     const form = useForm<FormValues>({
       resolver: zodResolver(formSchema)
     });
-
     const onSubmit = async (data: FormValues) => {
       try {
-        const authToken = Cookies.get("authToken");
 
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/${data.entrepriseId}/change-plan`,
@@ -64,23 +71,34 @@ export const ChangePlanToEntreprise: React.FC = () => {
             description: "plan added successfully!"
           });
         } else {
-          throw new Error("Failed to add plan");
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description:
+              "Error lors de l'ajout du plan."
+          });
         }
       } catch (error: any) {
         toast({
           title: "Error",
           variant: "destructive",
           description:
-            error.message || "An error occurred while adding plan."
+            error.message || "Erreur lors de l'ajout du plan."
         });
       }
     };
 
     useEffect(() => {
       async function getPlans() {
-        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/plans`)
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json"
+            }
+          })
           .then((response) => response.json())
-          .then((result) => {
+          .then((result: PlanDetails[]) => {
             setPlans(result);
           })
           .catch((error) => {
@@ -94,7 +112,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
       }
 
       getPlans();
-    }, [setPlans, toast]);
+    }, [authToken, setPlans, toast]);
 
     return (
       <Form {...form}>
@@ -106,7 +124,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
               <FormItem>
                 <FormLabel>Entreprise ID</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} placeholder={"Enter l'id de l'entreprise"} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -114,19 +132,45 @@ export const ChangePlanToEntreprise: React.FC = () => {
           />
           <FormField
             control={form.control}
-            name="plan"
+            name="planId"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Plan</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Plan to Add" />
+                    <SelectValue placeholder="Choisir un forfait" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Plan</SelectLabel>
                       {Object.values(plans).map((value) => (
-                        <SelectItem key={value.toString()} value={value.toString()}>
-                          {value.toString()}
+                        <SelectItem key={value.id} value={value.id.toString()}>
+                          {value.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="duration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Durée</FormLabel>
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisir une durée" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Plan</SelectLabel>
+                      {durations.map((value) => (
+                        <SelectItem key={value.id} value={value.id.toString()}>
+                          {value.name}
                         </SelectItem>
                       ))}
                     </SelectGroup>

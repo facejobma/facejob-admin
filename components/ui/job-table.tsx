@@ -46,7 +46,7 @@ export function JobDataTable<TData, TValue>({
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching secteur options:", error);
+        throw new Error("Error fetching sectors options:", error);
       });
   }, []);
 

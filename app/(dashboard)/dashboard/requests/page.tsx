@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
-// import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { EnterpriseRequests } from "@/components/tables/request-tables/requests";
+import { Entreprise } from "@/constants/data";
 
 const breadcrumbItems = [{ title: "Requests", link: "/dashboard/requests" }];
 
 export default function UsersPage() {
-  const [users, setUsers] = useState([]);
+  const [entrepriseRequests, setEntrepriseRequests] = useState([] as Entreprise[]);
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
@@ -21,36 +21,30 @@ export default function UsersPage() {
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json",
-            },
-          },
+              "Content-Type": "application/json"
+            }
+          }
         );
         const data = await response.json();
-        // const users = {
-        //   nomComplete: data.first_name + " " + data.last_name,
-        //   secteur: data.sector,
-        //   email: data.email,
-        //   tel: data.tel,
-        //   bio: data.bio,
-        // };
-        setUsers(data);
+
+        setEntrepriseRequests(data);
       } catch (error) {
         toast({
           title: "Whoops!",
           variant: "destructive",
-          description: "Erreur lors de la récupération des données.",
+          description: "Erreur lors de la récupération des données."
         });
       }
     };
 
     fetchData();
-  }, [authToken]);
+  }, [authToken, toast]);
 
   return (
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <EnterpriseRequests data={users} />
+        <EnterpriseRequests data={entrepriseRequests}  />
       </div>
     </>
   );

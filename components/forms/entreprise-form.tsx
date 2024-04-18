@@ -42,9 +42,9 @@ const formSchema = z.object({
   company_name: z
     .string()
     .min(3, { message: "Company Name must be at least 3 characters" }),
-  secteur: z
+  sector: z
     .string()
-    .min(3, { message: "secteur must be at least 3 characters" }),
+    .min(3, { message: "sector must be at least 3 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   phone: z.string().min(10, { message: "Invalid phone number" }),
   description: z
@@ -72,7 +72,7 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
     ? initialData
     : {
         company_name: "",
-        secteur: "",
+        sector: "",
         email: "",
         phone: "",
         description: "",
@@ -237,14 +237,14 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
           />
           <FormField
             control={form.control}
-            name="secteur"
+            name="sector"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Secteur</FormLabel>
                 <FormControl>
                   <Input
                     disabled={loading}
-                    placeholder="Enterprise's secteur"
+                    placeholder="Enterprise's sector"
                     {...field}
                   />
                 </FormControl>

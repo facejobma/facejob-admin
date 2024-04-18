@@ -39,7 +39,7 @@ export function CandidateDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
-  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
+  const [sectorOptions, setsectorOptions] = useState<OptionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const table = useReactTable({
@@ -53,12 +53,12 @@ export function CandidateDataTable<TData, TValue>({
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
-        setSecteurOptions(data);
+        setsectorOptions(data);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching secteur options:", error);
+        throw new Error("Error fetching sector options:", error);
       });
   }, []);
 
@@ -87,8 +87,8 @@ export function CandidateDataTable<TData, TValue>({
           onChange={handleSelectChange}
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">Secteur</option>
-          {secteurOptions.map((option) => (
+          <option value="">sector</option>
+          {sectorOptions.map((option) => (
             <option key={option.id} value={option.name}>
               {option.name}
             </option>

@@ -3,9 +3,9 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  useReactTable,
+  useReactTable
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import {
   Table,
@@ -13,13 +13,15 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Circles } from "react-loader-spinner";
+import { toast } from "@/components/ui/use-toast";
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,14 +35,14 @@ interface OptionData {
 }
 
 export function DataTable<TData, TValue>({
-  columns,
-  data,
-  searchKey,
-}: DataTableProps<TData, TValue>) {
+                                           columns,
+                                           data,
+                                           searchKey
+                                         }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("Pending");
   const [loading, setLoading] = useState<boolean>(true);
-  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
+  const [sectorOptions, setSectorOptions] = useState<OptionData[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -48,12 +50,16 @@ export function DataTable<TData, TValue>({
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
-        setSecteurOptions(data);
+        setSectorOptions(data);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching secteur options:", error);
+        toast({
+          title: "Whoops!",
+          variant: "destructive",
+          description: error?.toString() || "Erreur lors de la récupération des données."
+        });
       });
   }, []);
 
@@ -61,16 +67,16 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    getFilteredRowModel: getFilteredRowModel()
   });
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue]);
+  }, [searchKey, searchValue, table]);
 
   useEffect(() => {
     table.setGlobalFilter(selectValue);
-  }, [selectValue]);
+  }, [selectValue, table]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
@@ -90,19 +96,19 @@ export function DataTable<TData, TValue>({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
         >
-          <option value="Pending">Pending</option>
-          <option value="Accepted">Accepted</option>
-          <option value="Declined">Declined</option>
+          <option value="Pending">En attente</option>
+          <option value="Accepted">Accepté</option>
+          <option value="Declined">Décliné</option>
         </select>
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
         >
-          <option value="">Secteur</option>
-          {secteurOptions.map((option) => (
+          <option value="">sector</option>
+          {sectorOptions.map((option) => (
             <option key={option.id} value={option.name}>
               {option.name}
             </option>
@@ -132,9 +138,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -143,20 +149,20 @@ export function DataTable<TData, TValue>({
             <TableBody>
               {table.getFilteredRowModel().rows.length
                 ? table.getFilteredRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() ? "selected" : undefined}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
                 : null}
             </TableBody>
           </Table>

@@ -5,20 +5,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Entreprise } from "@/constants/data";
+import { Entreprise, EntrepriseStatus } from "@/constants/data";
 import {
   CheckSquare,
   XSquare,
-  // Edit,
   MoreHorizontal,
-  View,
+  View
 } from "lucide-react";
 
-import { useState } from "react";
+
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+
 
 interface CellActionProps {
   data: Entreprise;
@@ -27,6 +29,7 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
   const authToken = Cookies.get("authToken");
   const router = useRouter();
 
@@ -41,25 +44,31 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        },
+            Authorization: `Bearer ${authToken}`
+          }
+        }
       );
 
-      if (response.ok) {
-        console.log("Candidate deleted successfully!");
-      } else {
-        console.error("Failed to delete candidate");
+      if (!response.ok) {
+        toast({
+          title: "Whoops!",
+          variant: "destructive",
+          description: "Erreur lors de la récupération des données."
+        });
       }
     } catch (error) {
-      console.error("An error occurred while deleting the candidate:", error);
+      toast({
+        title: "Whoops!",
+        variant: "destructive",
+        description: error?.toString() || "Erreur lors de la récupération des données."
+      });
     } finally {
       setLoading(false);
       setOpen(false);
     }
   };
 
-  const onVerify = async (isVerified: string) => {
+  const onVerify = async (isVerified: EntrepriseStatus) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/accept/${data.id}`,
@@ -68,21 +77,29 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           headers: {
             Authorization: `Bearer ${authToken}`,
             Accept: "application/json",
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            isVerified,
-          }),
-        },
+            isVerified
+          })
+        }
       );
 
       if (response.ok) {
-        console.log("Candidate deleted successfully!");
+        toast({
+          title: "Success!",
+          description: "Entreprise a été vérifiée avec succès."
+        });
+        data.isVerified = isVerified;
       } else {
-        console.error("Failed to delete candidate");
+        data.isVerified = "Pending";
       }
     } catch (error) {
-      console.log(error);
+      toast({
+        title: "Whoops!",
+        variant: "destructive",
+        description: error?.toString() || "Erreur lors de la récupération des données."
+      });
     }
   };
 
@@ -106,14 +123,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <DropdownMenuItem
             onClick={() => {
-              onVerify("Accepted");
+              onVerify("Accepted" as EntrepriseStatus);
             }}
           >
             <CheckSquare className="mr-2 h-4 w-4" /> Accept
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              onVerify("Declined");
+              onVerify("Declined" as EntrepriseStatus);
             }}
           >
             <XSquare className="mr-2 h-4 w-4" /> Decline

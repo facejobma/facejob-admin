@@ -44,7 +44,7 @@ export const columns: ColumnDef<Entreprise>[] = [
   },
   {
     accessorKey: "id",
-    header: "Id d'entreprise",
+    header: "Id",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
@@ -56,14 +56,26 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableHiding: true
   },
   {
-    accessorKey: "plan",
+    accessorKey: "plan_name",
     header: "Pannel",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true
+  }, {
+    accessorKey: "plan_start_data",
+    header: "Date d'angagement",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true
+  }, {
+    accessorKey: "plan_end_data",
+    header: "Date de fin",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
   },
   {
-    accessorKey: "secteur",
+    accessorKey: "sector",
     header: "SECTEUR"
   },
   {

@@ -10,7 +10,7 @@ import { EntrepriseForm } from "@/components/forms/entreprise-form";
 interface EnterpriseData {
   logo: string;
   company_name: string;
-  secteur: string;
+  sector: string;
   email: string;
   phone: string;
   adresse: string;
@@ -51,7 +51,7 @@ export default function Page() {
 
           const {
             company_name,
-            secteur,
+            sector,
             email,
             phone,
             adresse,
@@ -64,7 +64,7 @@ export default function Page() {
 
           setEnterpriseData({
             company_name,
-            secteur,
+            sector,
             email,
             phone,
             adresse,

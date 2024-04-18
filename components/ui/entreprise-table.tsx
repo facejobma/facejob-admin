@@ -50,6 +50,7 @@ export function EntrepriseDataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  
   const planOptions = [
     "Pannel gratuit",
     "Pannel de base",
@@ -57,6 +58,7 @@ export function EntrepriseDataTable<TData, TValue>({
     "Pannel Essentiel",
     "Pannel premium",
   ];
+
 
   useEffect(() => {
     setLoading(true);

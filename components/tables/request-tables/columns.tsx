@@ -4,8 +4,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
+import { Dispatch, SetStateAction } from "react";
 
-export const columns: ColumnDef<Entreprise>[] = [
+export const columns: ColumnDef<Entreprise, Dispatch<SetStateAction<Entreprise[]>>>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -23,7 +24,7 @@ export const columns: ColumnDef<Entreprise>[] = [
       />
     ),
     enableSorting: false,
-    enableHiding: false,
+    enableHiding: false
   },
   {
     accessorKey: "logo",
@@ -39,26 +40,26 @@ export const columns: ColumnDef<Entreprise>[] = [
           />
         </div>
       </TableCell>
-    ),
+    )
   },
   {
     accessorKey: "company_name",
     header: "Company Name",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   {
-    accessorKey: "secteur",
-    header: "SECTEUR",
+    accessorKey: "sector",
+    header: "sector"
   },
   {
     accessorKey: "email",
-    header: "EMAIL",
+    header: "EMAIL"
   },
   {
     accessorKey: "phone",
-    header: "TEL",
+    header: "TEL"
   },
   {
     accessorKey: "isVerified",
@@ -75,10 +76,10 @@ export const columns: ColumnDef<Entreprise>[] = [
       >
         {row.original.isVerified}
       </div>
-    ),
+    )
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />,
-  },
+    cell: ({ row }) => <CellAction data={row.original} />
+  }
 ];

@@ -15,7 +15,7 @@ export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Requests (${data.length})`}
+          title={`Requests (${data.filter(entreprise => entreprise.isVerified == "Pending").length})`}
           description="Validating the entreprise requests"
         />
       </div>

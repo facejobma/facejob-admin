@@ -20,7 +20,7 @@ export type Sales = {
 }
 
 export interface Statistiques {
-  secteurs: number;
+  sectors: number;
   postules: number;
   users: number;
   offres: number;
@@ -28,18 +28,18 @@ export interface Statistiques {
   sales: Sales;
 }
 
-export enum Plan {
-  PannelGratuit = "Pannel gratuit",
-  PannelDeBase = "Pannel de base",
-  PannelIntermediaire = "Pannel Intérmédiaire",
-  PannelEssentiel = "Pannel Essentiel",
-  PannelPremium = "Pannel Premium"
-}
+// export enum Plan {
+//   PannelGratuit = "Pannel gratuit",
+//   PannelDeBase = "Pannel de base",
+//   PannelIntermediaire = "Pannel Intérmédiaire",
+//   PannelEssentiel = "Pannel Essentiel",
+//   PannelPremium = "Pannel Premium"
+// }
 
 export interface EnterpriseData {
   logo: string;
   company_name: string;
-  secteur: string;
+  sector: string;
   email: string;
   phone: string;
   adresse: string;
@@ -47,7 +47,9 @@ export interface EnterpriseData {
   effectif: string;
   description: string;
   isVerified: string;
-  plan: Plan;
+  plan_name: string;
+  // plan_end_data: Date;
+  // plan: Plan;
 }
 
 
@@ -67,6 +69,7 @@ export type PlanDetails = {
   updated_at: string;
   popular: boolean;
   exclusive: boolean;
+  isMonthly: boolean;
   isYearly: boolean;
   isQuarterly: boolean;
 }
