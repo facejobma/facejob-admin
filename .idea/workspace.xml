@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="fix padding / entreprise_logo" />
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="fix entreprise_logo" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -140,6 +140,7 @@
       <workItem from="1713469958065" duration="245000" />
       <workItem from="1713520105060" duration="11206000" />
       <workItem from="1713554576761" duration="191000" />
+      <workItem from="1713554895204" duration="350000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -309,7 +310,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713554754218</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="fix entreprise_logo">
+      <option name="closed" value="true" />
+      <created>1713554944387</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1713554944388</updated>
+    </task>
+    <task id="LOCAL-00023" summary="fix entreprise_logo">
+      <option name="closed" value="true" />
+      <created>1713555052111</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1713555052111</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -336,14 +353,15 @@
     <MESSAGE value="update sales" />
     <MESSAGE value="add sales tab" />
     <MESSAGE value="fix padding / entreprise_logo" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix padding / entreprise_logo" />
+    <MESSAGE value="fix entreprise_logo" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix entreprise_logo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/components/forms/entreprise-profile.tsx</url>
-          <line>56</line>
+          <line>57</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
