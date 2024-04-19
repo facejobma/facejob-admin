@@ -10,8 +10,8 @@ export function RecentSales({ sales }: { sales: Sales[] }) {
       {sales.map((sale, index) => (
         <div key={index} className="flex items-center">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={sale.entreprise_logo} alt="Avatar" />
-            <AvatarFallback>{sale.entreprise_name}</AvatarFallback>
+            <AvatarImage src={sale.entreprise.logo} alt="Avatar" />
+            <AvatarFallback>{sale.entreprise.company_name}</AvatarFallback>
           </Avatar>
           <div className="ml-4 space-y-1">
             <p className="text-sm font-medium leading-none">{sale.description}</p>

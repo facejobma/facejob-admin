@@ -16,9 +16,7 @@ export type Sales = {
   amount: string;
   created_at: string;
   description: string;
-  entreprise_id: string;
-  entreprise_name: string;
-  entreprise_logo: string;
+  entreprise: EnterpriseData;
   id: number;
   plan_id: number;
   updated_at: string;
@@ -53,8 +51,6 @@ export interface EnterpriseData {
   description: string;
   isVerified: string;
   plan_name: string;
-  // plan_end_data: Date;
-  // plan: Plan;
 }
 
 

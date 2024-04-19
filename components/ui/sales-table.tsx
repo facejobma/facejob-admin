@@ -5,8 +5,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
@@ -32,14 +30,17 @@ interface OptionData {
   name: string;
 }
 
-export function CandidateDataTable<TData, TValue>({
+export function SalesDataTable<TData, TValue>({
   columns,
   data,
   searchKey,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
-  const [sectorOptions, setSectorOptions] = useState<OptionData[]>([]);
+  const [selectPanValue, setSelectPanValue] = useState<string>("");
+  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(20);
   const [loading, setLoading] = useState<boolean>(true);
 
   const table = useReactTable({
@@ -49,22 +50,34 @@ export function CandidateDataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  
+  const planOptions = [
+    "Pannel gratuit",
+    "Pannel de base",
+    "Pannel Intérmédiare",
+    "Pannel Essentiel",
+    "Pannel premium",
+  ];
+
+
   useEffect(() => {
+    setLoading(true);
+
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
-        setSectorOptions(data);
+        setSecteurOptions(data);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching sector options:", error);
+        throw new Error("Error fetching secteur options:", error);
       });
   }, []);
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue, table]);
+  }, [searchKey, searchValue, selectPanValue, table]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
@@ -72,6 +85,28 @@ export function CandidateDataTable<TData, TValue>({
 
     table.setGlobalFilter(selectedValue);
   };
+
+  const handleSelectPannelChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const selectedValue = event.target.value;
+    setSelectPanValue(selectedValue);
+
+    table.setGlobalFilter(selectedValue);
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) =>
+      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
+    );
+  };
+
+  const startIndex = currentPage * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, data.length);
 
   return (
     <>
@@ -83,12 +118,24 @@ export function CandidateDataTable<TData, TValue>({
           className="w-full md:max-w-sm"
         />
         <select
+          value={selectPanValue || ""}
+          onChange={handleSelectPannelChange}
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+        >
+          <option value="">Pannel</option>
+          {planOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        <select
           value={selectValue || ""}
           onChange={handleSelectChange}
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">sector</option>
-          {sectorOptions.map((option) => (
+          <option value="">Secteur</option>
+          {secteurOptions.map((option) => (
             <option key={option.id} value={option.name}>
               {option.name}
             </option>
@@ -111,6 +158,7 @@ export function CandidateDataTable<TData, TValue>({
         <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
           <Table className="relative">
             <TableHeader>
+              {/* Header rows */}
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -127,23 +175,25 @@ export function CandidateDataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getFilteredRowModel().rows.length
-                ? table.getFilteredRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() ? "selected" : undefined}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : null}
+              {/* Render rows for the current page */}
+              {table
+                .getFilteredRowModel()
+                .rows.slice(startIndex, endIndex)
+                .map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
           <ScrollBar orientation="horizontal" />
@@ -158,16 +208,16 @@ export function CandidateDataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={handlePreviousPage}
+            disabled={currentPage === 0}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={handleNextPage}
+            disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
           >
             Next
           </Button>

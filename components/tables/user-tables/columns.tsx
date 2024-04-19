@@ -21,8 +21,6 @@ export const columns: ColumnDef<User>[] = [
         aria-label="Select row"
       />
     ),
-    // enableSorting: false,
-    // enableHiding: false,
   },
   {
     accessorKey: "first_name",
@@ -47,10 +45,6 @@ export const columns: ColumnDef<User>[] = [
     accessorKey: "bio",
     header: "BIO",
   },
-  // {
-  //   accessorKey: "status",
-  //   header: "STATUS",
-  // },
   {
     id: "actions",
     cell: ({ row }) => <CellAction data={row.original} />,

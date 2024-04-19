@@ -4,7 +4,7 @@ import { Overview } from "@/components/overview";
 import { RecentSales } from "@/components/recent-sales";
 import {
   Card,
-  CardContent,
+  CardContent, CardDescription,
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
@@ -200,9 +200,6 @@ function OverViewTab() {
               <Card className="col-span-4 md:col-span-3">
                 <CardHeader>
                   <CardTitle>Ventes récentes</CardTitle>
-                  {/*<CardDescription>*/}
-                  {/*  You made 265 sales this month.*/}
-                  {/*</CardDescription>*/}
                 </CardHeader>
                 <CardContent>
                   {stats.sales && <RecentSales sales={stats.sales} />}

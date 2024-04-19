@@ -16,7 +16,6 @@ import {
   Loader2,
   LogIn,
   LogOut,
-  LucideIcon,
   Moon,
   MoreVertical,
   Pizza,
@@ -32,11 +31,11 @@ import {
   ArrowLeft,
   GanttChartSquare,
   Video,
-  CircleDollarSign
+  HandCoins, DollarSign
 
 } from "lucide-react";
 
-export type Icon = LucideIcon;
+// export type Icon = LucideIcon;
 
 export const Icons = {
   dashboard: LayoutDashboardIcon,
@@ -72,5 +71,6 @@ export const Icons = {
   twitter: X,
   check: Check,
   logout: LogOut,
-  payments: CircleDollarSign,
+  payments: DollarSign,
+  sales: HandCoins
 };

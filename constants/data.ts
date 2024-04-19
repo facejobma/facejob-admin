@@ -84,6 +84,12 @@ export const navItems: NavItem[] = [
     label: "candidateVideos"
   },
   {
+    title: "Les ventes",
+    href: "/dashboard/sales",
+    icon: "sales",
+    label: "sales"
+  },
+  {
     title: "Service de Payment",
     href: "/dashboard/payments",
     icon: "payments",
