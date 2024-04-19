@@ -4,20 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="update sales">
-      <change afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/sales/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/tables/sales-tables/cell-action.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/tables/sales-tables/columns.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/tables/sales-tables/sales.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/sales-table.tsx" afterDir="false" />
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add sales tab">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/icons.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/icons.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/recent-sales.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/recent-sales.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/employee-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/employee.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/ui/candidate-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/candidate-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants/data.ts" beforeDir="false" afterPath="$PROJECT_DIR$/constants/data.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,7 +140,7 @@
       <workItem from="1713459684064" duration="7857000" />
       <workItem from="1713469123175" duration="807000" />
       <workItem from="1713469958065" duration="245000" />
-      <workItem from="1713520105060" duration="10492000" />
+      <workItem from="1713520105060" duration="11206000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -306,7 +294,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713527025522</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="add sales tab">
+      <option name="closed" value="true" />
+      <created>1713554086683</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1713554086683</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -331,7 +327,8 @@
     <MESSAGE value="add duration to plan" />
     <MESSAGE value="fix bug" />
     <MESSAGE value="update sales" />
-    <option name="LAST_COMMIT_MESSAGE" value="update sales" />
+    <MESSAGE value="add sales tab" />
+    <option name="LAST_COMMIT_MESSAGE" value="add sales tab" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

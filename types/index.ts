@@ -40,7 +40,7 @@ export interface Statistiques {
 // }
 
 export interface EnterpriseData {
-  logo: string;
+  entreprise_logo: string;
   company_name: string;
   sector: string;
   email: string;
