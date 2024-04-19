@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { CheckCircle, XCircle } from "lucide-react";
 import { EnterpriseData } from "@/types";
+import React from "react";
 
 
 

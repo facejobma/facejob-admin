@@ -13,7 +13,7 @@ export const columns: ColumnDef<Sales>[] = [
       <TableCell>
         <div className="w-10 h-10 relative rounded-full overflow-hidden">
           <Image
-            src={row.original.entreprise.logo}
+            src={row.original.entreprise.entreprise_logo}
             alt={`${row.original.entreprise.company_name} Logo`}
             layout="fill"
             objectFit="cover"
