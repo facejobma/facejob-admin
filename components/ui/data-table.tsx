@@ -3,9 +3,9 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  useReactTable
+  useReactTable,
 } from "@tanstack/react-table";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Table,
@@ -13,7 +13,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table";
 
 import { Input } from "./input";
@@ -21,7 +21,6 @@ import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Circles } from "react-loader-spinner";
 import { toast } from "@/components/ui/use-toast";
-
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,14 +34,16 @@ interface OptionData {
 }
 
 export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                           searchKey
-                                         }: DataTableProps<TData, TValue>) {
+  columns,
+  data,
+  searchKey,
+}: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("Pending");
   const [loading, setLoading] = useState<boolean>(true);
   const [sectorOptions, setSectorOptions] = useState<OptionData[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(20);
 
   useEffect(() => {
     setLoading(true);
@@ -58,7 +59,7 @@ export function DataTable<TData, TValue>({
         toast({
           title: "Whoops!",
           variant: "destructive",
-          description: error?.toString() || "Erreur lors de la récupération des données."
+          description: error?.toString() || "Error fetching sector options.",
         });
       });
   }, []);
@@ -67,7 +68,7 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel()
+    getFilteredRowModel: getFilteredRowModel(),
   });
 
   useEffect(() => {
@@ -83,6 +84,19 @@ export function DataTable<TData, TValue>({
     setSelectValue(selectedValue);
   };
 
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) =>
+      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
+    );
+  };
+
+  const startIndex = currentPage * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, data.length);
+
   return (
     <>
       <div className="flex space-x-2">
@@ -92,22 +106,21 @@ export function DataTable<TData, TValue>({
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full md:max-w-sm"
         />
-
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
           className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
         >
-          <option value="Pending">En attente</option>
-          <option value="Accepted">Accepté</option>
-          <option value="Declined">Décliné</option>
+          <option value="Pending">Pending</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Declined">Declined</option>
         </select>
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
         >
-          <option value="">sector</option>
+          <option value="">Sector</option>
           {sectorOptions.map((option) => (
             <option key={option.id} value={option.name}>
               {option.name}
@@ -138,17 +151,19 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
-              {table.getFilteredRowModel().rows.length
-                ? table.getFilteredRowModel().rows.map((row) => (
+              {table
+                .getFilteredRowModel()
+                .rows.slice(startIndex, endIndex)
+                .map((row) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() ? "selected" : undefined}
@@ -157,13 +172,12 @@ export function DataTable<TData, TValue>({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}
                   </TableRow>
-                ))
-                : null}
+                ))}
             </TableBody>
           </Table>
           <ScrollBar orientation="horizontal" />
@@ -178,16 +192,16 @@ export function DataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={handlePreviousPage}
+            disabled={currentPage === 0}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={handleNextPage}
+            disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
           >
             Next
           </Button>

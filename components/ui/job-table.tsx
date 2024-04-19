@@ -34,6 +34,8 @@ export function JobDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("Pending");
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(20);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -69,6 +71,19 @@ export function JobDataTable<TData, TValue>({
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
   };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) =>
+      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
+    );
+  };
+
+  const startIndex = currentPage * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, data.length);
 
   return (
     <>
@@ -121,23 +136,24 @@ export function JobDataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getFilteredRowModel().rows.length
-                ? table.getFilteredRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() ? "selected" : undefined}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : null}
+              {table
+                .getFilteredRowModel()
+                .rows.slice(startIndex, endIndex)
+                .map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
           <ScrollBar orientation="horizontal" />
@@ -152,16 +168,16 @@ export function JobDataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={handlePreviousPage}
+            disabled={currentPage === 0}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={handleNextPage}
+            disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
           >
             Next
           </Button>

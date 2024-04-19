@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
@@ -40,9 +39,11 @@ export function CandidateDataTable<TData, TValue>({
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [sectorOptions, setSectorOptions] = useState<OptionData[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(20);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const table = useReactTable({
+  const table = useReactTable<TData>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
@@ -52,13 +53,13 @@ export function CandidateDataTable<TData, TValue>({
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: OptionData[]) => {
         setSectorOptions(data);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching sector options:", error);
+        throw new Error("Error fetching sector options: " + error);
       });
   }, []);
 
@@ -66,12 +67,27 @@ export function CandidateDataTable<TData, TValue>({
     table.getColumn(searchKey)?.setFilterValue(searchValue);
   }, [searchKey, searchValue, table]);
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
 
     table.setGlobalFilter(selectedValue);
   };
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) =>
+      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1)
+    );
+  };
+
+  const startIndex = currentPage * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, data.length);
 
   return (
     <>
@@ -119,7 +135,7 @@ export function CandidateDataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   ))}
@@ -127,23 +143,24 @@ export function CandidateDataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getFilteredRowModel().rows.length
-                ? table.getFilteredRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() ? "selected" : undefined}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                : null}
+              {table
+                .getFilteredRowModel()
+                .rows.slice(startIndex, endIndex)
+                .map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
           <ScrollBar orientation="horizontal" />
@@ -158,16 +175,18 @@ export function CandidateDataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={handlePreviousPage}
+            disabled={currentPage === 0}
           >
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={handleNextPage}
+            disabled={
+              currentPage === Math.ceil(data.length / pageSize) - 1
+            }
           >
             Next
           </Button>
