@@ -13,10 +13,15 @@ export interface NavItem {
 
 
 export type Sales = {
-  entrepriseName: string;
-  entrepriseEmail: string;
-  amount: number;
-  date: string;
+  amount: string;
+  created_at: string;
+  description: string;
+  entreprise_id: string;
+  entreprise_name: string;
+  entreprise_logo: string;
+  id: number;
+  plan_id: number;
+  updated_at: string;
 }
 
 export interface Statistiques {
@@ -25,7 +30,7 @@ export interface Statistiques {
   users: number;
   offres: number;
   entreprises: number;
-  sales: Sales;
+  sales: Sales[];
 }
 
 // export enum Plan {

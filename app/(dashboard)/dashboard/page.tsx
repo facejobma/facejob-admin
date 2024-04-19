@@ -205,7 +205,7 @@ function OverViewTab() {
                   {/*</CardDescription>*/}
                 </CardHeader>
                 <CardContent>
-                  <RecentSales sales={stats.sales} />
+                  {stats.sales && <RecentSales sales={stats.sales} />}
                 </CardContent>
               </Card>
             </div>

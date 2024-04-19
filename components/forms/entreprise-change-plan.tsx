@@ -63,12 +63,13 @@ export const ChangePlanToEntreprise: React.FC = () => {
             body: JSON.stringify(data)
           }
         );
-
+        form.reset();
         if (response.ok) {
+          const { message } = await response.json() as { message: string };
           toast({
             title: "Success",
             variant: "default",
-            description: "plan added successfully!"
+            description: message || "Plan ajouté avec succès."
           });
         } else {
           toast({
@@ -118,6 +119,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
           <FormField
+            defaultValue={""}
             control={form.control}
             name="entrepriseId"
             render={({ field }) => (
@@ -131,6 +133,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
             )}
           />
           <FormField
+            defaultValue={""}
             control={form.control}
             name="planId"
             render={({ field }) => (
@@ -158,6 +161,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
           <FormField
             control={form.control}
             name="duration"
+            defaultValue={""}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Durée</FormLabel>

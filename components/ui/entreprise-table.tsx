@@ -70,7 +70,7 @@ export function EntrepriseDataTable<TData, TValue>({
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue, selectPanValue]);
+  }, [searchKey, searchValue, selectPanValue, table]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;

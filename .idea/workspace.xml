@@ -4,10 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add duration to plan">
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="fix bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/requests/[requestId]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-change-plan.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/recent-sales.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/recent-sales.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/entreprise-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/entreprise-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -142,6 +147,8 @@
       <workItem from="1713387967208" duration="475000" />
       <workItem from="1713459684064" duration="7857000" />
       <workItem from="1713469123175" duration="807000" />
+      <workItem from="1713469958065" duration="245000" />
+      <workItem from="1713520105060" duration="4041000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -279,7 +286,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713468849904</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="fix bug">
+      <option name="closed" value="true" />
+      <created>1713470035947</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1713470035947</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -302,7 +317,8 @@
     <MESSAGE value="change secteur to sector" />
     <MESSAGE value="fix hot reloading" />
     <MESSAGE value="add duration to plan" />
-    <option name="LAST_COMMIT_MESSAGE" value="add duration to plan" />
+    <MESSAGE value="fix bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
