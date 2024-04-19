@@ -16,7 +16,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
       <div className="flex items-center justify-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden">
           <Image
-            src={initialData.logo}
+            src={initialData.entreprise_logo}
             alt={`${initialData.company_name} Logo`}
             layout="fill"
             objectFit="cover"
