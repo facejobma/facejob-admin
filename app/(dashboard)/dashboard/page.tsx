@@ -191,10 +191,10 @@ function OverViewTab() {
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Overview</CardTitle>
+                  <CardTitle>Aperçu</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
-                  <Overview />
+                  {stats.sales && <Overview sales={stats.sales} />}
                 </CardContent>
               </Card>
               <Card className="col-span-4 md:col-span-3">
@@ -202,7 +202,7 @@ function OverViewTab() {
                   <CardTitle>Ventes récentes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {stats.sales && <RecentSales sales={stats.sales} />}
+                  {stats.sales && <RecentSales sales={stats.sales.slice(0, 5)} />}
                 </CardContent>
               </Card>
             </div>
