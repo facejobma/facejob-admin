@@ -18,6 +18,8 @@ import {
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CellActionProps {
   data: Job;
@@ -25,11 +27,23 @@ interface CellActionProps {
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   // const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [comment, setComment] = useState("");
+  const { toast } = useToast();
   const authToken = Cookies.get("authToken");
   const router = useRouter();
 
-  const onVerify = async (isVerified: string) => {
+  const onVerify = async (is_verified: string) => {
     try {
+      if (is_verified === "Declined" && !comment) {
+        toast({
+          title: "Error!",
+          variant: "destructive",
+          description: "Please provide a comment.",
+        });
+        return;
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/job/accept/${data.id}`,
         {
@@ -40,18 +54,28 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            isVerified,
+            is_verified,
+            comment,
           }),
         },
       );
 
       if (response.ok) {
-        console.log("Candidate deleted successfully!");
+        toast({
+          title: "Success!",
+          description: "Job a été vérifiée avec succès.",
+        });
+        data.is_verified = is_verified;
       } else {
-        console.error("Failed to delete candidate");
+        data.is_verified = "Pending";
       }
     } catch (error) {
-      console.log(error);
+      toast({
+        title: "Whoops!",
+        variant: "destructive",
+        description:
+          error?.toString() || "Erreur lors de la récupération des données.",
+      });
     }
   };
 
@@ -82,7 +106,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              onVerify("Declined");
+              setOpen(true);
             }}
           >
             <XSquare className="mr-2 h-4 w-4" /> Decline
@@ -96,6 +120,25 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {open && (
+        <div className="mt-4">
+          <Input
+            className="mb-2"
+            placeholder="Enter comment..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <Button
+            onClick={() => {
+              onVerify("Declined" as string);
+              setOpen(false);
+            }}
+          >
+            Confirm Decline
+          </Button>
+        </div>
+      )}
     </>
   );
 };
