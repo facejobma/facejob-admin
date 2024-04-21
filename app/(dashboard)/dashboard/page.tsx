@@ -1,6 +1,5 @@
 "use client";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
-import { Overview } from "@/components/overview";
 import { RecentSales } from "@/components/recent-sales";
 import {
   Card,
@@ -13,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Statistiques } from "@/types";
+import { Overview } from "@/components/overview";
 
 
 function OverViewTab() {
@@ -54,7 +54,7 @@ function OverViewTab() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Aperçu</TabsTrigger>
-            <TabsTrigger value="analytics" disabled>
+            <TabsTrigger value="analytics">
               Plus de details
             </TabsTrigger>
           </TabsList>
@@ -79,10 +79,7 @@ function OverViewTab() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.sectors}</div>
-                  {/*<p className="text-xs text-muted-foreground">*/}
-                  {/*  +20.1% from last month*/}
-                  {/*</p>*/}
+                  <div className="text-2xl font-bold">{stats.sectors_count}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -106,10 +103,7 @@ function OverViewTab() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.postules}</div>
-                  {/*<p className="text-xs text-muted-foreground">*/}
-                  {/*  +180.1% from last month*/}
-                  {/*</p>*/}
+                  <div className="text-2xl font-bold">{stats.postules_count}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -131,11 +125,8 @@ function OverViewTab() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{
-                    stats.offres
+                    stats.offres_count
                   }</div>
-                  {/*<p className="text-xs text-muted-foreground">*/}
-                  {/*  +19% from last month*/}
-                  {/*</p>*/}
                 </CardContent>
               </Card>
               <Card>
@@ -158,11 +149,8 @@ function OverViewTab() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{
-                    stats.users
+                    stats.candidates_count
                   }</div>
-                  {/*<p className="text-xs text-muted-foreground">*/}
-                  {/*  +201 since last hour*/}
-                  {/*</p>*/}
                 </CardContent>
               </Card>
               <Card>
@@ -180,21 +168,18 @@ function OverViewTab() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{
-                    stats.entreprises
+                    stats.entreprises_count
                   }</div>
-                  {/*<p className="text-xs text-muted-foreground">*/}
-                  {/*  +201 since last hour*/}
-                  {/*</p>*/}
                 </CardContent>
               </Card>
             </div>
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
               <Card className="col-span-4">
                 <CardHeader>
-                  <CardTitle>Aperçu</CardTitle>
+                  <CardTitle>Les ventes</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
-                  {stats.sales && <Overview sales={stats.sales} />}
+                  {stats.sales && <Overview unit={"DH"} stats={stats.sales} />}
                 </CardContent>
               </Card>
               <Card className="col-span-4 md:col-span-3">
@@ -202,7 +187,27 @@ function OverViewTab() {
                   <CardTitle>Ventes récentes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {stats.sales && <RecentSales sales={stats.sales.slice(0, 5)} />}
+                  {stats.last_n_sales && <RecentSales sales={stats.last_n_sales} />}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          <TabsContent value="analytics" className="space-y-4">
+            <div className="grid gap-4  grid-cols-2">
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Les enterprises</CardTitle>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  {stats.entreprises && <Overview stats={stats.entreprises} />}
+                </CardContent>
+              </Card>
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Les candidats</CardTitle>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  {stats.candidates && <Overview stats={stats.candidates} />}
                 </CardContent>
               </Card>
             </div>

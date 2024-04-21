@@ -12,6 +12,7 @@ export interface NavItem {
 }
 
 
+
 export type Sales = {
   amount: string;
   created_at: string;
@@ -22,22 +23,24 @@ export type Sales = {
   updated_at: string;
 }
 
-export interface Statistiques {
-  sectors: number;
-  postules: number;
-  users: number;
-  offres: number;
-  entreprises: number;
-  sales: Sales[];
+export type StatsItem = {
+  sum: number;
+  month: number;
+  year: number;
 }
 
-// export enum Plan {
-//   PannelGratuit = "Pannel gratuit",
-//   PannelDeBase = "Pannel de base",
-//   PannelIntermediaire = "Pannel Intérmédiaire",
-//   PannelEssentiel = "Pannel Essentiel",
-//   PannelPremium = "Pannel Premium"
-// }
+export interface Statistiques {
+  sectors_count: number;
+  postules_count: number;
+  offres_count: number;
+  candidates: StatsItem[];
+  candidates_count: number;
+  entreprises: StatsItem[];
+  entreprises_count: number;
+  sales: StatsItem[];
+  last_n_sales: Sales[];
+}
+
 
 export interface EnterpriseData {
   entreprise_logo: string;
