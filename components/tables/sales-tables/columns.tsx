@@ -27,15 +27,15 @@ export const columns: ColumnDef<Sales>[] = [
     header: "ID "
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "entreprise.company_name",
+    header: "Nom de l'entreprise",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
   },
   {
-    accessorKey: "entreprise.company_name",
-    header: "Nom de l'entreprise",
+    accessorKey: "description",
+    header: "Description",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
