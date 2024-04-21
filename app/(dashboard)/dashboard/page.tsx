@@ -3,8 +3,7 @@ import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { RecentSales } from "@/components/recent-sales";
 import {
   Card,
-  CardContent, CardDescription,
-  CardHeader,
+  CardContent, CardHeader,
   CardTitle
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";

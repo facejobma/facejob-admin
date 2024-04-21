@@ -22,7 +22,7 @@ export type Entreprise = {
   site_web: string;
   effectif: string;
   description: string;
-  isVerified: EntrepriseStatus;
+  is_verified: EntrepriseStatus;
   plan_start_data: Date;
   plan_end_data: Date;
 };

@@ -1,4 +1,3 @@
-import { AlertModal } from "@/components/modal/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -97,9 +96,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           title: "Success!",
           description: "Entreprise a été vérifiée avec succès.",
         });
-        data.isVerified = isVerified;
+        data.is_verified = isVerified;
       } else {
-        data.isVerified = "Pending";
+        data.is_verified = "Pending";
       }
     } catch (error) {
       toast({

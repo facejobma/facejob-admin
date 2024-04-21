@@ -33,9 +33,9 @@ const formSchema = z.object({
 });
 
 const durations = [
-  { id: 3, name: "Mensuelle" },
-  { id: 12, name: "Annuelle" },
-  { id: 4, name: "Trimestrielle" }
+  { duration: 1, name: "Mensuelle" },
+  { duration: 12, name: "Annuelle" },
+  { duration: 3, name: "Trimestrielle" }
 ];
 
 type FormValues = z.infer<typeof formSchema>;
@@ -173,7 +173,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
                     <SelectGroup>
                       <SelectLabel>Plan</SelectLabel>
                       {durations.map((value) => (
-                        <SelectItem key={value.id} value={value.id.toString()}>
+                        <SelectItem key={value.duration} value={value.duration.toString()}>
                           {value.name}
                         </SelectItem>
                       ))}

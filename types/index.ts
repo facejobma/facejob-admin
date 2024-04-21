@@ -52,7 +52,7 @@ export interface EnterpriseData {
   site_web: string;
   effectif: string;
   description: string;
-  isVerified: string;
+  is_verified: string;
   plan_name: string;
 }
 

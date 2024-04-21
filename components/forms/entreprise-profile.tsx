@@ -8,9 +8,9 @@ import React from "react";
 export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
   initialData,
 }) => {
-  const isPending = initialData.isVerified === "Pending";
-  const isAccepted = initialData.isVerified === "Accepted";
-  const isDeclined = initialData.isVerified === "Declined";
+  const isPending = initialData.is_verified === "Pending";
+  const isAccepted = initialData.is_verified === "Accepted";
+  const isDeclined = initialData.is_verified === "Declined";
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto mt-8 p-6">
@@ -37,7 +37,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
         </div>
 
         <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Pannel actuelle</h2>
+          <h2 className="text-lg font-semibold mb-2">Panel actuelle</h2>
           <p className="text-gray-600">{initialData.plan_name}</p>
         </div>
 

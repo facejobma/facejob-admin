@@ -25,12 +25,6 @@ export const columns: ColumnDef<Sales>[] = [
   {
     accessorKey: "entreprise.id",
     header: "ID "
-  }, {
-    accessorKey: "amount",
-    header: "Montant",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true
   },
   {
     accessorKey: "description",
@@ -56,6 +50,13 @@ export const columns: ColumnDef<Sales>[] = [
   {
     accessorKey: "plan.plan_name",
     header: "Nom du plan",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true
+  },
+  {
+    accessorKey: "amount",
+    header: "Montant en DH",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true

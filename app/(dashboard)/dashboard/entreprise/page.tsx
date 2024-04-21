@@ -4,13 +4,14 @@ import BreadCrumb from "@/components/breadcrumb";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { UserEnterprise } from "@/components/tables/user-tables/entreprises";
+import { Entreprise } from "@/constants/data";
 
 const breadcrumbItems = [
   { title: "Entreprise", link: "/dashboard/entreprise" }
 ];
 
 export default function UsersPage() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([] as Entreprise[]);
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
@@ -44,7 +45,7 @@ export default function UsersPage() {
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <UserEnterprise data={users} />
+        <UserEnterprise data={users.filter(entreprise => entreprise.is_verified === "Accepted")} />
       </div>
     </>
   );

@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -139,7 +138,7 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/entreprise/delete/${enterpriseId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/delete/${enterpriseId}`,
         {
           method: "DELETE",
           headers: {
@@ -174,9 +173,6 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
   // function setOpen(arg0: boolean): void {
   //   throw new Error("Function not implemented.");
   // }
-
-  const triggerImgUrlValidation = () => form.trigger("imgUrl");
-
   return (
     <>
       <div className="flex items-center justify-between">

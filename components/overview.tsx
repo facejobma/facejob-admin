@@ -1,5 +1,5 @@
 "use client";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { StatsItem } from "@/types";
 import moment from "moment";
 
@@ -35,6 +35,7 @@ export function Overview({ stats, unit = "" }: OverviewProps) {
           axisLine={false}
           tickFormatter={(value) => unit + value}
         />
+        <Tooltip />
         <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
