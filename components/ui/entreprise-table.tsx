@@ -18,10 +18,11 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Circles } from "react-loader-spinner";
+import { Entreprise } from "@/constants/data";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  columns: ColumnDef<Entreprise, any>[];
+  data: Entreprise[];
   searchKey: string;
 }
 
@@ -30,27 +31,36 @@ interface OptionData {
   name: string;
 }
 
-export function EntrepriseDataTable<TData, TValue>({
+export function EntrepriseDataTable({
   columns,
   data,
   searchKey,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [selectPanValue, setSelectPanValue] = useState<string>("");
+  const [selectEffectifValue, setSelectEffectifValue] = useState<string>("");
   const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [filteredData, setFilteredData] = useState<Entreprise[]>([]);
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  
+  const effectifOptions = [
+    "0 - 10",
+    "10 - 50",
+    "50 - 100",
+    "100 - 500",
+    "> 500",
+  ];
+
   const planOptions = [
     "Pannel gratuit",
     "Pannel de base",
@@ -58,7 +68,6 @@ export function EntrepriseDataTable<TData, TValue>({
     "Pannel Essentiel",
     "Pannel premium",
   ];
-
 
   useEffect(() => {
     setLoading(true);
@@ -76,14 +85,27 @@ export function EntrepriseDataTable<TData, TValue>({
   }, []);
 
   useEffect(() => {
-    table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue, selectPanValue, table]);
+    let filtered = data.filter((entreprise) =>
+      entreprise.company_name.toLowerCase().includes(searchValue.toLowerCase()),
+    );
+    if (selectPanValue) {
+      filtered = filtered.filter(
+        (entreprise) => entreprise.plan_name === selectPanValue,
+      );
+    }
+    if (selectEffectifValue) {
+      const [min, max] = selectEffectifValue.split(" - ").map(Number);
+      filtered = filtered.filter(
+        (entreprise) =>
+          entreprise.effectif >= min && entreprise.effectif <= max,
+      );
+    }
+    setFilteredData(filtered);
+  }, [data, searchValue, selectPanValue, selectEffectifValue]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
-
-    table.setGlobalFilter(selectedValue);
   };
 
   const handleSelectPannelChange = (
@@ -91,8 +113,13 @@ export function EntrepriseDataTable<TData, TValue>({
   ) => {
     const selectedValue = event.target.value;
     setSelectPanValue(selectedValue);
+  };
 
-    table.setGlobalFilter(selectedValue);
+  const handleSelectEffectifChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const selectedValue = event.target.value;
+    setSelectEffectifValue(selectedValue);
   };
 
   const handlePreviousPage = () => {
@@ -101,12 +128,12 @@ export function EntrepriseDataTable<TData, TValue>({
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) =>
-      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
+      Math.min(prevPage + 1, Math.ceil(filteredData.length / pageSize) - 1),
     );
   };
 
   const startIndex = currentPage * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, data.length);
+  const endIndex = Math.min(startIndex + pageSize, filteredData.length);
 
   return (
     <>
@@ -120,7 +147,7 @@ export function EntrepriseDataTable<TData, TValue>({
         <select
           value={selectPanValue || ""}
           onChange={handleSelectPannelChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Pannel</option>
           {planOptions.map((option) => (
@@ -132,12 +159,24 @@ export function EntrepriseDataTable<TData, TValue>({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Secteur</option>
           {secteurOptions.map((option) => (
             <option key={option.id} value={option.name}>
               {option.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={selectEffectifValue || ""}
+          onChange={handleSelectEffectifChange}
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+        >
+          <option value="">Effectif</option>
+          {effectifOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
             </option>
           ))}
         </select>
@@ -158,7 +197,6 @@ export function EntrepriseDataTable<TData, TValue>({
         <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
           <Table className="relative">
             <TableHeader>
-              {/* Header rows */}
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -175,7 +213,6 @@ export function EntrepriseDataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {/* Render rows for the current page */}
               {table
                 .getFilteredRowModel()
                 .rows.slice(startIndex, endIndex)
@@ -217,7 +254,9 @@ export function EntrepriseDataTable<TData, TValue>({
             variant="outline"
             size="sm"
             onClick={handleNextPage}
-            disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
+            disabled={
+              currentPage === Math.ceil(filteredData.length / pageSize) - 1
+            }
           >
             Next
           </Button>

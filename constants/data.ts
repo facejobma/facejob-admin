@@ -20,7 +20,7 @@ export type Entreprise = {
   phone: string;
   adresse: string;
   site_web: string;
-  effectif: string;
+  effectif: number;
   description: string;
   is_verified: EntrepriseStatus;
   plan_start_data: Date;

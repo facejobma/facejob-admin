@@ -9,12 +9,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSession } from "@/app/providers/SessionProvider";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-
 
 export function UserNav() {
   const { session } = useSession();
@@ -22,29 +21,24 @@ export function UserNav() {
   const { toast } = useToast();
 
   function signOut() {
-    // Your sign out logic here
-    fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/admin/logout", {
-      method: "POST",
+    fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/logout", {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
       .then(async (res) => {
-          if (res.ok) {
-            // redirect to login
-            router.push("/login");
-          }
-        }
-      )
+        // if (res.ok) {
+          router.push("/");
+        // }
+      })
       .catch((error) => {
-          toast({
-            title: "Whoops!",
-            variant: "destructive",
-            description: error.message
-          });
-        }
-      )
-    ;
+        toast({
+          title: "Whoops!",
+          variant: "destructive",
+          description: error.message,
+        });
+      });
   }
 
   if (session) {
@@ -90,8 +84,9 @@ export function UserNav() {
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => signOut()}>
+          <Button   className="relative">
             Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

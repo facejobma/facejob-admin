@@ -149,6 +149,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       {open && (
         <div className="mt-4">
           <Input
+            className="mb-2"
             placeholder="Enter comment..."
             value={comment}
             onChange={(e) => setComment(e.target.value)}
