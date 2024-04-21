@@ -35,13 +35,13 @@ export type Job = {
   date_fin: string;
   company_name: string;
   sector_name: string;
-  isVerified: string;
+  is_verified: string;
 };
 
 export type CV = {
   id: number;
   link: string;
-  isVerified: string;
+  is_verified: string;
   candidat_name: string;
   sector_name: string;
 };
