@@ -12,15 +12,22 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Statistiques } from "@/types";
 import { Overview } from "@/components/overview";
+import * as React from "react";
+import { DateRange } from "react-day-picker";
+import { addYears } from "date-fns";
 
 
 function OverViewTab() {
   const [stats, setStats] = useState({} as Statistiques);
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: addYears(new Date(), -1),
+    to: new Date()
+  });
   const { toast } = useToast();
 
   useEffect(() => {
     async function getStats() {
-      await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/statics")
+      await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/statics?from=" + date?.from?.toISOString() + "&to=" + date?.to?.toISOString())
         .then((response) => response.json())
         .then((result) => {
           setStats(result);
@@ -36,7 +43,7 @@ function OverViewTab() {
     }
 
     getStats();
-  }, [toast]);
+  }, [date?.from, date?.to, toast]);
 
 
   return (
@@ -47,7 +54,7 @@ function OverViewTab() {
             Bonjour, bon retour 👋
           </h2>
           <div className="hidden md:flex items-center space-x-2">
-            <CalendarDateRangePicker />
+            <CalendarDateRangePicker date={date} setDate={setDate} />
           </div>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
