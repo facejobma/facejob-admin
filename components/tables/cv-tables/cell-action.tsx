@@ -1,4 +1,3 @@
-import { AlertModal } from "@/components/modal/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +6,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CV } from "@/constants/data";
 import {
   CheckSquare,
   XSquare,
@@ -22,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { CV } from "@/types";
 
 interface CellActionProps {
   data: CV;
@@ -33,7 +32,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [comment, setComment] = useState("");
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
-  const router = useRouter();
   const [showPreview, setShowPreview] = useState(false);
   // const router = useRouter();
 

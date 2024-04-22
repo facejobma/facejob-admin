@@ -12,7 +12,6 @@ export interface NavItem {
 }
 
 
-
 export type Sales = {
   amount: string;
   created_at: string;
@@ -77,3 +76,46 @@ export type PlanDetails = {
   isYearly: boolean;
   isQuarterly: boolean;
 }
+export type User = {
+  id: number;
+  nomComplete: string;
+  sector: string;
+  email: string;
+  tel: string;
+  bio: string;
+};
+export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
+
+export type Entreprise = {
+  logo: string;
+  id: number;
+  company_name: string;
+  sector: string;
+  email: string;
+  phone: string;
+  adresse: string;
+  site_web: string;
+  effectif: number;
+  description: string;
+  is_verified: EntrepriseStatus;
+  plan_start_data: Date;
+  plan_end_data: Date;
+  plan_name: string;
+};
+export type Job = {
+  id: number;
+  titre: string;
+  description: string;
+  date_debut: string;
+  date_fin: string;
+  company_name: string;
+  sector_name: string;
+  is_verified: string;
+};
+export type CV = {
+  id: number;
+  link: string;
+  is_verified: string;
+  candidat_name: string;
+  sector_name: string;
+};

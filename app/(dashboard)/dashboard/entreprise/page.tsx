@@ -4,7 +4,8 @@ import BreadCrumb from "@/components/breadcrumb";
 import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { UserEnterprise } from "@/components/tables/user-tables/entreprises";
-import { Entreprise } from "@/constants/data";
+
+import { Entreprise } from "@/types";
 
 const breadcrumbItems = [
   { title: "Entreprise", link: "/dashboard/entreprise" }

@@ -7,10 +7,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Entreprise } from "@/constants/data";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import {  useRouter } from "next/navigation";
 import { useState } from "react";
+import { Entreprise } from "@/types";
 
 interface CellActionProps {
   data: Entreprise;

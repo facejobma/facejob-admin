@@ -2,9 +2,9 @@
 import { DataTable } from "@/components/ui/data-table";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { CV } from "@/constants/data";
 import { columns } from "./columns";
 import { FC } from "react";
+import { CV } from "@/types";
 
 interface CVProps {
   data: CV[];

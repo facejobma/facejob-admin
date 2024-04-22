@@ -6,7 +6,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Entreprise, EntrepriseStatus } from "@/constants/data";
 import { CheckSquare, XSquare, MoreHorizontal, View } from "lucide-react";
 
 import Cookies from "js-cookie";
@@ -15,6 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
 import { Input } from "@/components/ui/input";
+import { Entreprise, EntrepriseStatus } from "@/types";
 
 interface CellActionProps {
   data: Entreprise;

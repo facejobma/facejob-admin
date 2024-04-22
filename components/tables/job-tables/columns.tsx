@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { Job } from "@/constants/data";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
+import { Job } from "@/types";
 
 // import { TableCell } from "@/components/ui/table";
 // import Image from "next/image";

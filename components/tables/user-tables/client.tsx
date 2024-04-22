@@ -2,12 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { User } from "@/constants/data";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { columns } from "./columns";
 import { FC } from "react";
 import { CandidateDataTable } from "@/components/ui/candidate-table";
+import { User } from "@/types";
 
 interface ProductsClientProps {
   data: User[];

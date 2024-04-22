@@ -6,7 +6,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Job } from "@/constants/data";
 import {
   CheckSquare,
   XSquare,
@@ -20,6 +19,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { Job } from "@/types";
 
 interface CellActionProps {
   data: Job;

@@ -18,7 +18,8 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Circles } from "react-loader-spinner";
-import { Entreprise } from "@/constants/data";
+
+import { Entreprise } from "@/types";
 
 interface DataTableProps {
   columns: ColumnDef<Entreprise, any>[];

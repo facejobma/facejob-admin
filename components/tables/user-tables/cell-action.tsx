@@ -7,11 +7,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { User } from "@/constants/data";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { User } from "@/types";
 
 interface CellActionProps {
   data: User;

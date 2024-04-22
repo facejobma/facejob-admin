@@ -1,10 +1,10 @@
 "use client";
 import { Separator } from "@/components/ui/separator";
-import { Entreprise } from "@/constants/data";
 import { columns } from "@/components/tables/employee-tables/columns";
 import { FC } from "react";
 import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
 import { Heading } from "@/components/ui/heading";
+import { Entreprise } from "@/types";
 
 
 interface ProductsClientProps {
