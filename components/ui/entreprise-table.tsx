@@ -62,12 +62,21 @@ export function EntrepriseDataTable({
   ];
 
   // get all sectors from the table
-  const sectors = Array.from(new Set(data.map(item => (item as { sector: string }).sector)));
+  const sectors = Array.from(
+    new Set(data.map((item) => (item as { sector: string }).sector)),
+  );
 
   useEffect(() => {
     let filtered = data.filter((entreprise) =>
       entreprise.company_name.toLowerCase().includes(searchValue.toLowerCase()),
     );
+
+    if (selectValue) {
+      filtered = filtered.filter(
+        (entreprise) => entreprise.sector === selectValue,
+      );
+    }
+
     if (selectPanValue) {
       filtered = filtered.filter(
         (entreprise) => entreprise.plan_name === selectPanValue,
@@ -81,7 +90,7 @@ export function EntrepriseDataTable({
       );
     }
     setFilteredData(filtered);
-  }, [data, searchValue, selectPanValue, selectEffectifValue]);
+  }, [data, searchValue, selectValue, selectPanValue, selectEffectifValue]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
@@ -161,47 +170,47 @@ export function EntrepriseDataTable({
           ))}
         </select>
       </div>
-        <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-          <Table className="relative">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
+      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
+        <Table className="relative">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table
+              .getFilteredRowModel()
+              .rows.slice(startIndex, endIndex)
+              .map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
-            </TableHeader>
-            <TableBody>
-              {table
-                .getFilteredRowModel()
-                .rows.slice(startIndex, endIndex)
-                .map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() ? "selected" : undefined}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+          </TableBody>
+        </Table>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
