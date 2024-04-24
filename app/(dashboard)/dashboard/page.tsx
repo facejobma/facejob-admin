@@ -1,11 +1,7 @@
 "use client";
 import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { RecentSales } from "@/components/recent-sales";
-import {
-  Card,
-  CardContent, CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
@@ -15,36 +11,48 @@ import { Overview } from "@/components/overview";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
 import { addYears } from "date-fns";
-
+import Cookies from "js-cookie";
 
 function OverViewTab() {
   const [stats, setStats] = useState({} as Statistiques);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addYears(new Date(), -1),
-    to: new Date()
+    to: new Date(),
   });
   const { toast } = useToast();
 
+  const authToken = Cookies.get("authToken");
+
   useEffect(() => {
     async function getStats() {
-      await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/statics?from=" + date?.from?.toISOString() + "&to=" + date?.to?.toISOString())
+      await fetch(
+        process.env.NEXT_PUBLIC_BACKEND_URL +
+          "/api/admin/statics?from=" +
+          date?.from?.toISOString() +
+          "&to=" +
+          date?.to?.toISOString(),
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        },
+      )
         .then((response) => response.json())
         .then((result) => {
           setStats(result);
         })
         .catch((error) => {
-            toast({
-              title: "Whoops!",
-              variant: "destructive",
-              description: error.message
-            });
-          }
-        );
+          toast({
+            title: "Whoops!",
+            variant: "destructive",
+            description: error.message,
+          });
+        });
     }
 
     getStats();
   }, [date?.from, date?.to, toast]);
-
 
   return (
     <ScrollArea className="h-full">
@@ -60,9 +68,7 @@ function OverViewTab() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Aperçu</TabsTrigger>
-            <TabsTrigger value="analytics">
-              Plus de details
-            </TabsTrigger>
+            <TabsTrigger value="analytics">Plus de details</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -85,7 +91,9 @@ function OverViewTab() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.sectors_count}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.sectors_count}
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -109,12 +117,16 @@ function OverViewTab() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.postules_count}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.postules_count}
+                  </div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total d&apos;offres</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total d&apos;offres
+                  </CardTitle>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -130,9 +142,7 @@ function OverViewTab() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{
-                    stats.offres_count
-                  }</div>
+                  <div className="text-2xl font-bold">{stats.offres_count}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -154,9 +164,9 @@ function OverViewTab() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{
-                    stats.candidates_count
-                  }</div>
+                  <div className="text-2xl font-bold">
+                    {stats.candidates_count}
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -165,17 +175,25 @@ function OverViewTab() {
                     Nombre d&apos;entreprises
                   </CardTitle>
 
-                  <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="none"
-                       xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    className="h-4 w-4 text-muted-foreground"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M9 7H5C3.89543 7 3 7.89543 3 9V18C3 19.1046 3.89543 20 5 20H19C20.1046 20 21 19.1046 21 18V9C21 7.89543 20.1046 7 19 7H15M9 7V5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7M9 7H15"
-                      stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      stroke="#000000"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{
-                    stats.entreprises_count
-                  }</div>
+                  <div className="text-2xl font-bold">
+                    {stats.entreprises_count}
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -193,7 +211,9 @@ function OverViewTab() {
                   <CardTitle>Ventes récentes</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {stats.last_n_sales && <RecentSales sales={stats.last_n_sales} />}
+                  {stats.last_n_sales && (
+                    <RecentSales sales={stats.last_n_sales} />
+                  )}
                 </CardContent>
               </Card>
             </div>
