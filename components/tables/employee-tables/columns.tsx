@@ -57,7 +57,7 @@ export const columns: ColumnDef<Entreprise>[] = [
   },
   {
     accessorKey: "plan_name",
-    header: "Pannel",
+    header: "Panel",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
@@ -76,19 +76,19 @@ export const columns: ColumnDef<Entreprise>[] = [
   },
   {
     accessorKey: "sector",
-    header: "SECTEUR"
+    header: "Secteur"
   },
   {
     accessorKey: "email",
-    header: "EMAIL"
+    header: "Email"
   },
   {
     accessorKey: "phone",
-    header: "TEL"
+    header: "Tel"
   },
   {
     accessorKey: "effectif",
-    header: "EFFECTIF"
+    header: "Effectif"
   },
 
   {

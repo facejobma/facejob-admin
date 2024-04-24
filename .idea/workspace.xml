@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="fix types">
-      <change beforePath="$PROJECT_DIR$/.eslintrc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.json" afterDir="false" />
+    <list default="true" id="9a67348f-c8ea-44f3-a0b1-26b46dd6da59" name="Changes" comment="add date picker">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(dashboard)/dashboard/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/date-range-picker.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/date-range-picker.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/forms/entreprise-form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/forms/entreprise-form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/tables/employee-tables/columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/candidate-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/candidate-table.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/entreprise-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/entreprise-table.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +156,10 @@
       <workItem from="1713711065727" duration="5005000" />
       <workItem from="1713796936113" duration="2130000" />
       <workItem from="1713805599196" duration="1541000" />
-      <workItem from="1713807880720" duration="1821000" />
+      <workItem from="1713807880720" duration="1976000" />
+      <workItem from="1713880045845" duration="2000" />
+      <workItem from="1713884517941" duration="1579000" />
+      <workItem from="1713954299927" duration="4192000" />
     </task>
     <task id="LOCAL-00001" summary="todo complete SessionProvider.tsx">
       <option name="closed" value="true" />
@@ -391,7 +393,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713797381011</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="add date picker">
+      <option name="closed" value="true" />
+      <created>1713809809163</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1713809809163</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -399,7 +409,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="translate to french" />
     <MESSAGE value="update user component" />
     <MESSAGE value="remove localstorage" />
     <MESSAGE value="remove some pages" />
@@ -424,6 +433,7 @@
     <MESSAGE value="fix IsVerified mess" />
     <MESSAGE value="fix search in sales" />
     <MESSAGE value="fix types" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix types" />
+    <MESSAGE value="add date picker" />
+    <option name="LAST_COMMIT_MESSAGE" value="add date picker" />
   </component>
 </project>

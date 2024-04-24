@@ -5,7 +5,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,19 +17,12 @@ import {
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
-import { Circles } from "react-loader-spinner";
-
 import { Entreprise } from "@/types";
 
 interface DataTableProps {
   columns: ColumnDef<Entreprise, any>[];
   data: Entreprise[];
   searchKey: string;
-}
-
-interface OptionData {
-  id: number;
-  name: string;
 }
 
 export function EntrepriseDataTable({
@@ -41,8 +34,6 @@ export function EntrepriseDataTable({
   const [selectValue, setSelectValue] = useState<string>("");
   const [selectPanValue, setSelectPanValue] = useState<string>("");
   const [selectEffectifValue, setSelectEffectifValue] = useState<string>("");
-  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
   const [filteredData, setFilteredData] = useState<Entreprise[]>([]);
@@ -70,20 +61,8 @@ export function EntrepriseDataTable({
     "Pannel premium",
   ];
 
-  useEffect(() => {
-    setLoading(true);
-
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
-      .then((response) => response.json())
-      .then((data) => {
-        setSecteurOptions(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        throw new Error("Error fetching secteur options:", error);
-      });
-  }, []);
+  // get all sectors from the table
+  const sectors = Array.from(new Set(data.map(item => (item as { sector: string }).sector)));
 
   useEffect(() => {
     let filtered = data.filter((entreprise) =>
@@ -163,9 +142,9 @@ export function EntrepriseDataTable({
           className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Secteur</option>
-          {secteurOptions.map((option) => (
-            <option key={option.id} value={option.name}>
-              {option.name}
+          {sectors.map((option) => (
+            <option key={option} value={option}>
+              {option}
             </option>
           ))}
         </select>
@@ -182,19 +161,6 @@ export function EntrepriseDataTable({
           ))}
         </select>
       </div>
-      {loading ? (
-        <div className="flex items-center justify-center h-[calc(80vh-220px)]">
-          <Circles
-            height="80"
-            width="80"
-            color="#4fa94d"
-            ariaLabel="circles-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </div>
-      ) : (
         <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
           <Table className="relative">
             <TableHeader>
@@ -236,7 +202,6 @@ export function EntrepriseDataTable({
           </Table>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
-      )}
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}

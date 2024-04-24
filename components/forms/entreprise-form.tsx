@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { useState } from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Trash } from "lucide-react";
@@ -60,8 +60,7 @@ interface ProductFormProps {
 
 export const EntrepriseForm: React.FC<ProductFormProps> = ({
   initialData,
-  categories,
-}) => {
+                                                           }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -170,9 +169,6 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  // function setOpen(arg0: boolean): void {
-  //   throw new Error("Function not implemented.");
-  // }
   return (
     <>
       <div className="flex items-center justify-between">
