@@ -3,7 +3,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  useReactTable,
+  useReactTable
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import {
@@ -12,12 +12,11 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
-import { Circles } from "react-loader-spinner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -25,55 +24,39 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
 }
 
-interface OptionData {
-  id: number;
-  name: string;
-}
 
 export function SalesDataTable<TData, TValue>({
-  columns,
-  data,
-  searchKey,
-}: DataTableProps<TData, TValue>) {
+                                                columns,
+                                                data,
+                                                searchKey
+                                              }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [selectPanValue, setSelectPanValue] = useState<string>("");
-  const [secteurOptions, setSecteurOptions] = useState<OptionData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
-  const [loading, setLoading] = useState<boolean>(true);
+
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    getFilteredRowModel: getFilteredRowModel()
   });
 
-  
+  // get all sectors from the table
+  const sectors = Array.from(
+    new Set(data.map((item) => (item as { sector: string }).sector))
+  );
+
   const planOptions = [
     "Pannel gratuit",
     "Pannel de base",
     "Pannel Intérmédiare",
     "Pannel Essentiel",
-    "Pannel premium",
+    "Pannel premium"
   ];
 
-
-  useEffect(() => {
-    setLoading(true);
-
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
-      .then((response) => response.json())
-      .then((data) => {
-        setSecteurOptions(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        throw new Error("Error fetching secteur options:", error);
-      });
-  }, []);
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
@@ -87,7 +70,7 @@ export function SalesDataTable<TData, TValue>({
   };
 
   const handleSelectPannelChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
+    event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const selectedValue = event.target.value;
     setSelectPanValue(selectedValue);
@@ -101,7 +84,7 @@ export function SalesDataTable<TData, TValue>({
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) =>
-      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
+      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1)
     );
   };
 
@@ -135,70 +118,57 @@ export function SalesDataTable<TData, TValue>({
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Secteur</option>
-          {secteurOptions.map((option) => (
-            <option key={option.id} value={option.name}>
-              {option.name}
+          {sectors.map((option) => (
+            <option key={option} value={option}>
+              {option}
             </option>
           ))}
         </select>
       </div>
-      {loading ? (
-        <div className="flex items-center justify-center h-[calc(80vh-220px)]">
-          <Circles
-            height="80"
-            width="80"
-            color="#4fa94d"
-            ariaLabel="circles-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </div>
-      ) : (
-        <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-          <Table className="relative">
-            <TableHeader>
-              {/* Header rows */}
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
+
+      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
+        <Table className="relative">
+          <TableHeader>
+            {/* Header rows */}
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {/* Render rows for the current page */}
+            {table
+              .getFilteredRowModel()
+              .rows.slice(startIndex, endIndex)
+              .map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
-            </TableHeader>
-            <TableBody>
-              {/* Render rows for the current page */}
-              {table
-                .getFilteredRowModel()
-                .rows.slice(startIndex, endIndex)
-                .map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() ? "selected" : undefined}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      )}
+          </TableBody>
+        </Table>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
