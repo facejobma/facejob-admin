@@ -10,7 +10,7 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
-
+import { fr } from 'date-fns/locale';
 export function CalendarDateRangePicker({
                                           className,
                                           date,
@@ -51,6 +51,7 @@ export function CalendarDateRangePicker({
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="end">
           <Calendar
+            locale={fr}
             initialFocus
             mode="range"
             defaultMonth={date?.from}

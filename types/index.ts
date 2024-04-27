@@ -100,6 +100,8 @@ export type Entreprise = {
   is_verified: EntrepriseStatus;
   plan_start_data: Date;
   plan_end_data: Date;
+  created_at: string;
+  updated_at: string;
   plan_name: string;
 };
 export type Job = {

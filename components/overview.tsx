@@ -2,6 +2,9 @@
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { StatsItem } from "@/types";
 import moment from "moment";
+import "moment/locale/fr";
+
+moment.locales();
 
 interface OverviewProps {
   stats: StatsItem[];
@@ -12,7 +15,7 @@ export function Overview({ stats, unit = "" }: OverviewProps) {
 
   const data = stats.map((state) => ({
     name: moment()
-      .month(state.month)
+      .month(state.month - 1)
       .format("MMM"),
     total: state.sum
   }));

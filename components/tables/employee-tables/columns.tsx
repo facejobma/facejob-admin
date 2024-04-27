@@ -5,6 +5,10 @@ import { CellAction } from "./cell-action";
 import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
 import { Entreprise } from "@/types";
+import moment from "moment";
+import "moment/locale/fr";
+
+moment.locales();
 
 export const columns: ColumnDef<Entreprise>[] = [
   {
@@ -50,7 +54,7 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableHiding: true
   }, {
     accessorKey: "company_name",
-    header: "Company Name",
+    header: "Nom de l'entreprise",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
@@ -73,6 +77,24 @@ export const columns: ColumnDef<Entreprise>[] = [
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
+  },
+  {
+    accessorKey: "created_at",
+    header: "Date de creation",
+    cell: ({ row }) => (
+      <TableCell>
+        {moment(row.original.plan_start_data).fromNow()}
+      </TableCell>
+    )
+  },
+  {
+    accessorKey: "updated_at",
+    header: "Date de modification",
+    cell: ({ row }) => (
+      <TableCell>
+        {moment(row.original.plan_start_data).fromNow()}
+      </TableCell>
+    )
   },
   {
     accessorKey: "sector",
