@@ -21,12 +21,15 @@ import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { CV } from "@/types";
+import VideoPlayer from "@/components/VideoPlayer";
 
 interface CellActionProps {
   data: CV;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+  console.log("data,", data.link);
+
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState("");
@@ -134,7 +137,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           "Take a closer look at the candidate's CV video to gain insights into their qualifications and skills."
         }
       >
-        <video src={data.link} className="w-full h-full" />
+        <VideoPlayer link={data.link} />
+        {/* <video autoPlay style={{ width: "500px", height: "500px" }}>
+          <source src={data.link} />
+        </video>
+        <video autoPlay style={{ width: '500px', height: '500px' }}>
+        <source src="/blue.mp4" />
+      </video> */}
       </Modal>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>

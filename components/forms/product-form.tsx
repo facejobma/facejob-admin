@@ -19,8 +19,9 @@ import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 
 import { useToast } from "../ui/use-toast";
-import FileUpload from "../file-upload";
 import Cookies from "js-cookie";
+
+import FileUpload from "../file-upload";
 
 const ImgSchema = z.object({
   fileName: z.string(),
