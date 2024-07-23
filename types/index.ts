@@ -13,12 +13,13 @@ export interface NavItem {
 
 
 export type Sales = {
-  amount: string;
+  price: number;
   created_at: string;
   description: string;
   entreprise: EnterpriseData;
   id: number;
-  plan_id: number;
+  plan: PlanDetails;
+  status: string;
   updated_at: string;
 }
 
@@ -44,7 +45,7 @@ export interface Statistiques {
 export interface EnterpriseData {
   entreprise_logo: string;
   company_name: string;
-  sector: string;
+  sector: Sector;
   email: string;
   phone: string;
   adresse: string;
@@ -53,6 +54,13 @@ export interface EnterpriseData {
   description: string;
   is_verified: string;
   plan_name: string;
+}
+
+export interface Sector {
+  id: number;
+  name: string;
+  created_at: string;
+  updated_at: string;
 }
 
 
@@ -76,6 +84,7 @@ export type PlanDetails = {
   isYearly: boolean;
   isQuarterly: boolean;
 }
+
 export type User = {
   id: number;
   nomComplete: string;
@@ -104,6 +113,7 @@ export type Entreprise = {
   updated_at: string;
   plan_name: string;
 };
+
 export type Job = {
   id: number;
   titre: string;
@@ -114,6 +124,8 @@ export type Job = {
   sector_name: string;
   is_verified: string;
 };
+
+
 export type CV = {
   id: number;
   link: string;

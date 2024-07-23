@@ -1,4 +1,3 @@
-import { AlertModal } from "@/components/modal/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,61 +6,76 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
-import {  useRouter } from "next/navigation";
+import { CheckSquare, XSquare, MoreHorizontal, View } from "lucide-react";
+
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-import { Entreprise } from "@/types";
+
+import { Input } from "@/components/ui/input";
+import { Sales } from "@/types";
 
 interface CellActionProps {
-  data: Entreprise;
+  data: Sales;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [comment, setComment] = useState("");
+  const { toast } = useToast();
+  const authToken = Cookies.get("authToken");
   const router = useRouter();
 
-  // const onConfirm = a?sync () => {};
-
-  const onDelete = async () => {
+  const onVerify = async (is_verified: string) => {
     try {
-      setLoading(true);
-
-      const authToken = localStorage.getItem("authToken");
-
-      console.log("Data.id, ", data.id);
+      if (is_verified === "Declined" && !comment) {
+        toast({
+          title: "Error!",
+          variant: "destructive",
+          description: "Please provide a comment.",
+        });
+        return;
+      }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/delete/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/payments/accept/${data.id}`,
         {
-          method: "DELETE",
+          method: "PUT",
           headers: {
             Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            is_verified,
+            comment,
+          }),
         },
       );
 
       if (response.ok) {
-        console.log("Candidate deleted successfully!");
+        toast({
+          title: "Success!",
+          description: "Entreprise a été vérifiée avec succès.",
+        });
+        data.status = is_verified;
       } else {
-        console.error("Failed to delete candidate");
+        data.status = "pending";
       }
     } catch (error) {
-      console.error("An error occurred while deleting the candidate:", error);
-    } finally {
-      setLoading(false);
-      setOpen(false);
+      toast({
+        title: "Whoops!",
+        variant: "destructive",
+        description:
+          error?.toString() || "Erreur lors de la récupération des données.",
+      });
     }
   };
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -73,15 +87,47 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/entreprise/${data.id}`)}
+            onClick={() => {
+              onVerify("Accepted" as string);
+            }}
           >
-            <Edit className="mr-2 h-4 w-4" /> Update
+            <CheckSquare className="mr-2 h-4 w-4" /> Accept
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4" /> Delete
+          <DropdownMenuItem
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            <XSquare className="mr-2 h-4 w-4" /> Decline
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              router.push(`/dashboard/sales/${data.id}`);
+            }}
+          >
+            <View className="mr-2 h-4 w-4" /> Consult
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {open && (
+        <div className="mt-4">
+          <Input
+            className="mb-2"
+            placeholder="Enter comment..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <Button
+            onClick={() => {
+              onVerify("Declined" as string);
+              setOpen(false);
+            }}
+          >
+            Confirm Decline
+          </Button>
+        </div>
+      )}
     </>
   );
 };

@@ -43,12 +43,12 @@ export const navItems: NavItem[] = [
     icon: "sales",
     label: "sales"
   },
-  {
-    title: "Service de Payment",
-    href: "/dashboard/payments",
-    icon: "payments",
-    label: "payments"
-  },
+  // {
+  //   title: "Service de Payment",
+  //   href: "/dashboard/payments",
+  //   icon: "payments",
+  //   label: "payments"
+  // },
   {
     title: "Logout",
     href: "/",

@@ -6,9 +6,7 @@ import Cookies from "js-cookie";
 import { Sales } from "@/types";
 import { SalesTable } from "@/components/tables/sales-tables/sales";
 
-const breadcrumbItems = [
-  { title: "Les ventes", link: "/dashboard/sales" }
-];
+const breadcrumbItems = [{ title: "Les ventes", link: "/dashboard/sales" }];
 
 export default function SalesPage() {
   const [sales, setSales] = useState([] as Sales[]);
@@ -19,13 +17,13 @@ export default function SalesPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/sales",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/payments",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json"
-            }
-          }
+              "Content-Type": "application/json",
+            },
+          },
         );
         const data = await response.json();
         setSales(data);
@@ -33,7 +31,7 @@ export default function SalesPage() {
         toast({
           title: "Whoops!",
           variant: "destructive",
-          description: "Erreur lors de la récupération des données."
+          description: "Erreur lors de la récupération des données.",
         });
       }
     };
