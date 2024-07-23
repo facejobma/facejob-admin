@@ -5,12 +5,12 @@ import { useToast } from "@/components/ui/use-toast";
 import Cookies from "js-cookie";
 import { EnterpriseRequests } from "@/components/tables/request-tables/requests";
 
-import { Entreprise } from "@/types";
+import { EnterpriseData } from "@/types";
 
 const breadcrumbItems = [{ title: "Requests", link: "/dashboard/requests" }];
 
 export default function UsersPage() {
-  const [entrepriseRequests, setEntrepriseRequests] = useState([] as Entreprise[]);
+  const [entrepriseRequests, setEntrepriseRequests] = useState([] as EnterpriseData[]);
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 

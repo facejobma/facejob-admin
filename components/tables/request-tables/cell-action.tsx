@@ -14,10 +14,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 
 import { Input } from "@/components/ui/input";
-import { Entreprise, EntrepriseStatus } from "@/types";
+import { EnterpriseData, EntrepriseStatus } from "@/types";
 
 interface CellActionProps {
-  data: Entreprise;
+  data: EnterpriseData;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {

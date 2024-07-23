@@ -4,10 +4,10 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { columns } from "@/components/tables/request-tables/columns";
 import { FC } from "react";
-import { Entreprise } from "@/types";
+import { EnterpriseData } from "@/types";
 
 interface EntrepriseProps {
-  data: Entreprise[];
+  data: EnterpriseData[];
 }
 
 export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {

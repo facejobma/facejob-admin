@@ -32,7 +32,7 @@ interface EnterpriseData {
   plan_name: string;
 }
 
-export interface Sector {
+ interface Sector {
   id: number;
   name: string;
   created_at: string;

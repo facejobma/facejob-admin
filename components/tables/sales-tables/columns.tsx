@@ -6,22 +6,22 @@ import moment from "moment";
 import { CellAction } from "./cell-action";
 
 export const columns: ColumnDef<Sales>[] = [
-  // {
-  //   accessorKey: "entreprise",
-  //   header: "Logo de l'entreprise",
-  //   cell: ({ row }) => (
-  //     <TableCell>
-  //       <div className="w-10 h-10 relative rounded-full overflow-hidden">
-  //         <Image
-  //           src={row?.original?.entreprise.entreprise_logo}
-  //           alt={`${row.original.entreprise.company_name} Logo`}
-  //           layout="fill"
-  //           objectFit="cover"
-  //         />
-  //       </div>
-  //     </TableCell>
-  //   )
-  // },
+  {
+    accessorKey: "entreprise.entreprise_logo",
+    header: "Logo de l'entreprise",
+    cell: ({ row }) => (
+      <TableCell>
+        <div className="w-10 h-10 relative rounded-full overflow-hidden">
+          <Image
+            src={row?.original?.entreprise.logo}
+            alt={`${row.original.entreprise.company_name} Logo`}
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
+      </TableCell>
+    ),
+  },
   {
     accessorKey: "entreprise.id",
     header: "ID ",
@@ -106,7 +106,7 @@ export const columns: ColumnDef<Sales>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />, 
+    cell: ({ row }) => <CellAction data={row.original} />,
   },
   // {
   //   accessorKey: "updated_at",

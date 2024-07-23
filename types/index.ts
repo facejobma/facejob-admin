@@ -43,17 +43,19 @@ export interface Statistiques {
 
 
 export interface EnterpriseData {
-  entreprise_logo: string;
+  id: number;
+  logo: string;
   company_name: string;
   sector: Sector;
   email: string;
   phone: string;
   adresse: string;
   site_web: string;
-  effectif: string;
+  effectif: number;
   description: string;
   is_verified: string;
   plan_name: string;
+  created_at: string;
 }
 
 export interface Sector {
@@ -121,7 +123,7 @@ export type Job = {
   date_debut: string;
   date_fin: string;
   company_name: string;
-  sector_name: string;
+  secteur_name: string;
   is_verified: string;
 };
 
@@ -131,5 +133,5 @@ export type CV = {
   link: string;
   is_verified: string;
   candidat_name: string;
-  sector_name: string;
+  secteur_name: string;
 };

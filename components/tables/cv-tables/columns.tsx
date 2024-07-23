@@ -25,7 +25,7 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "link",
-    header: "VIDEO",
+    header: "Video",
     // cell: ({ row }) => (
     //   <TableCell>
     //     <div className="w-10 h-10 relative rounded-full overflow-hidden">
@@ -41,14 +41,17 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "candidat_name",
-    header: "CANDIDAT",
+    header: "Candidate",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true,
   },
   {
-    accessorKey: "sector_name",
-    header: "sector",
+    accessorKey: "secteur_name",
+    header: "Secteur",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "is_verified",

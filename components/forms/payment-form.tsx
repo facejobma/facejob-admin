@@ -18,7 +18,7 @@ export const PaymentForm: React.FC<{ initialData: Sales }> = ({
       <div className="flex items-center justify-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden">
           <Image
-            src={initialData.entreprise?.entreprise_logo}
+            src={initialData.entreprise?.logo}
             alt={`${initialData.entreprise?.company_name} Logo`}
             layout="fill"
             objectFit="cover"

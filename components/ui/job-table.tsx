@@ -20,6 +20,7 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Circles } from "react-loader-spinner";
+import { Sector } from "@/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -36,19 +37,20 @@ export function JobDataTable<TData, TValue>({
   const [selectValue, setSelectValue] = useState<string>("Pending");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setLoading(true);
-
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
       .then((response) => response.json())
       .then((data) => {
+        setSectors(data);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
-        throw new Error("Error fetching sectors options:", error);
+        console.error("Error fetching secteur options:", error);
       });
   }, []);
 
@@ -102,6 +104,18 @@ export function JobDataTable<TData, TValue>({
           <option value="Pending">Pending</option>
           <option value="Accepted">Accepted</option>
           <option value="Declined">Declined</option>
+        </select>
+        <select
+          value={selectValue || ""}
+          onChange={handleSelectChange}
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+        >
+          <option value="">Secteur</option>
+          {sectors.map((sector) => (
+            <option key={sector.id} value={sector.name}>
+              {sector.name}
+            </option>
+          ))}
         </select>
       </div>
       {loading ? (

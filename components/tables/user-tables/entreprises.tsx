@@ -4,11 +4,11 @@ import { columns } from "@/components/tables/employee-tables/columns";
 import { FC } from "react";
 import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
 import { Heading } from "@/components/ui/heading";
-import { Entreprise } from "@/types";
+import { EnterpriseData } from "@/types";
 
 
 interface ProductsClientProps {
-  data: Entreprise[];
+  data: EnterpriseData[];
 }
 
 export const UserEnterprise: FC<ProductsClientProps> = ({ data }) => {

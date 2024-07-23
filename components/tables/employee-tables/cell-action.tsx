@@ -10,10 +10,10 @@ import {
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import {  useRouter } from "next/navigation";
 import { useState } from "react";
-import { Entreprise } from "@/types";
+import { EnterpriseData } from "@/types";
 
 interface CellActionProps {
-  data: Entreprise;
+  data: EnterpriseData;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {

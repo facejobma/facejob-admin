@@ -4,13 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
-import { Entreprise } from "@/types";
+import { EnterpriseData } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
 
 moment.locales();
 
-export const columns: ColumnDef<Entreprise>[] = [
+export const columns: ColumnDef<EnterpriseData>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -28,7 +28,7 @@ export const columns: ColumnDef<Entreprise>[] = [
       />
     ),
     enableSorting: false,
-    enableHiding: false
+    enableHiding: false,
   },
   {
     accessorKey: "logo",
@@ -44,77 +44,73 @@ export const columns: ColumnDef<Entreprise>[] = [
           />
         </div>
       </TableCell>
-    )
+    ),
   },
   {
     accessorKey: "id",
     header: "Id",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true
-  }, {
+    enableHiding: true,
+  },
+  {
     accessorKey: "company_name",
     header: "Nom de l'entreprise",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true
+    enableHiding: true,
   },
   {
     accessorKey: "plan_name",
     header: "Panel",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true
-  }, {
-    accessorKey: "plan_start_data",
-    header: "Date d'angagement",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true
-  }, {
-    accessorKey: "plan_end_data",
-    header: "Date de fin",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true
+    enableHiding: true,
   },
+  // {
+  //   accessorKey: "plan_start_data",
+  //   header: "Date d'angagement",
+  //   enableColumnFilter: true,
+  //   enableSorting: true,
+  //   enableHiding: true,
+  // },
+  // {
+  //   accessorKey: "plan_end_data",
+  //   header: "Date de fin",
+  //   enableColumnFilter: true,
+  //   enableSorting: true,
+  //   enableHiding: true,
+  // },
   {
     accessorKey: "created_at",
     header: "Date de creation",
     cell: ({ row }) => (
-      <TableCell>
-        {moment(row.original.plan_start_data).fromNow()}
-      </TableCell>
-    )
+      <TableCell>{moment(row.original.created_at).fromNow()}</TableCell>
+    ),
   },
+
   {
-    accessorKey: "updated_at",
-    header: "Date de modification",
-    cell: ({ row }) => (
-      <TableCell>
-        {moment(row.original.plan_start_data).fromNow()}
-      </TableCell>
-    )
-  },
-  {
-    accessorKey: "sector",
-    header: "Secteur"
+    accessorKey: "sector.name",
+    header: "Secteur",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "email",
-    header: "Email"
+    header: "Email",
   },
   {
     accessorKey: "phone",
-    header: "Tel"
+    header: "Tel",
   },
   {
     accessorKey: "effectif",
-    header: "Effectif"
+    header: "Effectif",
   },
 
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />
-  }
+    cell: ({ row }) => <CellAction data={row.original} />,
+  },
 ];

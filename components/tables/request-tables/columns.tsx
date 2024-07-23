@@ -4,9 +4,9 @@ import { CellAction } from "./cell-action";
 import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
 import { Dispatch, SetStateAction } from "react";
-import { Entreprise } from "@/types";
+import { EnterpriseData } from "@/types";
 
-export const columns: ColumnDef<Entreprise, Dispatch<SetStateAction<Entreprise[]>>>[] = [
+export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<EnterpriseData[]>>>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -50,7 +50,7 @@ export const columns: ColumnDef<Entreprise, Dispatch<SetStateAction<Entreprise[]
     enableHiding: true
   },
   {
-    accessorKey: "sector",
+    accessorKey: "sector.name",
     header: "sector"
   },
   {

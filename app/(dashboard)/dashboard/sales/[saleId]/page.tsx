@@ -6,60 +6,61 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { PaymentForm } from "@/components/forms/payment-form";
+import { Sales } from "@/types";
 // import { Sales } from "@/types";
 
-interface Sales {
-  price: number;
-  created_at: string;
-  description: string;
-  entreprise: EnterpriseData;
-  id: number;
-  plan: PlanDetails;
-  status: string;
-  updated_at: string;
-}
+// interface Sales {
+//   price: number;
+//   created_at: string;
+//   description: string;
+//   entreprise: EnterpriseData;
+//   id: number;
+//   plan: PlanDetails;
+//   status: string;
+//   updated_at: string;
+// }
 
-interface EnterpriseData {
-  entreprise_logo: string;
-  company_name: string;
-  sector: Sector;
-  email: string;
-  phone: string;
-  adresse: string;
-  site_web: string;
-  effectif: string;
-  description: string;
-  is_verified: string;
-  plan_name: string;
-}
+// interface EnterpriseData {
+//   entreprise_logo: string;
+//   company_name: string;
+//   sector: Sector;
+//   email: string;
+//   phone: string;
+//   adresse: string;
+//   site_web: string;
+//   effectif: string;
+//   description: string;
+//   is_verified: string;
+//   plan_name: string;
+// }
 
-interface PlanDetails {
-  id: number;
-  name: string;
-  description: string;
-  monthly_price: number;
-  quarterly_price: number;
-  annual_price: number;
-  account_creation_included: number;
-  cv_video_access: number;
-  cv_video_consultations: number;
-  job_postings: number;
-  dedicated_support: number;
-  created_at: string;
-  updated_at: string;
-  popular: boolean;
-  exclusive: boolean;
-  isMonthly: boolean;
-  isYearly: boolean;
-  isQuarterly: boolean;
-}
+// interface PlanDetails {
+//   id: number;
+//   name: string;
+//   description: string;
+//   monthly_price: number;
+//   quarterly_price: number;
+//   annual_price: number;
+//   account_creation_included: number;
+//   cv_video_access: number;
+//   cv_video_consultations: number;
+//   job_postings: number;
+//   dedicated_support: number;
+//   created_at: string;
+//   updated_at: string;
+//   popular: boolean;
+//   exclusive: boolean;
+//   isMonthly: boolean;
+//   isYearly: boolean;
+//   isQuarterly: boolean;
+// }
 
-export interface Sector {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string;
-}
+// export interface Sector {
+//   id: number;
+//   name: string;
+//   created_at: string;
+//   updated_at: string;
+// }
 
 export default function Page() {
   const [payments, setPayments] = useState<Sales | null>(null);

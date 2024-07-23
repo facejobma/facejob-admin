@@ -3,7 +3,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  useReactTable
+  useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 
@@ -13,13 +13,13 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table";
 
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
-
+import { Sector } from "@/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,26 +28,37 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                           searchKey
-                                         }: DataTableProps<TData, TValue>) {
+  columns,
+  data,
+  searchKey,
+}: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [selectValue, setSelectValue] = useState<string>("Pending");
+  const [selectValue, setSelectValue] = useState<string>("");
+  const [selectPanValue, setSelectPanValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-
-  // get all sectors from the table
-  const sectors = Array.from(
-    new Set(data.map((item) => (item as { sector: string }).sector))
-  );
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+      .then((response) => response.json())
+      .then((data) => {
+        setSectors(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Error fetching secteur options:", error);
+      });
+  }, []);
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel()
+    getFilteredRowModel: getFilteredRowModel(),
   });
 
   useEffect(() => {
@@ -69,7 +80,7 @@ export function DataTable<TData, TValue>({
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) =>
-      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1)
+      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
     );
   };
 
@@ -97,12 +108,12 @@ export function DataTable<TData, TValue>({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">Sector</option>
-          {sectors.map((option) => (
-            <option key={option} value={option}>
-              {option}
+          <option value="">Secteur</option>
+          {sectors.map((sector) => (
+            <option key={sector.id} value={sector.name}>
+              {sector.name}
             </option>
           ))}
         </select>
@@ -117,9 +128,9 @@ export function DataTable<TData, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -138,7 +149,7 @@ export function DataTable<TData, TValue>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

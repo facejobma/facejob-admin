@@ -17,11 +17,11 @@ import {
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
-import { Entreprise } from "@/types";
+import { EnterpriseData, Sector } from "@/types";
 
 interface DataTableProps {
-  columns: ColumnDef<Entreprise, any>[];
-  data: Entreprise[];
+  columns: ColumnDef<EnterpriseData, any>[];
+  data: EnterpriseData[];
   searchKey: string;
 }
 
@@ -36,7 +36,9 @@ export function EntrepriseDataTable({
   const [selectEffectifValue, setSelectEffectifValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
-  const [filteredData, setFilteredData] = useState<Entreprise[]>([]);
+  const [filteredData, setFilteredData] = useState<EnterpriseData[]>([]);
+  const [sectors, setSectors] = useState<Sector[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const table = useReactTable({
     data: filteredData,
@@ -61,10 +63,19 @@ export function EntrepriseDataTable({
     "Pannel premium",
   ];
 
-  // get all sectors from the table
-  const sectors = Array.from(
-    new Set(data.map((item) => (item as { sector: string }).sector)),
-  );
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+      .then((response) => response.json())
+      .then((data) => {
+        setSectors(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Error fetching secteur options:", error);
+      });
+  }, []);
 
   useEffect(() => {
     let filtered = data.filter((entreprise) =>
@@ -73,7 +84,7 @@ export function EntrepriseDataTable({
 
     if (selectValue) {
       filtered = filtered.filter(
-        (entreprise) => entreprise.sector === selectValue,
+        (entreprise) => entreprise.sector?.name === selectValue,
       );
     }
 
@@ -148,12 +159,12 @@ export function EntrepriseDataTable({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Secteur</option>
-          {sectors.map((option) => (
-            <option key={option} value={option}>
-              {option}
+          {sectors.map((sector) => (
+            <option key={sector.id} value={sector.name}>
+              {sector.name}
             </option>
           ))}
         </select>
