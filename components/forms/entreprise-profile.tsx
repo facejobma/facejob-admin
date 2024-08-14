@@ -4,10 +4,9 @@ import { EnterpriseData } from "@/types";
 import React from "react";
 
 
-
 export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
-  initialData,
-}) => {
+                                                                               initialData
+                                                                             }) => {
   const isPending = initialData.is_verified === "Pending";
   const isAccepted = initialData.is_verified === "Accepted";
   const isDeclined = initialData.is_verified === "Declined";
@@ -16,12 +15,12 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
     <div className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto mt-8 p-6">
       <div className="flex items-center justify-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden">
-          <Image
+          {initialData.logo && <Image
             src={initialData.logo}
             alt={`${initialData.company_name} Logo`}
             layout="fill"
             objectFit="cover"
-          />
+          />}
         </div>
       </div>
 

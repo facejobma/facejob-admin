@@ -16,10 +16,10 @@ interface ImageUploadProps {
 
 
 export default function FileUpload({
-  onChange,
-  onRemove,
-  value,
-}: ImageUploadProps) {
+                                     onChange,
+                                     onRemove,
+                                     value
+                                   }: ImageUploadProps) {
   const { toast } = useToast();
   const onDeleteFile = (key: string) => {
     let filteredFiles = value.filter((item) => item.key !== key);
@@ -48,12 +48,12 @@ export default function FileUpload({
                 </Button>
               </div>
               <div>
-                <Image
+                {item.fileUrl && <Image
                   fill
                   className="object-cover"
                   alt="Image"
                   src={item.fileUrl || ""}
-                />
+                />}
               </div>
             </div>
           ))}
@@ -74,7 +74,7 @@ export default function FileUpload({
                       </p>
                     </>
                   );
-              },
+              }
             }}
             onClientUploadComplete={(res) => {
               // Do something with the response
@@ -87,7 +87,7 @@ export default function FileUpload({
               toast({
                 title: "Error",
                 variant: "destructive",
-                description: error.message,
+                description: error.message
               });
             }}
             onUploadBegin={() => {

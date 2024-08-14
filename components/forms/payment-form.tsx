@@ -5,8 +5,8 @@ import React from "react";
 import moment from "moment";
 
 export const PaymentForm: React.FC<{ initialData: Sales }> = ({
-  initialData,
-}) => {
+                                                                initialData
+                                                              }) => {
   const isPending = initialData.status === "pending";
   const isAccepted = initialData.status === "accepted";
   const isDeclined = initialData.status === "declined";
@@ -17,12 +17,12 @@ export const PaymentForm: React.FC<{ initialData: Sales }> = ({
     <div className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto mt-8 p-6">
       <div className="flex items-center justify-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden">
-          <Image
+          {initialData.entreprise && <Image
             src={initialData.entreprise?.logo}
             alt={`${initialData.entreprise?.company_name} Logo`}
             layout="fill"
             objectFit="cover"
-          />
+          />}
         </div>
       </div>
 

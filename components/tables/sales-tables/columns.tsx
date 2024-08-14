@@ -12,26 +12,26 @@ export const columns: ColumnDef<Sales>[] = [
     cell: ({ row }) => (
       <TableCell>
         <div className="w-10 h-10 relative rounded-full overflow-hidden">
-          <Image
+          {row?.original?.entreprise.logo && <Image
             src={row?.original?.entreprise.logo}
             alt={`${row.original.entreprise.company_name} Logo`}
             layout="fill"
             objectFit="cover"
-          />
+          />}
         </div>
       </TableCell>
-    ),
+    )
   },
   {
     accessorKey: "entreprise.id",
-    header: "ID ",
+    header: "ID "
   },
   {
     accessorKey: "entreprise.company_name",
     header: "Nom de l'entreprise",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   // {
   //   accessorKey: "description",
@@ -45,35 +45,35 @@ export const columns: ColumnDef<Sales>[] = [
     header: "Secteur",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   {
     accessorKey: "entreprise.phone",
     header: "Téléphone",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   {
     accessorKey: "entreprise.email",
     header: "Email",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   {
     accessorKey: "plan.name",
     header: "Nom du plan",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   {
     accessorKey: "price",
     header: "Montant en DH",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true,
+    enableHiding: true
   },
   {
     accessorKey: "created_at",
@@ -85,7 +85,7 @@ export const columns: ColumnDef<Sales>[] = [
       <TableCell>
         {moment(row.original.created_at).format("DD/MM/YYYY")}
       </TableCell>
-    ),
+    )
   },
   {
     accessorKey: "status",
@@ -102,12 +102,12 @@ export const columns: ColumnDef<Sales>[] = [
       >
         {row.original.status}
       </div>
-    ),
+    )
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />,
-  },
+    cell: ({ row }) => <CellAction data={row.original} />
+  }
   // {
   //   accessorKey: "updated_at",
   //   header: "Mis à jour le",

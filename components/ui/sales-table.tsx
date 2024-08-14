@@ -18,19 +18,7 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 
-interface EnterpriseData {
-  entreprise_logo: string;
-  company_name: string;
-  sector: Sector;
-  email: string;
-  phone: string;
-  adresse: string;
-  site_web: string;
-  effectif: string;
-  description: string;
-  is_verified: string;
-  plan_name: string;
-}
+
 
  interface Sector {
   id: number;
