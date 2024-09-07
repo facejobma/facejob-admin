@@ -20,6 +20,7 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { Sector } from "@/types";
+import Cookies from "js-cookie";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,7 +35,6 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
-  const [selectPanValue, setSelectPanValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -42,7 +42,13 @@ export function DataTable<TData, TValue>({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`,
+      {
+        headers:{
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${Cookies.get("authToken")}`,
+        }
+      })
       .then((response) => response.json())
       .then((data) => {
         setSectors(data);
