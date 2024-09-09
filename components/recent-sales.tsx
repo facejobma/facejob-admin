@@ -2,6 +2,7 @@ import { Sales } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 moment.locale("fr");
 
 export function RecentSales({ sales }: { sales: Sales[] }) {
@@ -10,7 +11,7 @@ export function RecentSales({ sales }: { sales: Sales[] }) {
       {sales.map((sale, index) => (
         <div key={index} className="flex items-center">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={sale.entreprise.logo} alt="Avatar" />
+            {sale.entreprise.logo && <AvatarImage src={sale.entreprise.logo} alt="Avatar" />}
             <AvatarFallback>{sale.entreprise.company_name}</AvatarFallback>
           </Avatar>
           <div className="ml-4 space-y-1">
