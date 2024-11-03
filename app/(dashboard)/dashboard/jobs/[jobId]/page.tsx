@@ -15,7 +15,7 @@ interface JobData {
   date_fin: string;
   company_name: number;
   sector_name: number;
-  isVerified: string;
+  is_verified: string;
 }
 
 export default function Page() {
@@ -34,7 +34,7 @@ export default function Page() {
           const authToken = Cookies.get("authToken");
 
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/offres/${jobId}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/offres_by_id/${jobId}`,
             {
               headers: {
                 Authorization: `Bearer ${authToken}`,
@@ -52,7 +52,7 @@ export default function Page() {
             date_fin,
             company_name,
             sector_name,
-            isVerified,
+            is_verified,
           } = data;
 
           setJobData({
@@ -63,7 +63,7 @@ export default function Page() {
             date_fin,
             company_name,
             sector_name,
-            isVerified,
+            is_verified,
           });
         } catch (error) {
           // console.log(error);
