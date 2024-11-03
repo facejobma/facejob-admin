@@ -6,6 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { JobForm } from "@/components/forms/job-form";
+import { Circles } from "react-loader-spinner";
+
 
 interface JobData {
   id: number;
@@ -79,12 +81,17 @@ export default function Page() {
       <div className="flex-1 space-y-4 p-5">
         <BreadCrumb items={breadcrumbItems} />
         {jobData ? (
-          <JobForm
-            initialData={jobData}
-            key={jobId as string}
-          />
+          <JobForm initialData={jobData} key={jobId as string} />
         ) : (
-          <p>Loading...</p>
+          <div className="flex items-center justify-center h-[calc(100vh-220px)]">
+            <Circles
+              height={80}
+              width={80}
+              color="#4fa94d"
+              ariaLabel="circles-loading"
+              visible={true}
+            />
+          </div>
         )}
       </div>
     </ScrollArea>

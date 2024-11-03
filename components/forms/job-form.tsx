@@ -32,14 +32,14 @@ export const JobForm: React.FC<{ initialData: JobData }> = ({
 
   const onVerify = async (is_verified: string) => {
     try {
-      if (is_verified === "Declined" && !comment) {
-        toast({
-          title: "Error!",
-          variant: "destructive",
-          description: "Please provide a comment.",
-        });
-        return;
-      }
+      // if (is_verified === "Declined") {
+      //   toast({
+      //     title: "Error!",
+      //     variant: "destructive",
+      //     description: "Please provide a comment.",
+      //   });
+      //   return;
+      // }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/job/accept/${initialData.id}`,
@@ -121,7 +121,7 @@ export const JobForm: React.FC<{ initialData: JobData }> = ({
             <button
               className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600"
               onClick={() => {
-                onVerify("Accepted");
+                onVerify("Declined");
               }}
             >
               Decline
