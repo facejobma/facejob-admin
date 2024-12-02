@@ -68,7 +68,7 @@ function OverViewTab() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Aperçu</TabsTrigger>
-            <TabsTrigger value="analytics">Plus de details</TabsTrigger>
+            <TabsTrigger value="analytics">plus de détails</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -222,7 +222,7 @@ function OverViewTab() {
             <div className="grid gap-4  grid-cols-2">
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Les enterprises</CardTitle>
+                  <CardTitle>Enterprises</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   {stats.entreprises && <Overview stats={stats.entreprises} />}
@@ -230,7 +230,7 @@ function OverViewTab() {
               </Card>
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Les candidats</CardTitle>
+                  <CardTitle>Candidats</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
                   {stats.candidates && <Overview stats={stats.candidates} />}

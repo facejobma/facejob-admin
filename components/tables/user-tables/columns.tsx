@@ -24,7 +24,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "first_name",
-    header: "NOM COMPLETE",
+    header: "NOM COMPLET",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true,

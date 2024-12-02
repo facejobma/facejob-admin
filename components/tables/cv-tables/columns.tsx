@@ -10,14 +10,14 @@ export const columns: ColumnDef<CV>[] = [
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Selctionner tout"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Selectionner une ligne"
       />
     ),
     enableSorting: false,
@@ -25,7 +25,7 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "link",
-    header: "Video",
+    header: "Vidéos",
     // cell: ({ row }) => (
     //   <TableCell>
     //     <div className="w-10 h-10 relative rounded-full overflow-hidden">
@@ -41,7 +41,7 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "candidat_name",
-    header: "Candidate",
+    header: "Candidats",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true,

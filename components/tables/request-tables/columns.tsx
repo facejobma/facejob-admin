@@ -44,14 +44,14 @@ export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<Enterpri
   },
   {
     accessorKey: "company_name",
-    header: "Company Name",
+    header: "Nom de l'Entreprise",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true
   },
   {
     accessorKey: "sector.name",
-    header: "sector"
+    header: "Secteur"
   },
   {
     accessorKey: "email",
@@ -63,7 +63,7 @@ export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<Enterpri
   },
   {
     accessorKey: "is_verified",
-    header: "Status",
+    header: "Statut",
     cell: ({ row }) => (
       <div
         className={

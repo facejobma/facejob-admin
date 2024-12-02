@@ -102,21 +102,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               onVerify("Accepted");
             }}
           >
-            <CheckSquare className="mr-2 h-4 w-4" /> Accept
+            <CheckSquare className="mr-2 h-4 w-4" /> Accepter
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
               setOpen(true);
             }}
           >
-            <XSquare className="mr-2 h-4 w-4" /> Decline
+            <XSquare className="mr-2 h-4 w-4" /> Decliner
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
               router.push(`/dashboard/jobs/${data.id}`);
             }}
           >
-            <View className="mr-2 h-4 w-4" /> Consult
+            <View className="mr-2 h-4 w-4" /> Consulter
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -135,7 +135,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
               setOpen(false);
             }}
           >
-            Confirm Decline
+            Confirmer la déclinaison
           </Button>
         </div>
       )}

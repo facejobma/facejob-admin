@@ -100,7 +100,11 @@ export const columns: ColumnDef<Sales>[] = [
               : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
         }
       >
-        {row.original.status}
+        {
+          row.original.status === "Accepted" ? "Accepté" :
+            row.original.status === "Declined" ? "Décliné" : "En cours"
+        }
+
       </div>
     )
   },

@@ -15,8 +15,8 @@ export const CVRequests: FC<CVProps> = ({ data }) => {
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Requests (${data.length})`}
-          description="Validating the CVs requests"
+          title={`Demandes (${data.length})`}
+          description="Valider les CV Vidéos"
         />
       </div>
       <Separator />

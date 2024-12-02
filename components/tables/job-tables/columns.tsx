@@ -39,11 +39,11 @@ export const columns: ColumnDef<Job>[] = [
   },
   {
     accessorKey: "sector_name",
-    header: "sector",
+    header: "Secteur",
   },
   {
     accessorKey: "is_verified",
-    header: "STATUS",
+    header: "Statut",
     cell: ({ row }) => (
       <div
         className={
