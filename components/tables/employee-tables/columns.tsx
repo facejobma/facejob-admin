@@ -81,13 +81,6 @@ export const columns: ColumnDef<EnterpriseData>[] = [
   //   enableSorting: true,
   //   enableHiding: true,
   // },
-  {
-    accessorKey: "created_at",
-    header: "Date de creation",
-    cell: ({ row }) => (
-      <TableCell>{moment(row.original.created_at).fromNow()}</TableCell>
-    )
-  },
 
   {
     accessorKey: "sector.name",
@@ -107,6 +100,14 @@ export const columns: ColumnDef<EnterpriseData>[] = [
   {
     accessorKey: "effectif",
     header: "Effectif"
+  },
+
+  {
+    accessorKey: "created_at",
+    header: "Date de creation",
+    cell: ({ row }) => (
+      <TableCell>{moment(row.original.created_at).format("DD/MM/yyyy")}</TableCell>
+    )
   },
 
   {

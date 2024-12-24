@@ -3,6 +3,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User } from "@/types";
+import { TableCell } from "@/components/ui/table";
+import moment from "moment";
+import "moment/locale/fr";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -44,6 +47,15 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "bio",
     header: "BIO",
+  },
+  {
+    accessorKey: "created_at",
+    header: "Date de creation",
+    cell: ({ row }) => (
+      <TableCell>
+        {moment(row.original.created_at).format("DD/MM/yyyy")}
+      </TableCell>
+    ),
   },
   {
     id: "actions",

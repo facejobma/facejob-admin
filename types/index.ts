@@ -94,6 +94,7 @@ export type User = {
   email: string;
   tel: string;
   bio: string;
+  created_at: string;
 };
 export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
 
@@ -125,6 +126,7 @@ export type Job = {
   company_name: string;
   secteur_name: string;
   is_verified: string;
+  created_at: string;
 };
 
 
@@ -134,4 +136,5 @@ export type CV = {
   is_verified: string;
   candidat_name: string;
   secteur_name: string;
+  created_at: string;
 };
