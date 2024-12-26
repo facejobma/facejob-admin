@@ -10,40 +10,24 @@ import { Circles } from "react-loader-spinner";
 
 interface ProductsClientProps {
   data: EnterpriseData[];
-  loading: boolean; // New prop for loading state
+  // loading: boolean; // New prop for loading state
 }
 
-export const UserEnterprise: FC<ProductsClientProps> = ({ data, loading }) => {
+export const UserEnterprise: FC<ProductsClientProps> = ({ data = [] }) => {
   return (
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Enterprises (${data?.length || 0})`}
-          description="Management des entreprises"
+          title={`Enterprises (${data.length})`}
+          description="Management des enterprises"
         />
       </div>
       <Separator />
-      {loading ? ( // Show loader if loading
-        <div className="flex justify-center items-center py-4">
-          <Circles
-            height="80"
-            width="80"
-            color="#4fa94d"
-            ariaLabel="circles-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </div>
-      ) : data && data.length > 0 ? (
-        <EntrepriseDataTable
-          searchKey="company_name"
-          columns={columns}
-          data={data}
-        />
-      ) : (
-        <p>Aucune entreprise trouvée.</p>
-      )}
+      <EntrepriseDataTable
+        searchKey="company_name"
+        columns={columns}
+        data={data}
+      />
     </>
   );
 };
