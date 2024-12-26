@@ -17,27 +17,27 @@ import {
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
-import { Sector } from "@/types";
+import { EnterpriseData, Sector } from "@/types";
 import Cookies from "js-cookie";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  columns: ColumnDef<EnterpriseData, any>[];
+  data: EnterpriseData[];
   searchKey: string;
 }
 
-export function EntrepriseDataTable<TData, TValue>({
+export function EntrepriseDataTable({
   columns,
   data,
   searchKey,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [selectPanValue, setSelectPanValue] = useState<string>("");
   const [selectEffectifValue, setSelectEffectifValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
-  const [filteredData, setFilteredData] = useState<TData[]>([]);
+  const [filteredData, setFilteredData] = useState<EnterpriseData[]>([]);
   const [sectors, setSectors] = useState<Sector[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -66,14 +66,12 @@ export function EntrepriseDataTable<TData, TValue>({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`,
-      {
-        headers:{
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${Cookies.get("authToken")}`,
-        }
-      }
-    )
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Cookies.get("authToken")}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         setSectors(data);
@@ -86,25 +84,25 @@ export function EntrepriseDataTable<TData, TValue>({
   }, []);
 
   useEffect(() => {
-    let filtered = data.filter((entreprise: any) =>
+    let filtered = data.filter((entreprise) =>
       entreprise.company_name.toLowerCase().includes(searchValue.toLowerCase()),
     );
 
     if (selectValue) {
       filtered = filtered.filter(
-        (entreprise: any) => entreprise.sector?.name === selectValue,
+        (entreprise) => entreprise.sector?.name === selectValue,
       );
     }
 
     if (selectPanValue) {
       filtered = filtered.filter(
-        (entreprise: any) => entreprise.plan_name === selectPanValue,
+        (entreprise) => entreprise.plan_name === selectPanValue,
       );
     }
     if (selectEffectifValue) {
       const [min, max] = selectEffectifValue.split(" - ").map(Number);
       filtered = filtered.filter(
-        (entreprise: any) =>
+        (entreprise) =>
           entreprise.effectif >= min && entreprise.effectif <= max,
       );
     }
@@ -208,24 +206,32 @@ export function EntrepriseDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table
-              .getFilteredRowModel()
-              .rows.slice(startIndex, endIndex)
-              .map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+            {table.getFilteredRowModel().rows.length > 0 ? (
+              table
+                .getFilteredRowModel()
+                .rows.slice(startIndex, endIndex)
+                .map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No data available.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
         <ScrollBar orientation="horizontal" />
