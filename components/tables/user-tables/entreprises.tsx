@@ -1,28 +1,26 @@
 "use client";
-import { Separator } from "@/components/ui/separator";
-import { columns } from "@/components/tables/employee-tables/columns";
-import { FC } from "react";
-import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
-import { Heading } from "@/components/ui/heading";
-import { EnterpriseData } from "@/types";
 import { DataTable } from "@/components/ui/data-table";
+import { Heading } from "@/components/ui/heading";
+import { Separator } from "@/components/ui/separator";
+import { columns } from "@/components/tables/request-tables/columns";
+import { FC } from "react";
+import { EnterpriseData } from "@/types";
 
 interface EntrepriseProps {
   data: EnterpriseData[];
 }
 
 export const UserEnterprise: FC<EntrepriseProps> = ({ data }) => {
-
   return (
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Enterprises (${data.filter(entreprise => entreprise.is_verified == "Accepted").length})`}
-          description="Management des enterprises"
+          title={`Requests (${data.filter(entreprise => entreprise.is_verified == "Pending").length})`}
+          description="Validating the entreprise requests"
         />
       </div>
       <Separator />
-      <DataTable searchKey="company_name" columns={columns} data={data.filter(entreprise => entreprise.is_verified == "Accepted")} />
+      <DataTable searchKey="company_name" columns={columns} data={data} />
     </>
   );
 };
