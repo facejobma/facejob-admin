@@ -11,6 +11,7 @@ import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import {  useRouter } from "next/navigation";
 import { useState } from "react";
 import { EnterpriseData } from "@/types";
+import Cookies from "js-cookie";
 
 interface CellActionProps {
   data: EnterpriseData;
@@ -27,9 +28,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
 
-      const authToken = localStorage.getItem("authToken");
+      const authToken = Cookies.get("authToken");
 
-      console.log("Data.id, ", data.id);
+      // console.log("Data.id, ", data.id);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/delete/${data.id}`,

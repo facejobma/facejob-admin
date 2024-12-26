@@ -5,6 +5,7 @@ import { FC } from "react";
 import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
 import { Heading } from "@/components/ui/heading";
 import { EnterpriseData } from "@/types";
+import { DataTable } from "@/components/ui/data-table";
 
 interface EntrepriseProps {
   data: EnterpriseData[];
@@ -21,7 +22,7 @@ export const UserEnterprise: FC<EntrepriseProps> = ({ data }) => {
         />
       </div>
       <Separator />
-      <EntrepriseDataTable searchKey="company_name" columns={columns} data={data.filter(entreprise => entreprise.is_verified == "Accepted")} />
+      <DataTable searchKey="company_name" columns={columns} data={data.filter(entreprise => entreprise.is_verified == "Accepted")} />
     </>
   );
 };
