@@ -96,7 +96,7 @@ export function EntrepriseDataTable({
 
     if (selectPanValue) {
       filtered = filtered.filter(
-        (entreprise) => entreprise.plan_name === selectPanValue,
+        (entreprise) => entreprise.plan?.name === selectPanValue,
       );
     }
     if (selectEffectifValue) {
