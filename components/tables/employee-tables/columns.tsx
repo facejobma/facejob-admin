@@ -37,9 +37,13 @@ export const columns: ColumnDef<
     cell: ({ row }) => (
       <TableCell>
         <div className="w-10 h-10 relative rounded-full overflow-hidden">
-          {row.original && (
+          {row.original?.logo && typeof row.original.logo === "string" && (
             <Image
-              src={row.original.logo}
+              src={
+                row.original.logo.startsWith("/")
+                  ? row.original.logo
+                  : `/${row.original.logo}`
+              }
               alt={`${row.original.company_name} Logo`}
               layout="fill"
               objectFit="cover"
@@ -49,16 +53,26 @@ export const columns: ColumnDef<
       </TableCell>
     ),
   },
+
+  // {
+  //   accessorKey: "logo",
+  //   header: "Logo",
+  //   cell: ({ row }) => (
+  //     <TableCell>
+  //       <div className="w-10 h-10 relative rounded-full overflow-hidden">
+  //         {row.original?.logo && <Image
+  //           src={row.original.logo}
+  //           alt={`${row.original.company_name} Logo`}
+  //           layout="fill"
+  //           objectFit="cover"
+  //         />}
+  //       </div>
+  //     </TableCell>
+  //   )
+  // },
   {
     accessorKey: "company_name",
-    header: "Nom de l'entreprise",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true,
-  },
-  {
-    accessorKey: "plan_name",
-    header: "Panel",
+    header: "Nom de l'Entreprise",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true,
@@ -66,23 +80,32 @@ export const columns: ColumnDef<
   {
     accessorKey: "sector.name",
     header: "Secteur",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true,
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: "EMAIL",
   },
   {
     accessorKey: "phone",
-    header: "Tel",
+    header: "TEL",
   },
   {
-    accessorKey: "effectif",
-    header: "Effectif",
+    accessorKey: "is_verified",
+    header: "Statut",
+    cell: ({ row }) => (
+      <div
+        className={
+          row.original.is_verified === "Accepted"
+            ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
+            : row.original.is_verified === "Declined"
+              ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
+              : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
+        }
+      >
+        {row.original.is_verified}
+      </div>
+    ),
   },
-
   {
     accessorKey: "created_at",
     header: "Date de creation",
@@ -92,7 +115,6 @@ export const columns: ColumnDef<
       </TableCell>
     ),
   },
-
   {
     id: "actions",
     cell: ({ row }) => <CellAction data={row.original} />,

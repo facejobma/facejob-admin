@@ -1,8 +1,7 @@
 "use client";
-// import { DataTable } from "@/components/ui/data-table";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { columns } from "@/components/tables/request-tables/columns";
+import { columns } from "@/components/tables/employee-tables/columns";
 import { FC } from "react";
 import { EnterpriseData } from "@/types";
 import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
@@ -16,12 +15,16 @@ export const UserEnterprise: FC<EntrepriseProps> = ({ data }) => {
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Requests (${data.length})`}
-          description="Validating the entreprise requests"
+          title={`Entreprises (${data.length})`}
+          description="Management des enterprises"
         />
       </div>
       <Separator />
-      <EntrepriseDataTable searchKey="company_name" columns={columns} data={data} />
+      <EntrepriseDataTable
+        searchKey="company_name"
+        columns={columns}
+        data={data}
+      />
     </>
   );
 };
