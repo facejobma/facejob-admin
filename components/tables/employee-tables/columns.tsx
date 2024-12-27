@@ -78,6 +78,13 @@ export const columns: ColumnDef<
     enableHiding: true,
   },
   {
+    accessorKey: "plan.name",
+    header: "Panel",
+    enableColumnFilter: true,
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: "sector.name",
     header: "Secteur",
   },

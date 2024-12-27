@@ -54,7 +54,7 @@ export interface EnterpriseData {
   effectif: number;
   description: string;
   is_verified: string;
-  plan_name: string;
+  plan: Plan;
   created_at: string;
 }
 
@@ -85,6 +85,15 @@ export type PlanDetails = {
   isMonthly: boolean;
   isYearly: boolean;
   isQuarterly: boolean;
+}
+
+export type Plan = {
+  id: number;
+  name: string;
+  description: string;
+  monthly_price: number;
+  quarterly_price: number;
+  annual_price: number;
 }
 
 export type User = {
