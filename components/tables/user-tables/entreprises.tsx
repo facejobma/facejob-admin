@@ -2,7 +2,7 @@
 import { DataTable } from "@/components/ui/data-table";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { columns } from "@/components/tables/request-tables/columns";
+import { columns } from "@/components/tables/employee-tables/columns";
 import { FC } from "react";
 import { EnterpriseData } from "@/types";
 
