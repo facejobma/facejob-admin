@@ -6,7 +6,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
-
 import {
   Table,
   TableBody,
@@ -15,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
@@ -28,7 +26,7 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
 }
 
-export function   DataTable<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,

@@ -1,16 +1,17 @@
-"use client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
+import { Dispatch, SetStateAction } from "react";
 import { EnterpriseData } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
 
-moment.locales();
-
-export const columns: ColumnDef<EnterpriseData>[] = [
+export const columns: ColumnDef<
+  EnterpriseData,
+  Dispatch<SetStateAction<EnterpriseData[]>>
+>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -28,7 +29,7 @@ export const columns: ColumnDef<EnterpriseData>[] = [
       />
     ),
     enableSorting: false,
-    enableHiding: false
+    enableHiding: false,
   },
   {
     accessorKey: "logo",
@@ -36,81 +37,93 @@ export const columns: ColumnDef<EnterpriseData>[] = [
     cell: ({ row }) => (
       <TableCell>
         <div className="w-10 h-10 relative rounded-full overflow-hidden">
-          {row.original && <Image
-            src={row.original.logo}
-            alt={`${row.original.company_name} Logo`}
-            layout="fill"
-            objectFit="cover"
-          />}
+          {row.original?.logo && typeof row.original.logo === "string" && (
+            <Image
+              src={
+                row.original.logo.startsWith("/")
+                  ? row.original.logo
+                  : `/${row.original.logo}`
+              }
+              alt={`${row.original.company_name} Logo`}
+              layout="fill"
+              objectFit="cover"
+            />
+          )}
         </div>
       </TableCell>
-    )
+    ),
   },
-  {
-    accessorKey: "id",
-    header: "Id",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true
-  },
+
+  // {
+  //   accessorKey: "logo",
+  //   header: "Logo",
+  //   cell: ({ row }) => (
+  //     <TableCell>
+  //       <div className="w-10 h-10 relative rounded-full overflow-hidden">
+  //         {row.original?.logo && <Image
+  //           src={row.original.logo}
+  //           alt={`${row.original.company_name} Logo`}
+  //           layout="fill"
+  //           objectFit="cover"
+  //         />}
+  //       </div>
+  //     </TableCell>
+  //   )
+  // },
   {
     accessorKey: "company_name",
-    header: "Nom de l'entreprise",
+    header: "Nom de l'Entreprise",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true
+    enableHiding: true,
   },
   {
-    accessorKey: "plan_name",
+    accessorKey: "plan.name",
     header: "Panel",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true
+    enableHiding: true,
   },
-  // {
-  //   accessorKey: "plan_start_data",
-  //   header: "Date d'angagement",
-  //   enableColumnFilter: true,
-  //   enableSorting: true,
-  //   enableHiding: true,
-  // },
-  // {
-  //   accessorKey: "plan_end_data",
-  //   header: "Date de fin",
-  //   enableColumnFilter: true,
-  //   enableSorting: true,
-  //   enableHiding: true,
-  // },
+  {
+    accessorKey: "sector.name",
+    header: "Secteur",
+  },
+  {
+    accessorKey: "email",
+    header: "EMAIL",
+  },
+  {
+    accessorKey: "phone",
+    header: "TEL",
+  },
+  {
+    accessorKey: "is_verified",
+    header: "Statut",
+    cell: ({ row }) => (
+      <div
+        className={
+          row.original.is_verified === "Accepted"
+            ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
+            : row.original.is_verified === "Declined"
+              ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
+              : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
+        }
+      >
+        {row.original.is_verified}
+      </div>
+    ),
+  },
   {
     accessorKey: "created_at",
     header: "Date de creation",
     cell: ({ row }) => (
-      <TableCell>{moment(row.original.created_at).fromNow()}</TableCell>
-    )
+      <TableCell>
+        {moment(row.original.created_at).format("DD/MM/yyyy")}
+      </TableCell>
+    ),
   },
-
-  {
-    accessorKey: "sector.name",
-    header: "Secteur",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true
-  },
-  {
-    accessorKey: "email",
-    header: "Email"
-  },
-  {
-    accessorKey: "phone",
-    header: "Tel"
-  },
-  {
-    accessorKey: "effectif",
-    header: "Effectif"
-  },
-
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />
-  }
+    cell: ({ row }) => <CellAction data={row.original} />,
+  },
 ];

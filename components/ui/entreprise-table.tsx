@@ -18,6 +18,7 @@ import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
 import { EnterpriseData, Sector } from "@/types";
+import Cookies from "js-cookie";
 
 interface DataTableProps {
   columns: ColumnDef<EnterpriseData, any>[];
@@ -65,7 +66,12 @@ export function EntrepriseDataTable({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Cookies.get("authToken")}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         setSectors(data);
@@ -90,7 +96,7 @@ export function EntrepriseDataTable({
 
     if (selectPanValue) {
       filtered = filtered.filter(
-        (entreprise) => entreprise.plan_name === selectPanValue,
+        (entreprise) => entreprise.plan?.name === selectPanValue,
       );
     }
     if (selectEffectifValue) {
@@ -200,24 +206,32 @@ export function EntrepriseDataTable({
             ))}
           </TableHeader>
           <TableBody>
-            {table
-              .getFilteredRowModel()
-              .rows.slice(startIndex, endIndex)
-              .map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
+            {table.getFilteredRowModel().rows.length > 0 ? (
+              table
+                .getFilteredRowModel()
+                .rows.slice(startIndex, endIndex)
+                .map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No data available.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
         <ScrollBar orientation="horizontal" />

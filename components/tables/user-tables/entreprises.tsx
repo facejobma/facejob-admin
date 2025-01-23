@@ -1,28 +1,30 @@
 "use client";
+import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { columns } from "@/components/tables/employee-tables/columns";
 import { FC } from "react";
-import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
-import { Heading } from "@/components/ui/heading";
 import { EnterpriseData } from "@/types";
+import { EntrepriseDataTable } from "@/components/ui/entreprise-table";
 
-
-interface ProductsClientProps {
+interface EntrepriseProps {
   data: EnterpriseData[];
 }
 
-export const UserEnterprise: FC<ProductsClientProps> = ({ data }) => {
-
+export const UserEnterprise: FC<EntrepriseProps> = ({ data }) => {
   return (
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Enterprises (${data.length})`}
+          title={`Entreprises (${data.length})`}
           description="Management des enterprises"
         />
       </div>
       <Separator />
-      <EntrepriseDataTable searchKey="company_name" columns={columns} data={data} />
+      <EntrepriseDataTable
+        searchKey="company_name"
+        columns={columns}
+        data={data}
+      />
     </>
   );
 };
