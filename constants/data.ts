@@ -20,13 +20,13 @@ export const navItems: NavItem[] = [
     label: "employee"
   },
   {
-    title: "Entreprises Review",
+    title: "Revue des Entreprises",
     href: "/dashboard/requests",
     icon: "request",
     label: "request"
   },
   {
-    title: "Job Review",
+    title: "Revue des annonces",
     href: "/dashboard/jobs",
     icon: "jobReview",
     label: "jobReview"
