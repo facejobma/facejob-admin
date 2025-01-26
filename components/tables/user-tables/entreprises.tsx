@@ -14,7 +14,7 @@ export const UserEnterprise: FC<EntrepriseProps> = ({ data }) => {
   return (
     <>
       <div className="flex items-start justify-between">
-        <Heading
+        <Heading  
           title={`Entreprises (${data.length})`}
           description="Management des enterprises"
         />
