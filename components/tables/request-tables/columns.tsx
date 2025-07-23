@@ -5,8 +5,13 @@ import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
 import { Dispatch, SetStateAction } from "react";
 import { EnterpriseData } from "@/types";
+import moment from "moment";
+import "moment/locale/fr";
 
-export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<EnterpriseData[]>>>[] = [
+export const columns: ColumnDef<
+  EnterpriseData,
+  Dispatch<SetStateAction<EnterpriseData[]>>
+>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -24,7 +29,7 @@ export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<Enterpri
       />
     ),
     enableSorting: false,
-    enableHiding: false
+    enableHiding: false,
   },
   {
     accessorKey: "logo",
@@ -32,38 +37,61 @@ export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<Enterpri
     cell: ({ row }) => (
       <TableCell>
         <div className="w-10 h-10 relative rounded-full overflow-hidden">
-          {row.original?.logo && <Image
-            src={row.original.logo}
-            alt={`${row.original.company_name} Logo`}
-            layout="fill"
-            objectFit="cover"
-          />}
+          {row.original?.logo && typeof row.original.logo === "string" && (
+            <Image
+              src={
+                row.original.logo.startsWith("/")
+                  ? row.original.logo
+                  : `/${row.original.logo}`
+              }
+              alt={`${row.original.company_name} Logo`}
+              layout="fill"
+              objectFit="cover"
+            />
+          )}
         </div>
       </TableCell>
-    )
+    ),
   },
+
+  // {
+  //   accessorKey: "logo",
+  //   header: "Logo",
+  //   cell: ({ row }) => (
+  //     <TableCell>
+  //       <div className="w-10 h-10 relative rounded-full overflow-hidden">
+  //         {row.original?.logo && <Image
+  //           src={row.original.logo}
+  //           alt={`${row.original.company_name} Logo`}
+  //           layout="fill"
+  //           objectFit="cover"
+  //         />}
+  //       </div>
+  //     </TableCell>
+  //   )
+  // },
   {
     accessorKey: "company_name",
-    header: "Company Name",
+    header: "Nom de l'Entreprise",
     enableColumnFilter: true,
     enableSorting: true,
-    enableHiding: true
+    enableHiding: true,
   },
   {
     accessorKey: "sector.name",
-    header: "sector"
+    header: "Secteur"
   },
   {
     accessorKey: "email",
-    header: "EMAIL"
+    header: "EMAIL",
   },
   {
     accessorKey: "phone",
-    header: "TEL"
+    header: "TEL",
   },
   {
     accessorKey: "is_verified",
-    header: "Status",
+    header: "Statut",
     cell: ({ row }) => (
       <div
         className={
@@ -76,10 +104,19 @@ export const columns: ColumnDef<EnterpriseData, Dispatch<SetStateAction<Enterpri
       >
         {row.original.is_verified}
       </div>
-    )
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: "Date de creation",
+    cell: ({ row }) => (
+      <TableCell>
+        {moment(row.original.created_at).format("DD/MM/yyyy")}
+      </TableCell>
+    ),
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />
-  }
+    cell: ({ row }) => <CellAction data={row.original} />,
+  },
 ];

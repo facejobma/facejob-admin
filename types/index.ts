@@ -54,7 +54,7 @@ export interface EnterpriseData {
   effectif: number;
   description: string;
   is_verified: string;
-  plan_name: string;
+  plan: Plan;
   created_at: string;
 }
 
@@ -87,6 +87,15 @@ export type PlanDetails = {
   isQuarterly: boolean;
 }
 
+export type Plan = {
+  id: number;
+  name: string;
+  description: string;
+  monthly_price: number;
+  quarterly_price: number;
+  annual_price: number;
+}
+
 export type User = {
   id: number;
   nomComplete: string;
@@ -94,6 +103,7 @@ export type User = {
   email: string;
   tel: string;
   bio: string;
+  created_at: string;
 };
 export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
 
@@ -125,6 +135,7 @@ export type Job = {
   company_name: string;
   secteur_name: string;
   is_verified: string;
+  created_at: string;
 };
 
 
@@ -134,4 +145,5 @@ export type CV = {
   is_verified: string;
   candidat_name: string;
   secteur_name: string;
+  created_at: string;
 };

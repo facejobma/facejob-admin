@@ -188,8 +188,8 @@ export function SalesDataTable<TData, TValue>({
       </ScrollArea>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
+          {table.getFilteredRowModel().rows.length} colonnes sélectionnée(s).
         </div>
         <div className="space-x-2">
           <Button
@@ -198,7 +198,7 @@ export function SalesDataTable<TData, TValue>({
             onClick={handlePreviousPage}
             disabled={currentPage === 0}
           >
-            Previous
+            Précédent
           </Button>
           <Button
             variant="outline"
@@ -206,7 +206,7 @@ export function SalesDataTable<TData, TValue>({
             onClick={handleNextPage}
             disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
           >
-            Next
+            Suivant
           </Button>
         </div>
       </div>

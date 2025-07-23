@@ -1,5 +1,10 @@
 import Image from "next/image";
 import { CheckCircle, XCircle } from "lucide-react";
+import { useState } from "react";
+
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface JobData {
   id: number;
@@ -9,15 +14,67 @@ interface JobData {
   date_fin: string;
   company_name: number;
   sector_name: number;
-  isVerified: string;
+  is_verified: string;
 }
 
 export const JobForm: React.FC<{ initialData: JobData }> = ({
   initialData,
 }) => {
-  const isPending = initialData.isVerified === "Pending";
-  const isAccepted = initialData.isVerified === "Accepted";
-  const isDeclined = initialData.isVerified === "Declined";
+  const isPending = initialData.is_verified === "Pending";
+  const isAccepted = initialData.is_verified === "Accepted";
+  const isDeclined = initialData.is_verified === "Declined";
+
+  const [open, setOpen] = useState(false);
+  const [comment, setComment] = useState("");
+  const { toast } = useToast();
+  const authToken = Cookies.get("authToken");
+  const router = useRouter();
+
+  const onVerify = async (is_verified: string) => {
+    try {
+      // if (is_verified === "Declined") {
+      //   toast({
+      //     title: "Error!",
+      //     variant: "destructive",
+      //     description: "Please provide a comment.",
+      //   });
+      //   return;
+      // }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/job/accept/${initialData.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            is_verified,
+            comment,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Success!",
+          description: "Job a été vérifiée avec succès.",
+        });
+        initialData.is_verified = is_verified;
+      } else {
+        initialData.is_verified = "Pending";
+      }
+    } catch (error) {
+      toast({
+        title: "Whoops!",
+        variant: "destructive",
+        description:
+          error?.toString() || "Erreur lors de la récupération des données.",
+      });
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto mt-8 p-6">
@@ -53,10 +110,20 @@ export const JobForm: React.FC<{ initialData: JobData }> = ({
       <div className="flex justify-end mt-6 space-x-4">
         {isPending && (
           <>
-            <button className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600">
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600"
+              onClick={() => {
+                onVerify("Accepted");
+              }}
+            >
               Accept
             </button>
-            <button className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600">
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600"
+              onClick={() => {
+                onVerify("Declined");
+              }}
+            >
               Decline
             </button>
           </>

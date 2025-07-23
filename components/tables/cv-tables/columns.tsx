@@ -2,6 +2,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { CV } from "@/types";
+import { TableCell } from "@/components/ui/table";
+import moment from "moment";
+import "moment/locale/fr";
 
 export const columns: ColumnDef<CV>[] = [
   {
@@ -10,14 +13,14 @@ export const columns: ColumnDef<CV>[] = [
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Selctionner tout"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Selectionner une ligne"
       />
     ),
     enableSorting: false,
@@ -25,7 +28,7 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "link",
-    header: "Video",
+    header: "Vidéos",
     // cell: ({ row }) => (
     //   <TableCell>
     //     <div className="w-10 h-10 relative rounded-full overflow-hidden">
@@ -41,7 +44,7 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "candidat_name",
-    header: "Candidate",
+    header: "Candidats",
     enableColumnFilter: true,
     enableSorting: true,
     enableHiding: true,
@@ -68,6 +71,15 @@ export const columns: ColumnDef<CV>[] = [
       >
         {row.original.is_verified}
       </div>
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: "Date de creation",
+    cell: ({ row }) => (
+      <TableCell>
+        {moment(row.original.created_at).format("DD/MM/yyyy")}
+      </TableCell>
     ),
   },
   {

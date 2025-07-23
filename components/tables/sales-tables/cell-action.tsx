@@ -100,13 +100,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           >
             <XSquare className="mr-2 h-4 w-4" /> Decline
           </DropdownMenuItem>
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             onClick={() => {
               router.push(`/dashboard/sales/${data.id}`);
             }}
           >
             <View className="mr-2 h-4 w-4" /> Consult
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
 

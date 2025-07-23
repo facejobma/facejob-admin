@@ -26,7 +26,15 @@ export default function SalesPage() {
           },
         );
         const data = await response.json();
-        setSales(data);
+
+        // Trier les ventes par date de création (du plus récent au plus ancien)
+        const sortedSales = data.sort((a: Sales, b: Sales) => {
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        });
+
+        setSales(sortedSales); // Mettre à jour l'état avec les ventes triées
       } catch (error) {
         toast({
           title: "Whoops!",

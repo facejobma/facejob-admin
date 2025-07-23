@@ -78,7 +78,7 @@ export function CandidateDataTable<TData, TValue>({
     <>
       <div className="flex space-x-2">
         <Input
-          placeholder={`Search ${searchKey}...`}
+          placeholder={`Rechercher par ${searchKey}...`}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full md:max-w-sm"
@@ -88,7 +88,7 @@ export function CandidateDataTable<TData, TValue>({
           onChange={handleSelectChange}
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">sector</option>
+          <option value="">secteur</option>
           {sectors.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -139,8 +139,8 @@ export function CandidateDataTable<TData, TValue>({
       </ScrollArea>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
+          {table.getFilteredRowModel().rows.length} colonnes sélectionnée(s).
         </div>
         <div className="space-x-2">
           <Button
@@ -149,7 +149,7 @@ export function CandidateDataTable<TData, TValue>({
             onClick={handlePreviousPage}
             disabled={currentPage === 0}
           >
-            Previous
+           Précédent
           </Button>
           <Button
             variant="outline"
@@ -159,7 +159,7 @@ export function CandidateDataTable<TData, TValue>({
               currentPage === Math.ceil(data.length / pageSize) - 1
             }
           >
-            Next
+           Suivant
           </Button>
         </div>
       </div>

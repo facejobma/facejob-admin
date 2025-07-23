@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import { CVRequests } from "@/components/tables/cv-tables/requests";
 
 const breadcrumbItems = [
-  { title: "Videos", link: "/dashboard/candidate-videos" },
+  { title: "Demandes", link: "/dashboard/candidate-videos" },
 ];
 
 export default function UsersPage() {

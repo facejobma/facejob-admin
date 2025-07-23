@@ -1,7 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
+import { TableCell } from "@/components/ui/table";
 import { Job } from "@/types";
+import moment from "moment";
+import "moment/locale/fr";
 
 // import { TableCell } from "@/components/ui/table";
 // import Image from "next/image";
@@ -39,11 +42,11 @@ export const columns: ColumnDef<Job>[] = [
   },
   {
     accessorKey: "sector_name",
-    header: "sector",
+    header: "Secteur",
   },
   {
     accessorKey: "is_verified",
-    header: "STATUS",
+    header: "Statut",
     cell: ({ row }) => (
       <div
         className={
@@ -56,6 +59,15 @@ export const columns: ColumnDef<Job>[] = [
       >
         {row.original.is_verified}
       </div>
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: "Date de creation",
+    cell: ({ row }) => (
+      <TableCell>
+        {moment(row.original.created_at).format("DD/MM/yyyy")}
+      </TableCell>
     ),
   },
   {

@@ -8,11 +8,13 @@ import { UserEnterprise } from "@/components/tables/user-tables/entreprises";
 import { EnterpriseData } from "@/types";
 
 const breadcrumbItems = [
-  { title: "Entreprise", link: "/dashboard/entreprise" }
+  { title: "Entreprise", link: "/dashboard/entreprise" },
 ];
 
 export default function UsersPage() {
-  const [users, setUsers] = useState([] as EnterpriseData[]);
+  const [entrepriseRequests, setEntrepriseRequests] = useState(
+    [] as EnterpriseData[],
+  );
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
@@ -24,17 +26,18 @@ export default function UsersPage() {
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json"
-            }
-          }
+              "Content-Type": "application/json",
+            },
+          },
         );
         const data = await response.json();
-        setUsers(data);
+
+        setEntrepriseRequests(data);
       } catch (error) {
         toast({
           title: "Whoops!",
           variant: "destructive",
-          description: "Erreur lors de la récupération des données."
+          description: "Erreur lors de la récupération des données.",
         });
       }
     };
@@ -46,7 +49,12 @@ export default function UsersPage() {
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <UserEnterprise data={users.filter(entreprise => entreprise.is_verified === "Accepted")} />
+        <UserEnterprise
+          data={entrepriseRequests
+            .filter(
+            (entreprise) => entreprise?.is_verified === "Accepted",
+          )}
+        />
       </div>
     </>
   );
