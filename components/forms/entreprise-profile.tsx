@@ -15,12 +15,12 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
     <div className="bg-white rounded-lg overflow-hidden shadow-lg max-w-md mx-auto mt-8 p-6">
       <div className="flex items-center justify-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden">
-          {initialData.logo && <Image
+          {/* {initialData.logo && <Image
             src={initialData.logo}
             alt={`${initialData.company_name} Logo`}
             layout="fill"
             objectFit="cover"
-          />}
+          />} */}
         </div>
       </div>
 
@@ -37,7 +37,8 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Panel actuelle</h2>
-          <p className="text-gray-600">{initialData.plan.name}</p>
+          <p className="text-gray-600">{initialData.plan?.name || "Aucun plan"}</p>
+
         </div>
 
         <div className="mb-4">
