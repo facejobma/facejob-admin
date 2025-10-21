@@ -41,6 +41,7 @@ function OverViewTab() {
         .then((response) => response.json())
         .then((result) => {
           setStats(result);
+          console.log("🚀 ~ getStats ~ result:", result)
         })
         .catch((error) => {
           toast({
