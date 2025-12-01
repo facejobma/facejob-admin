@@ -19,7 +19,6 @@ import { Heading } from "@/components/ui/heading";
 import { useToast } from "../ui/use-toast";
 import Cookies from "js-cookie";
 import FileUpload from "../file-upload";
-
 const ImgSchema = z.object({
   fileName: z.string(),
   name: z.string(),
