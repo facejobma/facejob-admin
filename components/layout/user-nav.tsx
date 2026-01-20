@@ -14,6 +14,7 @@ import {
 import { useSession } from "@/app/providers/SessionProvider";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { performLogout } from "@/lib/auth";
 
 export function UserNav() {
   const { session } = useSession();
@@ -21,24 +22,7 @@ export function UserNav() {
   const { toast } = useToast();
 
   function signOut() {
-    fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/logout", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (res) => {
-        // if (res.ok) {
-          router.push("/");
-        // }
-      })
-      .catch((error) => {
-        toast({
-          title: "Whoops!",
-          variant: "destructive",
-          description: error.message,
-        });
-      });
+    performLogout();
   }
 
   if (session) {
