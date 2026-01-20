@@ -29,6 +29,24 @@ export type StatsItem = {
   year: number;
 }
 
+
+
+
+
+export type Sale ={
+  id: number;
+  entreprise_id: number;
+  amount: string; // ou number si tu convertis
+  description: string;
+  plan_id: number;
+  sector_id: number | null;
+  created_at: string; // ou Date si tu parsers
+  updated_at: string; // ou Date si tu parsers
+  plan: Plan;
+  entreprise: Entreprise;
+  sector: Sector | null;
+}
+
 export interface Statistiques {
   sectors_count: number;
   postules_count: number;
@@ -38,7 +56,7 @@ export interface Statistiques {
   entreprises: StatsItem[];
   entreprises_count: number;
   sales: StatsItem[];
-  last_n_sales: Sales[];
+  last_n_sales: Sale[];
 }
 
 
@@ -94,6 +112,8 @@ export type Plan = {
   monthly_price: number;
   quarterly_price: number;
   annual_price: number;
+    company_name: string;
+  entreprise_logo: string;
 }
 
 export type User = {
@@ -124,6 +144,7 @@ export type Entreprise = {
   created_at: string;
   updated_at: string;
   plan_name: string;
+  entreprise_logo: string;
 };
 
 export type Job = {
