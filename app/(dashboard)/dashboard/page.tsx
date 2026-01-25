@@ -7,14 +7,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Statistiques } from "@/types";
-import { Overview } from "@/components/overview";
+import { SimpleBarChart } from "@/components/simple-bar-chart";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
 import { addYears } from "date-fns";
 import Cookies from "js-cookie";
 
 function OverViewTab() {
-  const [stats, setStats] = useState({} as Statistiques);
+  const [stats, setStats] = useState<Statistiques>({
+    sectors_count: 0,
+    postules_count: 0,
+    offres_count: 0,
+    candidates_count: 0,
+    entreprises_count: 0,
+    sales: [],
+    candidates: [],
+    entreprises: [],
+    last_n_sales: []
+  });
+  const [loading, setLoading] = useState(true);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addYears(new Date(), -1),
     to: new Date(),
@@ -25,35 +36,54 @@ function OverViewTab() {
 
   useEffect(() => {
     async function getStats() {
-      await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL +
-          "/api/admin/statics?from=" +
-          date?.from?.toISOString() +
-          "&to=" +
-          date?.to?.toISOString(),
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        },
-      )
-        .then((response) => response.json())
-        .then((result) => {
-          setStats(result);
-          console.log("🚀 ~ getStats ~ result:", result)
-        })
-        .catch((error) => {
-          toast({
-            title: "Whoops!",
-            variant: "destructive",
-            description: error.message,
-          });
+      if (!authToken) {
+        toast({
+          title: "Erreur d'authentification",
+          variant: "destructive",
+          description: "Token d'authentification manquant",
         });
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BACKEND_URL +
+            "/api/admin/statics?from=" +
+            date?.from?.toISOString() +
+            "&to=" +
+            date?.to?.toISOString(),
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        
+        setStats(result);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: error instanceof Error ? error.message : "Erreur lors du chargement des statistiques",
+        });
+      } finally {
+        setLoading(false);
+      }
     }
 
     getStats();
-  }, [date?.from, date?.to, toast]);
+  }, [date?.from, date?.to, toast, authToken]);
 
   return (
     <ScrollArea className="h-full">
@@ -204,7 +234,22 @@ function OverViewTab() {
                   <CardTitle>Les ventes</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
-                  {stats.sales && <Overview unit={"DH"} stats={stats.sales} />}
+                  {loading ? (
+                    <div className="flex items-center justify-center h-[350px]">
+                      <div className="text-muted-foreground">Chargement...</div>
+                    </div>
+                  ) : stats.sales && stats.sales.length > 0 ? (
+                    <SimpleBarChart 
+                      unit={"DH "} 
+                      stats={stats.sales} 
+                      title="Graphique des Ventes"
+                      color="bg-green-500 hover:bg-green-600"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+                      Aucune donnée de vente disponible
+                    </div>
+                  )}
                 </CardContent>
               </Card>
               <Card className="col-span-4 md:col-span-3">
@@ -226,7 +271,17 @@ function OverViewTab() {
                   <CardTitle>Entreprises</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
-                  {stats.entreprises && <Overview stats={stats.entreprises} />}
+                  {stats.entreprises && stats.entreprises.length > 0 ? (
+                    <SimpleBarChart 
+                      stats={stats.entreprises} 
+                      title="Nouvelles Entreprises"
+                      color="bg-blue-500 hover:bg-blue-600"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+                      Aucune donnée d'entreprise disponible
+                    </div>
+                  )}
                 </CardContent>
               </Card>
               <Card className="col-span-1">
@@ -234,7 +289,17 @@ function OverViewTab() {
                   <CardTitle>Candidats</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
-                  {stats.candidates && <Overview stats={stats.candidates} />}
+                  {stats.candidates && stats.candidates.length > 0 ? (
+                    <SimpleBarChart 
+                      stats={stats.candidates} 
+                      title="Nouveaux Candidats"
+                      color="bg-purple-500 hover:bg-purple-600"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-[350px] text-muted-foreground">
+                      Aucune donnée de candidat disponible
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

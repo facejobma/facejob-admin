@@ -2,7 +2,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { CV } from "@/types";
-import { TableCell } from "@/components/ui/table";
 import moment from "moment";
 import "moment/locale/fr";
 
@@ -77,9 +76,7 @@ export const columns: ColumnDef<CV>[] = [
     accessorKey: "created_at",
     header: "Date de creation",
     cell: ({ row }) => (
-      <TableCell>
-        {moment(row.original.created_at).format("DD/MM/yyyy")}
-      </TableCell>
+      moment(row.original.created_at).format("DD/MM/yyyy")
     ),
   },
   {

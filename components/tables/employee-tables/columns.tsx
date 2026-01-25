@@ -1,7 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
-import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
 import { Dispatch, SetStateAction } from "react";
 import { EnterpriseData } from "@/types";
@@ -35,22 +34,20 @@ export const columns: ColumnDef<
     accessorKey: "logo",
     header: "Logo",
     cell: ({ row }) => (
-      <TableCell>
-        <div className="w-10 h-10 relative rounded-full overflow-hidden">
-          {row.original?.logo && typeof row.original.logo === "string" && (
-            <Image
-              src={
-                row.original.logo.startsWith("/")
-                  ? row.original.logo
-                  : `/${row.original.logo}`
-              }
-              alt={`${row.original.company_name} Logo`}
-              layout="fill"
-              objectFit="cover"
-            />
-          )}
-        </div>
-      </TableCell>
+      <div className="w-10 h-10 relative rounded-full overflow-hidden">
+        {row.original?.logo && typeof row.original.logo === "string" && (
+          <Image
+            src={
+              row.original.logo.startsWith("/")
+                ? row.original.logo
+                : `/${row.original.logo}`
+            }
+            alt={`${row.original.company_name} Logo`}
+            layout="fill"
+            objectFit="cover"
+          />
+        )}
+      </div>
     ),
   },
 
@@ -117,9 +114,7 @@ export const columns: ColumnDef<
     accessorKey: "created_at",
     header: "Date de creation",
     cell: ({ row }) => (
-      <TableCell>
-        {moment(row.original.created_at).format("DD/MM/yyyy")}
-      </TableCell>
+      moment(row.original.created_at).format("DD/MM/yyyy")
     ),
   },
   {

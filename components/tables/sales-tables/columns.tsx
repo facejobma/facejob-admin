@@ -1,6 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Sales } from "@/types";
-import { TableCell } from "@/components/ui/table";
 import Image from "next/image";
 import moment from "moment";
 import { CellAction } from "./cell-action";
@@ -10,16 +9,14 @@ export const columns: ColumnDef<Sales>[] = [
     accessorKey: "entreprise.entreprise_logo",
     header: "Logo de l'entreprise",
     cell: ({ row }) => (
-      <TableCell>
-        <div className="w-10 h-10 relative rounded-full overflow-hidden">
-          {row?.original?.entreprise?.logo && <Image
-            src={row?.original?.entreprise.logo}
-            alt={`${row.original.entreprise.company_name} Logo`}
-            layout="fill"
-            objectFit="cover"
-          />}
-        </div>
-      </TableCell>
+      <div className="w-10 h-10 relative rounded-full overflow-hidden">
+        {row?.original?.entreprise?.logo && <Image
+          src={row?.original?.entreprise.logo}
+          alt={`${row.original.entreprise.company_name} Logo`}
+          layout="fill"
+          objectFit="cover"
+        />}
+      </div>
     )
   },
   {
@@ -82,9 +79,7 @@ export const columns: ColumnDef<Sales>[] = [
     enableSorting: true,
     enableHiding: true,
     cell: ({ row }) => (
-      <TableCell>
-        {moment(row.original.created_at).format("DD/MM/YYYY")}
-      </TableCell>
+      moment(row.original.created_at).format("DD/MM/YYYY")
     )
   },
   {
