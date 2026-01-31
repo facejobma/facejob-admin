@@ -15,7 +15,7 @@ export default async function RootLayout({
   const session = "tmpSession";
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} overflow-hidden`}>
+      <body className={`${inter.className}`}>
         <Providers session={session}>
           <Toaster />
           {children}

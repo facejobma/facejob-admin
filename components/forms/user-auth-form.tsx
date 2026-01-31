@@ -39,6 +39,7 @@ export default function UserAuthForm() {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
   const onSubmit = async (data: UserFormValue) => {
@@ -85,7 +86,7 @@ export default function UserAuthForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 w-full"
+          className="space-y-5 w-full"
         >
           <FormField
             control={form.control}
@@ -97,13 +98,16 @@ export default function UserAuthForm() {
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                     <Input
                       type="email"
                       placeholder="admin@facejob.com"
                       disabled={isLoading}
-                      className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-colors"
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      className="pl-10 h-12 bg-white border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                     />
                   </div>
                 </FormControl>
@@ -122,18 +126,22 @@ export default function UserAuthForm() {
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       disabled={isLoading}
-                      className="pl-10 pr-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-colors"
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      className="pl-10 pr-12 h-12 bg-white border-2 border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors"
+                      disabled={isLoading}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors z-10 disabled:opacity-50"
                     >
                       {showPassword ? <EyeOff /> : <Eye />}
                     </button>
@@ -144,20 +152,25 @@ export default function UserAuthForm() {
             )}
           />
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pt-2">
             <div className="flex items-center">
               <input
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                disabled={isLoading}
+                className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded disabled:opacity-50"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                 Se souvenir de moi
               </label>
             </div>
             <div className="text-sm">
-              <a href="#" className="font-medium text-green-600 hover:text-green-500 transition-colors">
+              <a 
+                href="#" 
+                className="font-medium text-green-600 hover:text-green-500 transition-colors"
+                onClick={(e) => e.preventDefault()}
+              >
                 Mot de passe oublié?
               </a>
             </div>
@@ -165,14 +178,14 @@ export default function UserAuthForm() {
 
           <Button
             disabled={isLoading}
-            className="w-full h-12 bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-200 font-medium text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+            className="w-full h-12 bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-200 font-medium text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:hover:bg-green-600"
             type="submit"
           >
             {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connexion en cours...
-              </>
+              <div className="flex items-center justify-center">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span>Connexion en cours...</span>
+              </div>
             ) : (
               "Se connecter"
             )}
@@ -183,7 +196,11 @@ export default function UserAuthForm() {
       <div className="text-center">
         <p className="text-sm text-gray-600">
           Besoin d'aide?{" "}
-          <a href="#" className="font-medium text-green-600 hover:text-green-500 transition-colors">
+          <a 
+            href="#" 
+            className="font-medium text-green-600 hover:text-green-500 transition-colors"
+            onClick={(e) => e.preventDefault()}
+          >
             Contactez le support
           </a>
         </p>

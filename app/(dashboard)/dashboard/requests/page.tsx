@@ -43,18 +43,29 @@ export default function UsersPage() {
     fetchData();
   }, [authToken, toast]);
 
-  // Filter for pending requests
+  // For debugging: show all enterprises first, then we can adjust the filter
+  // const pendingRequests = entrepriseRequests; // Show all for now
+  
+  // Filter for pending requests (non-verified enterprises)
   const pendingRequests = entrepriseRequests.filter(
     (entreprise) => 
-      entreprise?.is_verified === "Pending" || 
-      entreprise?.is_verified === false ||
-      !entreprise?.is_verified
+      entreprise?.is_verified === false || 
+      entreprise?.is_verified === "Pending" ||
+      entreprise?.is_verified === "Declined" ||
+      (!entreprise?.is_verified && entreprise?.is_verified !== true)
   );
+
+  console.log("All enterprises:", entrepriseRequests);
+  console.log("Pending requests:", pendingRequests);
+  console.log("Sample enterprise is_verified:", entrepriseRequests[0]?.is_verified);
+  
+  // If no pending requests, show all for debugging
+  const displayData = pendingRequests.length > 0 ? pendingRequests : entrepriseRequests;
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-hidden">
       <BreadCrumb items={breadcrumbItems} />
-      <EnterpriseRequests data={pendingRequests} />
+      <EnterpriseRequests data={displayData} />
     </div>
   );
 }

@@ -16,7 +16,7 @@ export function SimpleBarChart({
   stats, 
   unit = "", 
   title = "Graphique", 
-  color = "bg-green-500 hover:bg-green-600" 
+  color = "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500" 
 }: SimpleBarChartProps) {
   if (!Array.isArray(stats) || stats.length === 0) {
     return (
@@ -45,9 +45,9 @@ export function SimpleBarChart({
   }
 
   return (
-    <div className="w-full h-[350px] p-4 bg-white rounded-lg">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">{title}</h3>
-      <div className="flex items-end justify-between h-64 border-b border-l border-gray-300">
+    <div className="w-full h-[350px] p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+      <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">{title}</h3>
+      <div className="flex items-end justify-between h-64 border-b border-l border-gray-300 dark:border-gray-600">
         {data.map((item, index) => {
           const height = (item.total / maxValue) * 100;
           return (
@@ -58,16 +58,16 @@ export function SimpleBarChart({
                   style={{ height: `${height * 2}px` }}
                 ></div>
                 {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 dark:bg-gray-700 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap shadow-lg">
                   {unit}{item.total.toLocaleString()}
                 </div>
               </div>
-              <span className="text-xs text-gray-600 mt-2">{item.name}</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 mt-2">{item.name}</span>
             </div>
           );
         })}
       </div>
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
         Évolution par mois {unit && `(en ${unit})`}
       </div>
     </div>

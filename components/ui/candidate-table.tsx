@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "./input";
 import { Button } from "./button";
-import { ScrollArea, ScrollBar } from "./scroll-area";
+import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -25,16 +25,15 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
 }
 
-
 export function CandidateDataTable<TData, TValue>({
-                                                    columns,
-                                                    data,
-                                                    searchKey
-                                                  }: DataTableProps<TData, TValue>) {
+  columns,
+  data,
+  searchKey
+}: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(20);
+  const [pageSize] = useState<number>(10);
 
   const table = useReactTable<TData>({
     data,
@@ -44,7 +43,6 @@ export function CandidateDataTable<TData, TValue>({
     globalFilterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true;
       
-      // Handle sector filtering
       const sector = (row.original as any).sector;
       const sectorName = typeof sector === 'object' && sector !== null 
         ? sector.name 
@@ -54,34 +52,21 @@ export function CandidateDataTable<TData, TValue>({
     }
   });
 
-
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
   }, [searchKey, searchValue, table]);
 
-  const handleSelectChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
-
     table.setGlobalFilter(selectedValue);
   };
 
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) =>
-      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1)
-    );
-  };
-
+  const filteredRows = table.getFilteredRowModel().rows;
   const startIndex = currentPage * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, data.length);
+  const endIndex = Math.min(startIndex + pageSize, filteredRows.length);
+  const totalPages = Math.ceil(filteredRows.length / pageSize);
 
-  // get all sectors from the table
   const sectors = Array.from(new Set(
     data
       .map(item => {
@@ -91,101 +76,141 @@ export function CandidateDataTable<TData, TValue>({
         }
         return sector;
       })
-      .filter(Boolean) // Remove null/undefined values
+      .filter(Boolean)
   ));
 
-
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Input
-          placeholder={`Rechercher par ${searchKey}...`}
-          value={searchValue}
-          onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full sm:max-w-sm"
-        />
-        <select
-          value={selectValue || ""}
-          onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
-        >
-          <option value="">Tous les secteurs</option>
-          {sectors.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
+    <div className="w-full max-w-full space-y-4 overflow-x-hidden">
+      {/* Search and Filter */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Rechercher par nom..."
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
+        <div className="relative min-w-[160px]">
+          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <select
+            value={selectValue || ""}
+            onChange={handleSelectChange}
+            className="w-full pl-10 pr-8 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="">Tous les secteurs</option>
+            {sectors.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      <div className="rounded-md border">
-        <ScrollArea className="h-[calc(80vh-220px)] w-full">
-          <div className="min-w-full overflow-x-auto">
-            <Table className="relative min-w-full">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="whitespace-nowrap">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table
-                  .getFilteredRowModel()
-                  .rows.slice(startIndex, endIndex)
-                  .map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() ? "selected" : undefined}
+
+      {/* Table */}
+      <div className="w-full border rounded-lg overflow-hidden">
+        <div className="w-full">
+          <Table className="w-full table-fixed">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header, index) => (
+                    <TableHead 
+                      key={header.id} 
+                      className={`font-semibold text-xs ${
+                        index === 0 ? 'w-1/4' : 
+                        index === 1 ? 'w-1/3' : 
+                        index === 2 ? 'w-1/6' : 
+                        index === 3 ? 'w-1/6' : 
+                        'w-1/12'
+                      }`}
                     >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {filteredRows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    Aucun candidat trouvé.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredRows
+                  .slice(startIndex, endIndex)
+                  .map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
+                      {row.getVisibleCells().map((cell, index) => (
+                        <TableCell 
+                          key={cell.id} 
+                          className={`text-xs truncate ${
+                            index === 0 ? 'w-1/4' : 
+                            index === 1 ? 'w-1/3' : 
+                            index === 2 ? 'w-1/6' : 
+                            index === 3 ? 'w-1/6' : 
+                            'w-1/12'
+                          }`}
+                          title={typeof cell.getValue() === 'string' ? cell.getValue() as string : ''}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
                     </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+                  ))
+              )}
+            </TableBody>
+          </Table>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePreviousPage}
-            disabled={currentPage === 0}
-          >
-           Précédent
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNextPage}
-            disabled={
-              currentPage === Math.ceil(data.length / pageSize) - 1
-            }
-          >
-           Suivant
-          </Button>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} sur {filteredRows.length} ligne(s) sélectionnée(s)
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground">
+            Affichage {startIndex + 1}-{Math.min(endIndex, filteredRows.length)} sur {filteredRows.length}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage + 1} sur {Math.max(1, totalPages)}
+            </span>
+            
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+                disabled={currentPage >= totalPages - 1}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

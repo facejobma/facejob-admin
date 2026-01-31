@@ -36,26 +36,39 @@ export const columns: ColumnDef<
     accessorKey: "logo",
     header: "Logo",
     size: 80,
-    cell: ({ row }) => (
-      <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-100">
-        {row.original?.logo && typeof row.original.logo === "string" ? (
-          <Image
-            src={
-              row.original.logo.startsWith("/")
-                ? row.original.logo
-                : `/${row.original.logo}`
-            }
-            alt={`${row.original.company_name} Logo`}
-            layout="fill"
-            objectFit="cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
-            Logo
-          </div>
-        )}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const logoUrl = row.original?.logo;
+      const companyName = row.original?.company_name || '';
+      
+      return (
+        <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+          {logoUrl && typeof logoUrl === "string" ? (
+            <Image
+              src={logoUrl}
+              alt={`${companyName} Logo`}
+              width={40}
+              height={40}
+              className="object-cover rounded-full"
+              onError={(e) => {
+                console.log("Image load error:", logoUrl);
+                // Hide the image and show fallback
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `<div class="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-600 bg-green-100">${companyName.charAt(0).toUpperCase() || 'E'}</div>`;
+                }
+              }}
+              unoptimized={logoUrl.includes('placeholder')} // Disable optimization for placeholder images
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs font-semibold text-gray-600 bg-green-100">
+              {companyName.charAt(0).toUpperCase() || 'E'}
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "company_name",

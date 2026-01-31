@@ -39,17 +39,17 @@ export const IMG_MAX_LIMIT = 3;
 const formSchema = z.object({
   imgUrl: z
     .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: "You can only add up to 3 images" })
-    .min(1, { message: "At least one image must be added." }),
+    .max(1, { message: "Vous ne pouvez ajouter qu'une seule image de profil" })
+    .optional(),
   first_name: z
     .string()
-    .min(3, { message: "First Name must be at least 3 characters" }),
+    .min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
   sector: z
     .string()
-    .min(3, { message: "Sector must be at least 3 characters" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  tel: z.string().min(10, { message: "Invalid phone number" }),
-  bio: z.string().min(3, { message: "Bio must be at least 3 characters" })
+    .min(2, { message: "Le secteur doit contenir au moins 2 caractères" }),
+  email: z.string().email({ message: "Adresse email invalide" }),
+  tel: z.string().min(10, { message: "Numéro de téléphone invalide" }),
+  bio: z.string().min(3, { message: "La bio doit contenir au moins 3 caractères" })
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -197,15 +197,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     <>
       <div className="flex items-center justify-between">
         <Heading
-          title="Candidate Form"
-          description="Edit or Create a Candidate"
+          title="Profil du Candidat"
+          description="Modifier les informations du candidat"
         />
         {initialData && (
           <Button
             disabled={loading}
             variant="destructive"
             size="sm"
-            onClick={onDelete} // Attach the onDelete function to the delete button
+            onClick={onDelete}
           >
             <Trash className="h-4 w-4" />
           </Button>
@@ -222,7 +222,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             name="imgUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Images</FormLabel>
+                <FormLabel>Photo de Profil</FormLabel>
                 <FormControl>
                   <FileUpload
                     onChange={field.onChange}
@@ -234,68 +234,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="first_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={loading}
-                    placeholder="Candidate's first name"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="sector"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sector</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={loading}
-                    placeholder="Candidate's sector"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={loading}
-                    placeholder="Candidate's email"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="md:grid md:grid-cols-3 gap-8">
+          
+          <div className="md:grid md:grid-cols-2 gap-8">
             <FormField
               control={form.control}
-              name="tel"
+              name="first_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>Prénom</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Candidate's phone number"
+                      placeholder="Prénom du candidat"
                       {...field}
                     />
                   </FormControl>
@@ -305,14 +255,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="bio"
+              name="sector"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Bio</FormLabel>
+                  <FormLabel>Secteur</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Candidate's bio"
+                      placeholder="Secteur d'activité"
                       {...field}
                     />
                   </FormControl>
@@ -321,8 +271,65 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               )}
             />
           </div>
+          
+          <div className="md:grid md:grid-cols-2 gap-8">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Adresse email"
+                      type="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Téléphone</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Numéro de téléphone"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <FormField
+            control={form.control}
+            name="bio"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Biographie</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={loading}
+                    placeholder="Description du candidat"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
           <Button disabled={loading} className="ml-auto" type="submit">
-            Save
+            {loading ? "Enregistrement..." : "Enregistrer"}
           </Button>
         </form>
       </Form>
