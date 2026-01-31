@@ -11,12 +11,16 @@ interface EntrepriseProps {
 }
 
 export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
+  console.log("EnterpriseRequests - Received data:", data);
+  console.log("EnterpriseRequests - Data length:", data.length);
+  console.log("EnterpriseRequests - First item:", data[0]);
+  
   return (
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Requests (${data.filter(entreprise => entreprise.is_verified == "Pending").length})`}
-          description="Validating the entreprise requests"
+          title={`Demandes (${data.length})`}
+          description="Validation des demandes d'entreprises"
         />
       </div>
       <Separator />

@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { CheckCircle, XCircle } from "lucide-react";
-import { Sales } from "@/types";
+import { PaymentDetail } from "@/types";
 import React from "react";
 import moment from "moment";
 
-export const PaymentForm: React.FC<{ initialData: Sales }> = ({
+export const PaymentForm: React.FC<{ initialData: PaymentDetail }> = ({
                                                                 initialData
                                                               }) => {
   const isPending = initialData.status === "pending";
@@ -18,8 +18,8 @@ export const PaymentForm: React.FC<{ initialData: Sales }> = ({
       <div className="flex items-center justify-center">
         <div className="w-20 h-20 relative rounded-full overflow-hidden">
           {initialData.entreprise?.logo && <Image
-            src={initialData.entreprise?.logo}
-            alt={`${initialData.entreprise?.company_name} Logo`}
+            src={initialData.entreprise.logo}
+            alt={`${initialData.entreprise.company_name} Logo`}
             layout="fill"
             objectFit="cover"
           />}
@@ -27,24 +27,24 @@ export const PaymentForm: React.FC<{ initialData: Sales }> = ({
       </div>
 
       <p className="text-gray-600 text-center mt-4">
-        {initialData.description}
+        {initialData.entreprise?.description}
       </p>
 
       <div className="mt-6">
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Contact Information</h2>
-          <p className="text-gray-600">{initialData.entreprise.email}</p>
-          <p className="text-gray-600">{initialData.entreprise.phone}</p>
+          <p className="text-gray-600">{initialData.entreprise?.email}</p>
+          <p className="text-gray-600">{initialData.entreprise?.phone}</p>
         </div>
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Secteur</h2>
-          <p className="text-gray-600">{initialData.entreprise.sector?.name}</p>
+          <p className="text-gray-600">{initialData.entreprise?.sector?.name}</p>
         </div>
 
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Panel actuelle</h2>
-          <p className="text-gray-600">{initialData.plan.name}</p>
+          <p className="text-gray-600">{initialData.plan?.name}</p>
         </div>
 
         <div className="mb-4">
@@ -55,13 +55,13 @@ export const PaymentForm: React.FC<{ initialData: Sales }> = ({
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Website</h2>
           <p className="text-blue-500 hover:underline">
-            {initialData.entreprise.site_web}
+            {initialData.entreprise?.site_web}
           </p>
         </div>
 
         <div>
           <h2 className="text-lg font-semibold mb-2">Company Size</h2>
-          <p className="text-gray-600">{initialData.entreprise.effectif}</p>
+          <p className="text-gray-600">{initialData.entreprise?.effectif}</p>
         </div>
 
         <div>

@@ -40,7 +40,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/payments/accept/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/payments/accept/${data.id}`,
         {
           method: "PUT",
           headers: {

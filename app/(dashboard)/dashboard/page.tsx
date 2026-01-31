@@ -50,7 +50,7 @@ function OverViewTab() {
         setLoading(true);
         const response = await fetch(
           process.env.NEXT_PUBLIC_BACKEND_URL +
-            "/api/admin/statics?from=" +
+            "/api/v1/admin/statics?from=" +
             date?.from?.toISOString() +
             "&to=" +
             date?.to?.toISOString(),
@@ -279,7 +279,7 @@ function OverViewTab() {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-[350px] text-muted-foreground">
-                      Aucune donnée d'entreprise disponible
+                      Aucune donnée d&apos;entreprise disponible
                     </div>
                   )}
                 </CardContent>

@@ -66,20 +66,23 @@ export function EntrepriseDataTable({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Cookies.get("authToken")}`,
       },
     })
       .then((response) => response.json())
-      .then((data) => {
-        setSectors(data);
+      .then((result) => {
+        // Handle both array and object responses
+        const sectorsData = Array.isArray(result) ? result : (result.data || []);
+        setSectors(sectorsData);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
         console.error("Error fetching secteur options:", error);
+        setSectors([]); // Set empty array on error
       });
   }, []);
 
@@ -99,13 +102,36 @@ export function EntrepriseDataTable({
         (entreprise) => entreprise.plan?.name === selectPanValue,
       );
     }
+    
     if (selectEffectifValue) {
-      const [min, max] = selectEffectifValue.split(" - ").map(Number);
-      filtered = filtered.filter(
-        (entreprise) =>
-          entreprise.effectif >= min && entreprise.effectif <= max,
-      );
+      // Handle effectif filtering for both string and number values
+      if (selectEffectifValue === "> 500") {
+        filtered = filtered.filter((entreprise) => {
+          const effectif = entreprise.effectif;
+          if (typeof effectif === 'string') {
+            return effectif.includes('+') || effectif.includes('1000');
+          }
+          return effectif > 500;
+        });
+      } else {
+        const [min, max] = selectEffectifValue.split(" - ").map(Number);
+        filtered = filtered.filter((entreprise) => {
+          const effectif = entreprise.effectif;
+          if (typeof effectif === 'string') {
+            // Try to extract number from string like "200-500"
+            const numMatch = effectif.match(/\d+/);
+            if (numMatch) {
+              const num = parseInt(numMatch[0]);
+              return num >= min && num <= max;
+            }
+            return false;
+          }
+          return effectif >= min && effectif <= max;
+        });
+      }
     }
+    
+    console.log("Filtered data:", filtered);
     setFilteredData(filtered);
   }, [data, searchValue, selectValue, selectPanValue, selectEffectifValue]);
 
@@ -142,20 +168,20 @@ export function EntrepriseDataTable({
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
 
   return (
-    <>
-      <div className="flex space-x-2">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Input
           placeholder={`Search ${searchKey}...`}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full md:max-w-sm"
+          className="w-full sm:max-w-sm"
         />
         <select
           value={selectPanValue || ""}
           onChange={handleSelectPannelChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
         >
-          <option value="">Pannel</option>
+          <option value="">Tous les plans</option>
           {planOptions.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -165,10 +191,10 @@ export function EntrepriseDataTable({
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
         >
-          <option value="">Secteur</option>
-          {sectors.map((sector) => (
+          <option value="">Tous les secteurs</option>
+          {Array.isArray(sectors) && sectors.map((sector) => (
             <option key={sector.id} value={sector.name}>
               {sector.name}
             </option>
@@ -177,9 +203,9 @@ export function EntrepriseDataTable({
         <select
           value={selectEffectifValue || ""}
           onChange={handleSelectEffectifChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
         >
-          <option value="">Effectif</option>
+          <option value="">Tous les effectifs</option>
           {effectifOptions.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -187,68 +213,72 @@ export function EntrepriseDataTable({
           ))}
         </select>
       </div>
-      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-        <Table className="relative">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getFilteredRowModel().rows.length > 0 ? (
-              table
-                .getFilteredRowModel()
-                .rows.slice(startIndex, endIndex)
-                .map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() ? "selected" : undefined}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
+      <div className="rounded-md border">
+        <ScrollArea className="h-[calc(80vh-220px)] w-full">
+          <div className="min-w-full overflow-x-auto">
+            <Table className="relative min-w-full">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="whitespace-nowrap">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
                     ))}
                   </TableRow>
-                ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  No data available.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <div className="flex items-center justify-end space-x-2 py-4">
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getFilteredRowModel().rows.length > 0 ? (
+                  table
+                    .getFilteredRowModel()
+                    .rows.slice(startIndex, endIndex)
+                    .map((row) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() ? "selected" : undefined}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id} className="whitespace-nowrap">
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="text-center">
+                      Aucune donnée disponible.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
+      <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
+          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handlePreviousPage}
             disabled={currentPage === 0}
           >
-            Previous
+            Précédent
           </Button>
           <Button
             variant="outline"
@@ -258,10 +288,10 @@ export function EntrepriseDataTable({
               currentPage === Math.ceil(filteredData.length / pageSize) - 1
             }
           >
-            Next
+            Suivant
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

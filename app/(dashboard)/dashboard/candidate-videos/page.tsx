@@ -18,7 +18,7 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/candidate-videos",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/candidate-videos",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -26,9 +26,10 @@ export default function UsersPage() {
             },
           },
         );
-        const data = await response.json();
+        const result = await response.json();
 
-        setUsers(data);
+        // Extract the data array from the API response
+        setUsers(result.data || []);
       } catch (error) {
         toast({
           title: "Whoops!",

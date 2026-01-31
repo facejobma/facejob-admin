@@ -34,7 +34,8 @@ export function JobDataTable<TData, TValue>({
   searchKey,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [selectValue, setSelectValue] = useState<string>("Pending");
+  const [selectValue, setSelectValue] = useState<string>("");
+  const [sectorValue, setSectorValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -42,15 +43,18 @@ export function JobDataTable<TData, TValue>({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`)
       .then((response) => response.json())
-      .then((data) => {
-        setSectors(data);
+      .then((result) => {
+        // Handle both array and object responses
+        const sectorsData = Array.isArray(result) ? result : (result.data || []);
+        setSectors(sectorsData);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
         console.error("Error fetching secteur options:", error);
+        setSectors([]); // Set empty array on error
       });
   }, []);
 
@@ -63,15 +67,30 @@ export function JobDataTable<TData, TValue>({
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue]);
+  }, [searchKey, searchValue, table]);
 
   useEffect(() => {
-    table.setGlobalFilter(selectValue);
-  }, [selectValue]);
+    if (selectValue) {
+      table.setGlobalFilter(selectValue);
+    } else {
+      table.setGlobalFilter("");
+    }
+  }, [selectValue, table]);
+
+  useEffect(() => {
+    if (sectorValue) {
+      // Apply sector filter logic here if needed
+    }
+  }, [sectorValue, table]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
+  };
+
+  const handleSectorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSectorValue(selectedValue);
   };
 
   const handlePreviousPage = () => {
@@ -101,17 +120,18 @@ export function JobDataTable<TData, TValue>({
           onChange={handleSelectChange}
           className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
+          <option value="">Tous les statuts</option>
           <option value="Pending">En cours</option>
           <option value="Accepted">Accepté</option>
           <option value="Declined">Décliné</option>
         </select>
         <select
-          value={selectValue || ""}
-          onChange={handleSelectChange}
+          value={sectorValue || ""}
+          onChange={handleSectorChange}
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">Secteur</option>
-          {sectors.map((sector) => (
+          <option value="">Tous les secteurs</option>
+          {Array.isArray(sectors) && sectors.map((sector) => (
             <option key={sector.id} value={sector.name}>
               {sector.name}
             </option>

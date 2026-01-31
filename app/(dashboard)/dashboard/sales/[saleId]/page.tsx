@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { PaymentForm } from "@/components/forms/payment-form";
-import { Sales } from "@/types";
+import { PaymentDetail } from "@/types";
 // import { Sales } from "@/types";
 
 // interface Sales {
@@ -63,7 +63,7 @@ import { Sales } from "@/types";
 // }
 
 export default function Page() {
-  const [payments, setPayments] = useState<Sales | null>(null);
+  const [payments, setPayments] = useState<PaymentDetail | null>(null);
   const { saleId } = useParams();
 
   const breadcrumbItems = [
@@ -78,7 +78,7 @@ export default function Page() {
           const authToken = Cookies.get("authToken");
 
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/payment/${saleId}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/payment/${saleId}`,
             {
               headers: {
                 Authorization: `Bearer ${authToken}`,

@@ -11,6 +11,9 @@ interface EntrepriseProps {
 }
 
 export const UserEnterprise: FC<EntrepriseProps> = ({ data }) => {
+  console.log("UserEnterprise received data:", data);
+  console.log("Data length:", data.length);
+  
   return (
     <>
       <div className="flex items-start justify-between">

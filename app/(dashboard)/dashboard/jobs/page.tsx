@@ -14,12 +14,10 @@ export default function UsersPage() {
   const authToken = Cookies.get("authToken");
 
   useEffect(() => {
-    // console.log("token, ", authToken);
-
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/offres",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/offres",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -27,9 +25,12 @@ export default function UsersPage() {
             },
           },
         );
-        const data = await response.json();
-        setJobs(data);
+        const result = await response.json();
+        
+        // Extract the data array from the API response
+        setJobs(result.data || []);
       } catch (error) {
+        console.error("Jobs fetch error:", error);
         toast({
           title: "Whoops!",
           variant: "destructive",
@@ -39,14 +40,12 @@ export default function UsersPage() {
     };
 
     fetchData();
-  }, [authToken]);
+  }, [authToken, toast]);
 
   return (
-    <>
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <BreadCrumb items={breadcrumbItems} />
-        <JobRequests data={jobs} />
-      </div>
-    </>
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-hidden">
+      <BreadCrumb items={breadcrumbItems} />
+      <JobRequests data={jobs} />
+    </div>
   );
 }

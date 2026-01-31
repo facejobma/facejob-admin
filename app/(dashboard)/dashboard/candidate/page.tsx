@@ -16,7 +16,7 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/candidates",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/candidates",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -24,9 +24,10 @@ export default function UsersPage() {
             },
           },
         );
-        const data = await response.json();
+        const result = await response.json();
 
-        setUsers(data);
+        // Extract the data array from the API response
+        setUsers(result.data || []);
       } catch (error) {
         toast({
           title: "Whoops!",
@@ -40,11 +41,9 @@ export default function UsersPage() {
   }, [authToken, toast]);
 
   return (
-    <>
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <BreadCrumb items={breadcrumbItems} />
-        <UserClient data={users} />
-      </div>
-    </>
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-hidden">
+      <BreadCrumb items={breadcrumbItems} />
+      <UserClient data={users} />
+    </div>
   );
 }

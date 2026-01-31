@@ -20,7 +20,7 @@ export default function Page() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/plans",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/plans",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,

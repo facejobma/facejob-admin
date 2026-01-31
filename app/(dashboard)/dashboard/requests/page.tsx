@@ -18,7 +18,7 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/entreprises",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/entreprises",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -26,10 +26,12 @@ export default function UsersPage() {
             }
           }
         );
-        const data = await response.json();
-
-        setEntrepriseRequests(data);
+        const result = await response.json();
+        
+        // Extract the data array from the API response
+        setEntrepriseRequests(result.data || []);
       } catch (error) {
+        console.error("Requests fetch error:", error);
         toast({
           title: "Whoops!",
           variant: "destructive",
@@ -41,12 +43,18 @@ export default function UsersPage() {
     fetchData();
   }, [authToken, toast]);
 
+  // Filter for pending requests
+  const pendingRequests = entrepriseRequests.filter(
+    (entreprise) => 
+      entreprise?.is_verified === "Pending" || 
+      entreprise?.is_verified === false ||
+      !entreprise?.is_verified
+  );
+
   return (
-    <>
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <BreadCrumb items={breadcrumbItems} />
-        <EnterpriseRequests data={entrepriseRequests}  />
-      </div>
-    </>
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-hidden">
+      <BreadCrumb items={breadcrumbItems} />
+      <EnterpriseRequests data={pendingRequests} />
+    </div>
   );
 }

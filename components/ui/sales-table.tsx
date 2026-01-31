@@ -55,15 +55,18 @@ export function SalesDataTable<TData, TValue>({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/sectors`)
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`)
       .then((response) => response.json())
-      .then((data) => {
-        setSectors(data);
+      .then((result) => {
+        // Handle both array and object responses
+        const sectorsData = Array.isArray(result) ? result : (result.data || []);
+        setSectors(sectorsData);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
         console.error("Error fetching secteur options:", error);
+        setSectors([]); // Set empty array on error
       });
   }, []);
 
@@ -134,8 +137,8 @@ export function SalesDataTable<TData, TValue>({
           onChange={handleSelectChange}
           className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
-          <option value="">Secteur</option>
-          {sectors.map((sector) => (
+          <option value="">Tous les secteurs</option>
+          {Array.isArray(sectors) && sectors.map((sector) => (
             <option key={sector.id} value={sector.name}>
               {sector.name}
             </option>

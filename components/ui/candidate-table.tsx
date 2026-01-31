@@ -40,7 +40,18 @@ export function CandidateDataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel()
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, columnId, filterValue) => {
+      if (!filterValue) return true;
+      
+      // Handle sector filtering
+      const sector = (row.original as any).sector;
+      const sectorName = typeof sector === 'object' && sector !== null 
+        ? sector.name 
+        : sector;
+      
+      return sectorName?.toLowerCase().includes(filterValue.toLowerCase()) || false;
+    }
   });
 
 
@@ -71,24 +82,34 @@ export function CandidateDataTable<TData, TValue>({
   const endIndex = Math.min(startIndex + pageSize, data.length);
 
   // get all sectors from the table
-  const sectors = Array.from(new Set(data.map(item => (item as { sector: string }).sector)));
+  const sectors = Array.from(new Set(
+    data
+      .map(item => {
+        const sector = (item as any).sector;
+        if (typeof sector === 'object' && sector !== null) {
+          return sector.name;
+        }
+        return sector;
+      })
+      .filter(Boolean) // Remove null/undefined values
+  ));
 
 
   return (
-    <>
-      <div className="flex space-x-2">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Input
           placeholder={`Rechercher par ${searchKey}...`}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full md:max-w-sm"
+          className="w-full sm:max-w-sm"
         />
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
         >
-          <option value="">secteur</option>
+          <option value="">Tous les secteurs</option>
           {sectors.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -96,53 +117,57 @@ export function CandidateDataTable<TData, TValue>({
           ))}
         </select>
       </div>
-      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-        <Table className="relative">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  </TableHead>
+      <div className="rounded-md border">
+        <ScrollArea className="h-[calc(80vh-220px)] w-full">
+          <div className="min-w-full overflow-x-auto">
+            <Table className="relative min-w-full">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="whitespace-nowrap">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table
-              .getFilteredRowModel()
-              .rows.slice(startIndex, endIndex)
-              .map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+              </TableHeader>
+              <TableBody>
+                {table
+                  .getFilteredRowModel()
+                  .rows.slice(startIndex, endIndex)
+                  .map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() ? "selected" : undefined}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="whitespace-nowrap">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <div className="flex items-center justify-end space-x-2 py-4">
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
+      <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} colonnes sélectionnée(s).
+          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -163,6 +188,6 @@ export function CandidateDataTable<TData, TValue>({
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

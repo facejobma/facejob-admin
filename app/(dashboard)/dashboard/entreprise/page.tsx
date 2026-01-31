@@ -22,7 +22,7 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/entreprises",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/entreprises",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -30,10 +30,15 @@ export default function UsersPage() {
             },
           },
         );
-        const data = await response.json();
+        const result = await response.json();
 
-        setEntrepriseRequests(data);
+        console.log("API Response:", result);
+        console.log("Entreprises data:", result.data);
+        
+        // Extract the data array from the API response
+        setEntrepriseRequests(result.data || []);
       } catch (error) {
+        console.error("Fetch error:", error);
         toast({
           title: "Whoops!",
           variant: "destructive",
@@ -45,17 +50,19 @@ export default function UsersPage() {
     fetchData();
   }, [authToken, toast]);
 
+  // Debug: log the filtered data
+  const filteredData = entrepriseRequests.filter(
+    (entreprise) => entreprise?.is_verified === true || entreprise?.is_verified === "Accepted",
+  );
+  
+  console.log("Total entreprises:", entrepriseRequests.length);
+  console.log("Filtered entreprises:", filteredData.length);
+  console.log("Sample entreprise:", entrepriseRequests[0]);
+
   return (
-    <>
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <BreadCrumb items={breadcrumbItems} />
-        <UserEnterprise
-          data={entrepriseRequests
-            .filter(
-            (entreprise) => entreprise?.is_verified === "Accepted",
-          )}
-        />
-      </div>
-    </>
+    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-hidden">
+      <BreadCrumb items={breadcrumbItems} />
+      <UserEnterprise data={filteredData} />
+    </div>
   );
 }
