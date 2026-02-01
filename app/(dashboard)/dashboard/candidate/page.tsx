@@ -11,7 +11,7 @@ import Cookies from "js-cookie";
 const breadcrumbItems = [{ title: "Candidats", link: "/dashboard/candidate" }];
 
 export default function CandidatesPage() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
@@ -163,12 +163,12 @@ export default function CandidatesPage() {
   }
 
   return (
-    <div className="w-full max-w-full space-y-6 p-4 md:p-8 pt-6 overflow-x-hidden">
+    <div className="w-full space-y-6 p-4 md:p-8 pt-6 overflow-x-hidden">
       <BreadCrumb items={breadcrumbItems} />
       
       {/* Header */}
       <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-        <div>
+        <div className="min-w-0 flex-1">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
             Gestion des Candidats
           </h2>
@@ -179,16 +179,16 @@ export default function CandidatesPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full">
         {statsCards.map((card, index) => {
           const Icon = card.icon;
           return (
-            <Card key={index} className="hover:shadow-md transition-shadow border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <Card key={index} className="hover:shadow-md transition-shadow border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 min-w-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400 truncate">
                   {card.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                <div className={`p-2 rounded-lg ${card.bgColor} flex-shrink-0`}>
                   <Icon className={`h-4 w-4 ${card.color}`} />
                 </div>
               </CardHeader>
@@ -203,7 +203,7 @@ export default function CandidatesPage() {
       </div>
 
       {/* Candidates Table */}
-      <div className="w-full max-w-full">
+      <div className="w-full">
         <Card className="w-full border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <CardContent className="p-6">
             {users.length === 0 ? (
@@ -223,7 +223,7 @@ export default function CandidatesPage() {
                 </div>
               </div>
             ) : (
-              <div className="w-full max-w-full overflow-x-hidden">
+              <div className="w-full overflow-x-hidden">
                 <UserClient data={users} />
               </div>
             )}

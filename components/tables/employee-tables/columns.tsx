@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { TruncatedCell } from "@/components/ui/truncated-cell";
 import Image from "next/image";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { EnterpriseData } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
@@ -36,26 +36,38 @@ export const columns: ColumnDef<
     accessorKey: "logo",
     header: "Logo",
     size: 80,
-    cell: ({ row }) => (
-      <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-100">
-        {row.original?.logo && typeof row.original.logo === "string" ? (
-          <Image
-            src={
-              row.original.logo.startsWith("/")
-                ? row.original.logo
-                : `/${row.original.logo}`
-            }
-            alt={`${row.original.company_name} Logo`}
-            layout="fill"
-            objectFit="cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
-            Logo
-          </div>
-        )}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const [imageError, setImageError] = useState(false);
+      
+      return (
+        <div className="w-10 h-10 relative rounded-lg overflow-hidden bg-gray-100 border">
+          {row.original?.logo && typeof row.original.logo === "string" && !imageError ? (
+            <Image
+              src={
+                row.original.logo.startsWith("http") 
+                  ? row.original.logo
+                  : row.original.logo.startsWith("/")
+                  ? row.original.logo
+                  : `/${row.original.logo}`
+              }
+              alt={`${row.original.company_name} Logo`}
+              fill
+              className="object-cover"
+              onError={() => {
+                console.log("Image load error for:", row.original.logo);
+                setImageError(true);
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-gray-500 bg-gray-50">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "company_name",

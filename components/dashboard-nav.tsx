@@ -93,13 +93,13 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
         <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
           <button
             onClick={() => handleItemClick(logoutItem)}
-            className="w-full"
+            className="w-full text-left"
           >
             <div className="group flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg mr-3 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-800 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg mr-3 transition-colors bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-800 group-hover:text-red-600 dark:group-hover:text-red-400">
                 <Icons.logout className="h-4 w-4" />
               </div>
-              <span className="flex-1 truncate">{logoutItem.title}</span>
+              <span className="flex-1 truncate text-left">{logoutItem.title}</span>
             </div>
           </button>
         </div>

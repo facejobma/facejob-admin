@@ -26,10 +26,30 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'source.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.vectorstock.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.vecteezy.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.freepik.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.shutterstock.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.pexels.com',
       }
     ],
     // Fallback pour la compatibilité
-    domains: ["picsum.photos", "d1csarkz8obe9u.cloudfront.net", "via.placeholder.com", "placeholder.com", "images.unsplash.com", "source.unsplash.com"],
+    domains: ["picsum.photos", "d1csarkz8obe9u.cloudfront.net", "via.placeholder.com", "placeholder.com", "images.unsplash.com", "source.unsplash.com", "cdn.vectorstock.com", "static.vecteezy.com"],
   },
   output: 'standalone'
 };

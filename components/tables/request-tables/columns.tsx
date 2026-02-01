@@ -5,6 +5,7 @@ import { TruncatedCell } from "@/components/ui/truncated-cell";
 import Image from "next/image";
 import { Dispatch, SetStateAction } from "react";
 import { EnterpriseData } from "@/types";
+import { Clock, CheckCircle, XCircle } from "lucide-react";
 import moment from "moment";
 import "moment/locale/fr";
 
@@ -128,19 +129,25 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       const isVerified = row.original.is_verified;
       let status = "En attente";
-      let className = "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center text-xs";
+      let className = "bg-yellow-100 text-yellow-800 border-yellow-200 rounded-full py-1 px-3 text-center text-xs font-medium border";
+      let icon = <Clock className="h-3 w-3 mr-1" />;
       
       if (isVerified === true || isVerified === "Accepted") {
-        status = "Accepté";
-        className = "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center text-xs";
+        status = "Acceptée";
+        className = "bg-green-100 text-green-800 border-green-200 rounded-full py-1 px-3 text-center text-xs font-medium border";
+        icon = <CheckCircle className="h-3 w-3 mr-1" />;
       } else if (isVerified === false || isVerified === "Declined") {
-        status = "Refusé";
-        className = "bg-red-200 text-red-800 rounded-full py-1 px-2 text-center text-xs";
+        status = "Refusée";
+        className = "bg-red-100 text-red-800 border-red-200 rounded-full py-1 px-3 text-center text-xs font-medium border";
+        icon = <XCircle className="h-3 w-3 mr-1" />;
       }
       
       return (
         <div className={className}>
-          {status}
+          <div className="flex items-center justify-center">
+            {icon}
+            {status}
+          </div>
         </div>
       );
     },

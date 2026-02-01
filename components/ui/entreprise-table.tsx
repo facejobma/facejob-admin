@@ -35,6 +35,13 @@ export function EntrepriseDataTable({
   const [selectValue, setSelectValue] = useState<string>("");
   const [selectPanValue, setSelectPanValue] = useState<string>("");
   const [selectEffectifValue, setSelectEffectifValue] = useState<string>("");
+  const [selectStatusValue, setSelectStatusValue] = useState<string>("");
+
+  const statusOptions = [
+    { value: "Accepted", label: "Acceptées" },
+    { value: "Declined", label: "Refusées" },
+    { value: "Pending", label: "En attente" },
+  ];
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
   const [filteredData, setFilteredData] = useState<EnterpriseData[]>([]);
@@ -103,6 +110,26 @@ export function EntrepriseDataTable({
       );
     }
     
+    if (selectStatusValue) {
+      if (selectStatusValue === "Accepted") {
+        filtered = filtered.filter(
+          (entreprise) => entreprise.is_verified === true || entreprise.is_verified === "Accepted"
+        );
+      } else if (selectStatusValue === "Declined") {
+        filtered = filtered.filter(
+          (entreprise) => entreprise.is_verified === false || entreprise.is_verified === "Declined"
+        );
+      } else if (selectStatusValue === "Pending") {
+        filtered = filtered.filter(
+          (entreprise) => 
+            entreprise.is_verified !== true && 
+            entreprise.is_verified !== "Accepted" && 
+            entreprise.is_verified !== false && 
+            entreprise.is_verified !== "Declined"
+        );
+      }
+    }
+    
     if (selectEffectifValue) {
       // Handle effectif filtering for both string and number values
       if (selectEffectifValue === "> 500") {
@@ -133,7 +160,7 @@ export function EntrepriseDataTable({
     
     console.log("Filtered data:", filtered);
     setFilteredData(filtered);
-  }, [data, searchValue, selectValue, selectPanValue, selectEffectifValue]);
+  }, [data, searchValue, selectValue, selectPanValue, selectEffectifValue, selectStatusValue]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
@@ -152,6 +179,13 @@ export function EntrepriseDataTable({
   ) => {
     const selectedValue = event.target.value;
     setSelectEffectifValue(selectedValue);
+  };
+
+  const handleSelectStatusChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const selectedValue = event.target.value;
+    setSelectStatusValue(selectedValue);
   };
 
   const handlePreviousPage = () => {
@@ -197,6 +231,18 @@ export function EntrepriseDataTable({
           {Array.isArray(sectors) && sectors.map((sector) => (
             <option key={sector.id} value={sector.name}>
               {sector.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={selectStatusValue || ""}
+          onChange={handleSelectStatusChange}
+          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+        >
+          <option value="">Tous les statuts</option>
+          {statusOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>

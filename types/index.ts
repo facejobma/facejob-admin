@@ -148,12 +148,18 @@ export type Plan = {
 
 export type User = {
   id: number;
-  nomComplete: string;
+  nomComplete?: string;
+  first_name?: string;
+  last_name?: string;
   sector: Sector | string;
   email: string;
-  tel: string;
-  bio: string;
+  tel?: string;
+  phone?: string;
+  bio?: string;
+  avatar?: string;
+  email_verified_at?: string | null;
   created_at: string;
+  updated_at?: string;
 };
 export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
 

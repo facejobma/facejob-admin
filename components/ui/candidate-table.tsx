@@ -16,8 +16,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Input } from "./input";
-import { Button } from "./button";
-import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -31,9 +30,8 @@ export function CandidateDataTable<TData, TValue>({
   searchKey
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [selectValue, setSelectValue] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize] = useState<number>(10);
+  const [sectorFilter, setSectorFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
 
   const table = useReactTable<TData>({
     data,
@@ -43,29 +41,66 @@ export function CandidateDataTable<TData, TValue>({
     globalFilterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true;
       
-      const sector = (row.original as any).sector;
-      const sectorName = typeof sector === 'object' && sector !== null 
-        ? sector.name 
-        : sector;
+      const { sector: sectorValue, status: statusValue, search: searchValue } = filterValue;
       
-      return sectorName?.toLowerCase().includes(filterValue.toLowerCase()) || false;
+      // Filtre par recherche textuelle
+      if (searchValue) {
+        const candidate = row.original as any;
+        const fullName = candidate.first_name && candidate.last_name 
+          ? `${candidate.first_name} ${candidate.last_name}`
+          : candidate.nomComplete || '';
+        const email = candidate.email || '';
+        const searchText = `${fullName} ${email}`.toLowerCase();
+        
+        if (!searchText.includes(searchValue.toLowerCase())) {
+          return false;
+        }
+      }
+      
+      // Filtre par secteur
+      if (sectorValue) {
+        const sector = (row.original as any).sector;
+        const sectorName = typeof sector === 'object' && sector !== null 
+          ? sector.name 
+          : sector;
+        
+        if (!sectorName?.toLowerCase().includes(sectorValue.toLowerCase())) {
+          return false;
+        }
+      }
+      
+      // Filtre par statut
+      if (statusValue) {
+        const isVerified = (row.original as any).email_verified_at;
+        const candidateStatus = isVerified ? 'actif' : 'inactif';
+        
+        if (candidateStatus !== statusValue) {
+          return false;
+        }
+      }
+      
+      return true;
     }
   });
 
   useEffect(() => {
-    table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue, table]);
+    // Appliquer les filtres combinés
+    table.setGlobalFilter({
+      sector: sectorFilter,
+      status: statusFilter,
+      search: searchValue
+    });
+  }, [sectorFilter, statusFilter, searchValue, table]);
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
-    setSelectValue(selectedValue);
-    table.setGlobalFilter(selectedValue);
+  const handleSectorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSectorFilter(event.target.value);
+  };
+
+  const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(event.target.value);
   };
 
   const filteredRows = table.getFilteredRowModel().rows;
-  const startIndex = currentPage * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, filteredRows.length);
-  const totalPages = Math.ceil(filteredRows.length / pageSize);
 
   const sectors = Array.from(new Set(
     data
@@ -80,7 +115,7 @@ export function CandidateDataTable<TData, TValue>({
   ));
 
   return (
-    <div className="w-full max-w-full space-y-4 overflow-x-hidden">
+    <div className="w-full space-y-4 overflow-x-hidden">
       {/* Search and Filter */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-sm">
@@ -93,11 +128,11 @@ export function CandidateDataTable<TData, TValue>({
           />
         </div>
         
-        <div className="relative min-w-[160px]">
+        <div className="relative min-w-[160px] max-w-[200px]">
           <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <select
-            value={selectValue || ""}
-            onChange={handleSelectChange}
+            value={sectorFilter || ""}
+            onChange={handleSectorChange}
             className="w-full pl-10 pr-8 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">Tous les secteurs</option>
@@ -106,6 +141,19 @@ export function CandidateDataTable<TData, TValue>({
                 {option}
               </option>
             ))}
+          </select>
+        </div>
+
+        <div className="relative min-w-[140px] max-w-[180px]">
+          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <select
+            value={statusFilter || ""}
+            onChange={handleStatusChange}
+            className="w-full pl-10 pr-8 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="actif">Actif</option>
+            <option value="inactif">Inactif</option>
           </select>
         </div>
       </div>
@@ -120,12 +168,15 @@ export function CandidateDataTable<TData, TValue>({
                   {headerGroup.headers.map((header, index) => (
                     <TableHead 
                       key={header.id} 
-                      className={`font-semibold text-xs ${
-                        index === 0 ? 'w-1/4' : 
-                        index === 1 ? 'w-1/3' : 
-                        index === 2 ? 'w-1/6' : 
-                        index === 3 ? 'w-1/6' : 
-                        'w-1/12'
+                      className={`font-semibold text-xs whitespace-nowrap ${
+                        index === 0 ? 'w-12 text-center' : 
+                        index === 1 ? 'w-1/4' : 
+                        index === 2 ? 'w-1/8' : 
+                        index === 3 ? 'w-1/8' : 
+                        index === 4 ? 'w-1/12' :
+                        index === 5 ? 'w-1/4' :
+                        index === 6 ? 'w-1/8' :
+                        'w-16 text-center'
                       }`}
                     >
                       {header.isPlaceholder
@@ -147,22 +198,24 @@ export function CandidateDataTable<TData, TValue>({
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredRows
-                  .slice(startIndex, endIndex)
-                  .map((row) => (
-                    <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
-                      {row.getVisibleCells().map((cell, index) => (
-                        <TableCell 
-                          key={cell.id} 
-                          className={`text-xs truncate ${
-                            index === 0 ? 'w-1/4' : 
-                            index === 1 ? 'w-1/3' : 
-                            index === 2 ? 'w-1/6' : 
-                            index === 3 ? 'w-1/6' : 
-                            'w-1/12'
-                          }`}
-                          title={typeof cell.getValue() === 'string' ? cell.getValue() as string : ''}
-                        >
+                  filteredRows
+                    .map((row) => (
+                      <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
+                        {row.getVisibleCells().map((cell, index) => (
+                          <TableCell 
+                            key={cell.id} 
+                            className={`text-xs ${
+                              index === 0 ? 'w-12 text-center' : 
+                              index === 1 ? 'w-1/4 truncate' : 
+                              index === 2 ? 'w-1/8 truncate' : 
+                              index === 3 ? 'w-1/8 truncate' : 
+                              index === 4 ? 'w-1/12 truncate' :
+                              index === 5 ? 'w-1/4 truncate' :
+                              index === 6 ? 'w-1/8 truncate' :
+                              'w-16 text-center'
+                            }`}
+                            title={typeof cell.getValue() === 'string' ? cell.getValue() as string : ''}
+                          >
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
@@ -174,45 +227,7 @@ export function CandidateDataTable<TData, TValue>({
         </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} sur {filteredRows.length} ligne(s) sélectionnée(s)
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground">
-            Affichage {startIndex + 1}-{Math.min(endIndex, filteredRows.length)} sur {filteredRows.length}
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Page {currentPage + 1} sur {Math.max(1, totalPages)}
-            </span>
-            
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                disabled={currentPage === 0}
-                className="h-8 w-8 p-0"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
-                disabled={currentPage >= totalPages - 1}
-                className="h-8 w-8 p-0"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Pagination - Removed as requested */}
     </div>
   );
 }

@@ -88,7 +88,7 @@ export default function FileUpload({
           <div className="w-full max-w-md">
             <UploadDropzone<OurFileRouter>
               className="dark:bg-zinc-800 py-4 ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg"
-              endpoint="videoUpload"
+              endpoint="imageUpload"
               config={{ mode: "auto" }}
               content={{
                 label: "Ajouter une photo de profil",

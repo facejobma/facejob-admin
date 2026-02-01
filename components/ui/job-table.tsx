@@ -63,23 +63,51 @@ export function JobDataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, columnId, filterValue) => {
+      if (!filterValue) return true;
+      
+      const isVerified = row.original?.is_verified;
+      switch (filterValue) {
+        case "Pending":
+          return isVerified === false || isVerified === "Pending" || (!isVerified && isVerified !== true);
+        case "Accepted":
+          return isVerified === true || isVerified === "Accepted";
+        case "Declined":
+          return isVerified === "Declined";
+        default:
+          return true;
+      }
+    },
+    initialState: {
+      columnVisibility: {
+        sector_name: false, // Hide the sector column
+      },
+    },
   });
 
   useEffect(() => {
-    table.getColumn(searchKey)?.setFilterValue(searchValue);
+    const column = table.getColumn(searchKey);
+    if (column) {
+      column.setFilterValue(searchValue);
+    }
   }, [searchKey, searchValue, table]);
 
   useEffect(() => {
-    if (selectValue) {
-      table.setGlobalFilter(selectValue);
-    } else {
-      table.setGlobalFilter("");
-    }
+    table.setGlobalFilter(selectValue || "");
   }, [selectValue, table]);
 
   useEffect(() => {
     if (sectorValue) {
-      // Apply sector filter logic here if needed
+      // Apply sector filter to the sector_name column
+      const sectorColumn = table.getColumn("sector_name");
+      if (sectorColumn) {
+        sectorColumn.setFilterValue(sectorValue);
+      }
+    } else {
+      const sectorColumn = table.getColumn("sector_name");
+      if (sectorColumn) {
+        sectorColumn.setFilterValue("");
+      }
     }
   }, [sectorValue, table]);
 
@@ -110,7 +138,7 @@ export function JobDataTable<TData, TValue>({
     <>
       <div className="flex space-x-2">
         <Input
-          placeholder={`Rechercher par  ${searchKey}...`}
+          placeholder={`Rechercher par titre d'offre...`}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full md:max-w-sm"
@@ -121,9 +149,9 @@ export function JobDataTable<TData, TValue>({
           className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
         >
           <option value="">Tous les statuts</option>
-          <option value="Pending">En cours</option>
-          <option value="Accepted">Accepté</option>
-          <option value="Declined">Décliné</option>
+          <option value="Pending">En attente</option>
+          <option value="Accepted">Acceptées</option>
+          <option value="Declined">Refusées</option>
         </select>
         <select
           value={sectorValue || ""}

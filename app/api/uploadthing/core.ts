@@ -22,6 +22,22 @@ export const ourFileRouter = {
     .onUploadComplete(async () => {
       // This code RUNS ON YOUR SERVER after upload
     }),
+  
+  // Endpoint for image uploads (profile pictures, etc.)
+  imageUpload: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .middleware(async ({}) => {
+      // This code runs on your server before upload
+      const user = auth();
+
+      // If you throw, the candidate will not be able to upload
+      if (!user) throw new Error("Unauthorized");
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      return { userId: user.id };
+    })
+    .onUploadComplete(async () => {
+      // This code RUNS ON YOUR SERVER after upload
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

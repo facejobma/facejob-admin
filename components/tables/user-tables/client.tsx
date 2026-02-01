@@ -69,19 +69,13 @@ export const UserClient: FC<ProductsClientProps> = ({ data }) => {
           <Download className="mr-2 h-4 w-4" />
           {isExporting ? "Export..." : "Exporter CSV"}
         </Button>
-        <Button
-          size="sm"
-          onClick={() => router.push(`/dashboard/user/update`)}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Ajouter un candidat
-        </Button>
+
       </div>
       
       <Separator />
       
       <div className="w-full max-w-full overflow-x-hidden">
-        <CandidateDataTable searchKey="first_name" columns={columns} data={data} />
+        <CandidateDataTable searchKey="nomComplete" columns={columns} data={data} />
       </div>
     </div>
   );
