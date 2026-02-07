@@ -16,7 +16,7 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/candidates",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/candidates",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,

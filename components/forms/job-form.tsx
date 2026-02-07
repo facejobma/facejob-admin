@@ -42,7 +42,7 @@ export const JobForm: React.FC<{ initialData: JobData }> = ({
       // }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/job/accept/${initialData.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/accept/${initialData.id}`,
         {
           method: "PUT",
           headers: {

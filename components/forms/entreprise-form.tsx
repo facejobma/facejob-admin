@@ -88,7 +88,7 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({ initialData }) => {
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/updateId/${enterpriseId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/enterprise/updateId/${enterpriseId}`,
         {
           method: "PUT",
           headers: {
@@ -135,7 +135,7 @@ export const EntrepriseForm: React.FC<ProductFormProps> = ({ initialData }) => {
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/enterprise/delete/${enterpriseId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/delete/${enterpriseId}`,
         {
           method: "DELETE",
           headers: {

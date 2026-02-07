@@ -41,7 +41,7 @@ export function performLogout() {
   // Call backend logout endpoint if needed
   const authToken = Cookies.get("authToken");
   if (authToken && process.env.NEXT_PUBLIC_BACKEND_URL) {
-    fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/logout", {
+    fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/logout", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authToken}`,

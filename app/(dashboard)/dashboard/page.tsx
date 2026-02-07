@@ -25,9 +25,10 @@ function OverViewTab() {
 
   useEffect(() => {
     async function getStats() {
+      const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
       await fetch(
         process.env.NEXT_PUBLIC_BACKEND_URL +
-          "/api/admin/statics?from=" +
+          `/api/${apiVersion}/admin/statics?from=` +
           date?.from?.toISOString() +
           "&to=" +
           date?.to?.toISOString(),

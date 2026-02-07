@@ -92,9 +92,9 @@ export const PricingCard = ({
       <CardContent className="flex flex-col gap-2">
         <CheckItem key={account_creation_included}
                    text={"Création de compte client et gestion des candidatures *"} />
-        <CheckItem key={job_postings} text={"Accès illimité pour visualisation de CV vidéos ** "} />
+        <CheckItem key={cv_video_access} text={"Accès visualisation de CV vidéos ** "} />
         <CheckItem key={cv_video_consultations}
-                   text={"Jusqu'à " + cv_video_consultations.toString() + " Consultations de CV vidéo / mois *** "} />
+                   text={"Accès coordonnées candidats: " + (cv_video_consultations === 0 ? "Non inclus" : cv_video_consultations.toString() + " contacts/mois") + " *** "} />
       </CardContent>
     </div>
     <CardFooter className="mt-2">

@@ -52,7 +52,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
       try {
 
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/enterprise/${data.entrepriseId}/change-plan`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/enterprise/${data.entrepriseId}/change-plan`,
           {
             method: "POST",
             headers: {
@@ -91,7 +91,7 @@ export const ChangePlanToEntreprise: React.FC = () => {
 
     useEffect(() => {
       async function getPlans() {
-        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/plans`,
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/plans`,
           {
             headers: {
               Authorization: `Bearer ${authToken}`,

@@ -17,7 +17,7 @@ export default function SalesPage() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/admin/payments",
+          process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/payments",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
