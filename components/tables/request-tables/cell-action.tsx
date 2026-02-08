@@ -21,48 +21,11 @@ interface CellActionProps {
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  // const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState("");
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
   const router = useRouter();
-
-  // const onDelete = async () => {
-  //   try {
-  //     setLoading(true);
-
-  //     const authToken = localStorage.getItem("authToken");
-
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate/delete/${data.id}`,
-  //       {
-  //         method: "DELETE",
-  //         headers: {
-  //           Authorization: `Bearer ${authToken}`,
-  //         },
-  //       },
-  //     );
-
-  //     if (!response.ok) {
-  //       toast({
-  //         title: "Whoops!",
-  //         variant: "destructive",
-  //         description: "Erreur lors de la récupération des données.",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     toast({
-  //       title: "Whoops!",
-  //       variant: "destructive",
-  //       description:
-  //         error?.toString() || "Erreur lors de la récupération des données.",
-  //     });
-  //   } finally {
-  //     setLoading(false);
-  //     setOpen(false);
-  //   }
-  // };
 
   const onVerify = async (is_verified: EntrepriseStatus) => {
     try {

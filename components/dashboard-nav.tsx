@@ -33,54 +33,77 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
     return null;
   }
 
+  // Séparer les éléments de navigation et le logout
+  const navigationItems = items.filter(item => item.label !== "logout");
+  const logoutItem = items.find(item => item.label === "logout");
+
   return (
-    <nav className="grid items-start gap-2">
-      {items.map((item, index) => {
-        const Icon = Icons[item.icon || "arrowRight"];
-        const isLogout = item.label === "logout";
-        
-        return (
-          item.href && (
-            isLogout ? (
-              <button
-                key={index}
-                onClick={() => handleItemClick(item)}
-                className="w-full text-left"
-              >
-                <span
-                  className={cn(
-                    "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition duration-300 ease-in-out",
-                    "hover:bg-red-50 hover:text-red-600 text-gray-600",
-                    item.disabled && "cursor-not-allowed opacity-80",
-                  )}
-                >
-                  <Icon className="mr-2 h-5 w-5" />
-                  <span className="flex-shrink-0">{item.title}</span>
-                </span>
-              </button>
-            ) : (
+    <div className="space-y-2">
+      {/* Navigation Items */}
+      <nav className="space-y-1">
+        {navigationItems.map((item, index) => {
+          const Icon = Icons[item.icon || "arrowRight"];
+          const isActive = path === item.href;
+          
+          return (
+            item.href && (
               <Link
                 key={index}
                 href={item.disabled ? "/" : item.href}
                 onClick={() => handleItemClick(item)}
+                className="block"
               >
-                <span
+                <div
                   className={cn(
-                    "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition duration-300 ease-in-out",
-                    path === item.href
-                      ? "bg-accent text-accent-foreground"
-                      : "hover:bg-accent hover:text-accent-foreground",
-                    item.disabled && "cursor-not-allowed opacity-80",
+                    "group flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ease-in-out relative",
+                    isActive
+                      ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 shadow-sm border border-green-100 dark:border-green-800"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
+                    item.disabled && "cursor-not-allowed opacity-50",
                   )}
                 >
-                  <Icon className="mr-2 h-5 w-5" />
-                  <span className="flex-shrink-0">{item.title}</span>
-                </span>
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-green-500 dark:bg-green-400 rounded-r-full"></div>
+                  )}
+                  
+                  <div className={cn(
+                    "flex items-center justify-center w-8 h-8 rounded-lg mr-3 transition-colors",
+                    isActive 
+                      ? "bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-400" 
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+                  )}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  
+                  <span className="flex-1 truncate">{item.title}</span>
+                  
+                  {isActive && (
+                    <div className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full ml-2"></div>
+                  )}
+                </div>
               </Link>
             )
-          )
-        );
-      })}
-    </nav>
+          );
+        })}
+      </nav>
+
+      {/* Logout Section */}
+      {logoutItem && (
+        <div className="pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
+          <button
+            onClick={() => handleItemClick(logoutItem)}
+            className="w-full text-left"
+          >
+            <div className="group flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg mr-3 transition-colors bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-800 group-hover:text-red-600 dark:group-hover:text-red-400">
+                <Icons.logout className="h-4 w-4" />
+              </div>
+              <span className="flex-1 truncate text-left">{logoutItem.title}</span>
+            </div>
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

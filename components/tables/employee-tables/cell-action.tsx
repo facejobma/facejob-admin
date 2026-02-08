@@ -7,8 +7,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
-import {  useRouter } from "next/navigation";
+import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { EnterpriseData } from "@/types";
 import Cookies from "js-cookie";
@@ -22,15 +22,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  // const onConfirm = a?sync () => {};
-
   const onDelete = async () => {
     try {
       setLoading(true);
 
       const authToken = Cookies.get("authToken");
-
-      // console.log("Data.id, ", data.id);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/delete/${data.id}`,
@@ -43,12 +39,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       );
 
       if (response.ok) {
-        console.log("Candidate deleted successfully!");
+        console.log("Enterprise deleted successfully!");
+        // Refresh the page to update the list
+        window.location.reload();
       } else {
-        console.error("Failed to delete candidate");
+        console.error("Failed to delete enterprise");
       }
     } catch (error) {
-      console.error("An error occurred while deleting the candidate:", error);
+      console.error("An error occurred while deleting the enterprise:", error);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -72,12 +70,19 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-          {/* <DropdownMenuItem
+          
+          <DropdownMenuItem
             onClick={() => router.push(`/dashboard/entreprise/${data.id}`)}
           >
+            <Eye className="mr-2 h-4 w-4" /> Visualiser
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem
+            onClick={() => router.push(`/dashboard/entreprise/${data.id}/edit`)}
+          >
             <Edit className="mr-2 h-4 w-4" /> Modifier
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
+          
           <DropdownMenuItem onClick={() => setOpen(true)}>
             <Trash className="mr-2 h-4 w-4" /> Supprimer
           </DropdownMenuItem>

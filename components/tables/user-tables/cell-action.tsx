@@ -5,16 +5,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuTrigger
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, Eye, MoreHorizontal, Trash, CheckCircle, XCircle, Clock, Mail, Phone, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
+import { User as UserType } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
-import { User } from "@/types";
+import Cookies from "js-cookie";
 
 interface CellActionProps {
-  data: User;
+  data: UserType | any; // any pour supporter les propriétés étendues
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -27,35 +29,91 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
 
-      const authToken = localStorage.getItem("authToken");
-
+      const authToken = Cookies.get("authToken");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate/delete/${data.id}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`
-          }
-        }
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
       );
 
       if (response.ok) {
         toast({
-          title: "Success !",
-          variant: "default",
-          description: "le candidat est supprimé avec succès "
+          title: "Succès",
+          description: "Candidat supprimé avec succès",
         });
+        // Refresh the page to update the list
+        window.location.reload();
       } else {
-        console.error("Failed to delete candidate");
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: "Impossible de supprimer le candidat",
+        });
       }
     } catch (error) {
       console.error("An error occurred while deleting the candidate:", error);
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Une erreur est survenue lors de la suppression",
+      });
     } finally {
       setLoading(false);
       setOpen(false);
     }
   };
+
+  const updateActivationStatus = async (activate: boolean) => {
+    try {
+      setLoading(true);
+      const authToken = Cookies.get("authToken");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate/${data.id}/${activate ? 'activate' : 'deactivate'}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description: `Candidat ${activate ? "activé" : "désactivé"} avec succès`,
+        });
+        window.location.reload();
+      } else {
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: "Impossible de mettre à jour le statut",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating activation status:", error);
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Une erreur est survenue",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const candidateName = data.first_name && data.last_name 
+    ? `${data.first_name} ${data.last_name}`
+    : data.nomComplete || 'Candidat';
+
+  const isActive = data.email_verified_at;
 
   return (
     <>
@@ -72,16 +130,64 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
+          
           <DropdownMenuItem
             onClick={() => router.push(`/dashboard/candidate/${data.id}`)}
           >
-            <Edit className="mr-2 h-4 w-4" /> Update
+            <Eye className="mr-2 h-4 w-4" /> Voir le profil
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4" /> Delete
+          
+          <DropdownMenuItem
+            onClick={() => router.push(`/dashboard/candidate/${data.id}/edit`)}
+          >
+            <Edit className="mr-2 h-4 w-4" /> Modifier
+          </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem
+            onClick={() => window.open(`mailto:${data.email}`, '_blank')}
+          >
+            <Mail className="mr-2 h-4 w-4" /> Envoyer un email
+          </DropdownMenuItem>
+          
+          {data.tel && (
+            <DropdownMenuItem
+              onClick={() => window.open(`tel:${data.tel}`, '_blank')}
+            >
+              <Phone className="mr-2 h-4 w-4" /> Appeler
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuSeparator />
+          
+          {!isActive && (
+            <DropdownMenuItem
+              onClick={() => updateActivationStatus(true)}
+              disabled={loading}
+            >
+              <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Activer
+            </DropdownMenuItem>
+          )}
+          
+          {isActive && (
+            <DropdownMenuItem
+              onClick={() => updateActivationStatus(false)}
+              disabled={loading}
+            >
+              <XCircle className="mr-2 h-4 w-4 text-red-600" /> Désactiver
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem 
+            onClick={() => setOpen(true)}
+            className="text-red-600 focus:text-red-600"
+          >
+            <Trash className="mr-2 h-4 w-4" /> Supprimer
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

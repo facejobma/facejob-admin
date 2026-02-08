@@ -8,9 +8,11 @@ import { CV } from "@/types";
 
 interface CVProps {
   data: CV[];
+  onRefresh?: () => void;
+  isLoading?: boolean;
 }
 
-export const CVRequests: FC<CVProps> = ({ data }) => {
+export const CVRequests: FC<CVProps> = ({ data, onRefresh, isLoading }) => {
   return (
     <>
       <div className="flex items-start justify-between">
@@ -20,7 +22,13 @@ export const CVRequests: FC<CVProps> = ({ data }) => {
         />
       </div>
       <Separator />
-      <DataTable searchKey="candidat_name" columns={columns} data={data} />
+      <DataTable 
+        searchKey="candidat_name" 
+        columns={columns} 
+        data={data} 
+        onRefresh={onRefresh}
+        isLoading={isLoading}
+      />
     </>
   );
 };

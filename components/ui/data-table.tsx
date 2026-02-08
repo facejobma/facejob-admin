@@ -24,15 +24,20 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey: string;
+  onRefresh?: () => void;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
+  onRefresh,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [selectValue, setSelectValue] = useState<string>("");
+  const [selectValue, setSelectValue] = useState<string>(""); // Default to show all
+  const [sectorValue, setSectorValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(20);
   const [sectors, setSectors] = useState<Sector[]>([]);
@@ -48,13 +53,16 @@ export function DataTable<TData, TValue>({
         }
       })
       .then((response) => response.json())
-      .then((data) => {
-        setSectors(data);
+      .then((result) => {
+        // Handle both array and object responses
+        const sectorsData = Array.isArray(result) ? result : (result.data || []);
+        setSectors(sectorsData);
         setLoading(false);
       })
       .catch((error) => {
         setLoading(false);
         console.error("Error fetching secteur options:", error);
+        setSectors([]); // Set empty array on error
       });
   }, []);
 
@@ -63,19 +71,42 @@ export function DataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      onRefresh,
+    },
   });
 
   useEffect(() => {
     table.getColumn(searchKey)?.setFilterValue(searchValue);
   }, [searchKey, searchValue, table]);
 
+  // Status filtering - find the is_verified column and filter it
   useEffect(() => {
-    table.setGlobalFilter(selectValue);
+    const statusColumn = table.getColumn('is_verified');
+    if (statusColumn) {
+      if (selectValue) {
+        statusColumn.setFilterValue(selectValue);
+      } else {
+        statusColumn.setFilterValue(undefined);
+      }
+    }
   }, [selectValue, table]);
+
+  useEffect(() => {
+    if (sectorValue) {
+      // Apply sector filter logic here if needed
+      // This depends on how your data structure handles sectors
+    }
+  }, [sectorValue, table]);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = event.target.value;
     setSelectValue(selectedValue);
+  };
+
+  const handleSectorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = event.target.value;
+    setSectorValue(selectedValue);
   };
 
   const handlePreviousPage = () => {
@@ -92,83 +123,88 @@ export function DataTable<TData, TValue>({
   const endIndex = Math.min(startIndex + pageSize, data.length);
 
   return (
-    <>
-      <div className="flex space-x-2">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Input
           placeholder={`Rechercher par ${searchKey}...`}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full md:max-w-sm"
+          className="w-full sm:max-w-sm"
         />
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white text-gray-500 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 w-60"
+          className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
         >
+          <option value="">Tous les statuts</option>
           <option value="Pending">En cours</option>
           <option value="Accepted">Accepté</option>
           <option value="Declined">Décliné</option>
         </select>
         <select
-          value={selectValue || ""}
-          onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          value={sectorValue || ""}
+          onChange={handleSectorChange}
+          className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
         >
-          <option value="">Secteur</option>
-          {sectors.map((sector) => (
+          <option value="">Tous les secteurs</option>
+          {Array.isArray(sectors) && sectors.map((sector) => (
             <option key={sector.id} value={sector.name}>
               {sector.name}
             </option>
           ))}
         </select>
       </div>
-      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-        <Table className="relative">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
+      <div className="rounded-md border">
+        <ScrollArea className="w-full">
+          <div className="min-w-full overflow-x-auto">
+            <Table className="relative min-w-full">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="whitespace-nowrap">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table
-              .getFilteredRowModel()
-              .rows.slice(startIndex, endIndex)
-              .map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
+              </TableHeader>
+              <TableBody>
+                {table
+                  .getFilteredRowModel()
+                  .rows.slice(startIndex, endIndex)
+                  .map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() ? "selected" : undefined}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="whitespace-nowrap">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <div className="flex items-center justify-end space-x-2 py-4">
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      </div>
+      <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} sur {" "}
-          {table.getFilteredRowModel().rows.length}  colonnes sélectionnée(s).
+          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -187,6 +223,6 @@ export function DataTable<TData, TValue>({
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

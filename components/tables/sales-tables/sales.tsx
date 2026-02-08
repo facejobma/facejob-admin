@@ -22,7 +22,7 @@ export const SalesTable: FC<ProductsClientProps> = ({ data }) => {
         />
       </div>
       <Separator />
-      <SalesDataTable searchKey="entreprise_company_name" columns={columns} data={data} />
+      <SalesDataTable searchKey="reference" columns={columns} data={data} />
     </>
   );
 };

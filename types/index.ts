@@ -13,14 +13,17 @@ export interface NavItem {
 
 
 export type Sales = {
-  price: number;
-  created_at: string;
-  description: string;
-  entreprise: EnterpriseData;
   id: number;
-  plan: PlanDetails;
+  price: string;
+  start_date: string;
+  end_date: string;
+  payment_method: string;
+  reference: string;
+  payment_period: string;
   status: string;
-  updated_at: string;
+  contact_access_consumed: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export type StatsItem = {
@@ -47,6 +50,26 @@ export type Sale ={
   sector: Sector | null;
 }
 
+export type PaymentDetail = {
+  id: number;
+  amount: string;
+  price: string;
+  start_date: string;
+  end_date: string;
+  payment_method: string;
+  reference: string;
+  payment_period: string;
+  status: string;
+  contact_access_consumed: number;
+  job_posted: number;
+  entreprise_id: number;
+  plan_id: number;
+  created_at: string;
+  updated_at: string;
+  plan: Plan;
+  entreprise: EnterpriseData;
+}
+
 export interface Statistiques {
   sectors_count: number;
   postules_count: number;
@@ -69,11 +92,18 @@ export interface EnterpriseData {
   phone: string;
   adresse: string;
   site_web: string;
-  effectif: number;
+  effectif: number | string;
   description: string;
-  is_verified: string;
-  plan: Plan;
+  is_verified: boolean | string;
+  is_validated?: boolean;
+  plan: Plan | null;
   created_at: string;
+  city?: string;
+  linkedin?: string;
+  founded_year?: number;
+  legal_form?: string;
+  ice_number?: string;
+  rc_number?: string;
 }
 
 export interface Sector {
@@ -118,12 +148,18 @@ export type Plan = {
 
 export type User = {
   id: number;
-  nomComplete: string;
-  sector: string;
+  nomComplete?: string;
+  first_name?: string;
+  last_name?: string;
+  sector: Sector | string;
   email: string;
-  tel: string;
-  bio: string;
+  tel?: string;
+  phone?: string;
+  bio?: string;
+  avatar?: string;
+  email_verified_at?: string | null;
   created_at: string;
+  updated_at?: string;
 };
 export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
 
@@ -154,8 +190,14 @@ export type Job = {
   date_debut: string;
   date_fin: string;
   company_name: string;
-  secteur_name: string;
-  is_verified: string;
+  sector_name: string; // Changed from secteur_name
+  sector_id: number;
+  job_name: string;
+  job_id: number;
+  entreprise_id: number;
+  is_verified: boolean | string; // Support both boolean and string
+  contractType?: string;
+  location?: string;
   created_at: string;
 };
 

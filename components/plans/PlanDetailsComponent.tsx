@@ -56,6 +56,7 @@ export const PricingCard = ({
                               annual_price,
                               description,
                               account_creation_included,
+                              cv_video_access,
                               cv_video_consultations,
                               job_postings,
                               popular,

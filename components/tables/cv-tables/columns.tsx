@@ -2,7 +2,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { CV } from "@/types";
-import { TableCell } from "@/components/ui/table";
 import moment from "moment";
 import "moment/locale/fr";
 
@@ -28,19 +27,24 @@ export const columns: ColumnDef<CV>[] = [
   },
   {
     accessorKey: "link",
-    header: "Vidéos",
-    // cell: ({ row }) => (
-    //   <TableCell>
-    //     <div className="w-10 h-10 relative rounded-full overflow-hidden">
-    //       <Image
-    //         src={row.original.logo}
-    //         alt={`${row.original.company_name} Logo`}
-    //         layout="fill"
-    //         objectFit="cover"
-    //       />
-    //     </div>
-    //   </TableCell>
-    // ),
+    header: "Vidéo",
+    cell: ({ row }) => (
+      <div className="w-48 h-32 relative rounded-lg overflow-hidden bg-gray-900">
+        <video 
+          src={row.original.link} 
+          className="w-full h-full object-contain"
+          controls
+          preload="metadata"
+          playsInline
+          muted={false}
+        >
+          <source src={row.original.link} type="video/mp4" />
+          Votre navigateur ne supporte pas la lecture de vidéos.
+        </video>
+      </div>
+    ),
+    enableSorting: false,
+    enableColumnFilter: false,
   },
   {
     accessorKey: "candidat_name",
@@ -77,13 +81,11 @@ export const columns: ColumnDef<CV>[] = [
     accessorKey: "created_at",
     header: "Date de creation",
     cell: ({ row }) => (
-      <TableCell>
-        {moment(row.original.created_at).format("DD/MM/yyyy")}
-      </TableCell>
+      moment(row.original.created_at).format("DD/MM/yyyy")
     ),
   },
   {
     id: "actions",
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row, table }) => <CellAction data={row.original} onRefresh={table.options.meta?.onRefresh} />,
   },
 ];

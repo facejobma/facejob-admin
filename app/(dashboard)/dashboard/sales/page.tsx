@@ -25,17 +25,21 @@ export default function SalesPage() {
             },
           },
         );
-        const data = await response.json();
+        const result = await response.json();
+
+        // Extract the data array from the API response
+        const salesData = result.data || [];
 
         // Trier les ventes par date de création (du plus récent au plus ancien)
-        const sortedSales = data.sort((a: Sales, b: Sales) => {
+        const sortedSales = salesData.sort((a: Sales, b: Sales) => {
           return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
           );
         });
 
         setSales(sortedSales); // Mettre à jour l'état avec les ventes triées
       } catch (error) {
+        console.error("Sales fetch error:", error);
         toast({
           title: "Whoops!",
           variant: "destructive",

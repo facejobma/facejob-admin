@@ -25,9 +25,10 @@ import VideoPlayer from "@/components/VideoPlayer";
 
 interface CellActionProps {
   data: CV;
+  onRefresh?: () => void;
 }
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
   console.log("data,", data.link);
 
   const [loading, setLoading] = useState(false);
@@ -99,9 +100,22 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           title: "Success!",
           description: "CV a été éditée avec succès.",
         });
-        data.is_verified = is_verified;
+        
+        // Refresh the data to show updated status
+        if (onRefresh) {
+          onRefresh();
+        }
+        
+        // Clear comment after successful decline
+        if (is_verified === "Declined") {
+          setComment("");
+        }
       } else {
-        data.is_verified = "Pending";
+        toast({
+          title: "Error!",
+          variant: "destructive",
+          description: "Erreur lors de la mise à jour du CV.",
+        });
       }
     } catch (error) {
       toast({
