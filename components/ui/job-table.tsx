@@ -66,7 +66,12 @@ export function JobDataTable<TData, TValue>({
     globalFilterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true;
       
+<<<<<<< HEAD
       const isVerified = (row.original as any)?.is_verified;
+=======
+      // @ts-ignore - is_verified exists on job data
+      const isVerified = row.original?.is_verified;
+>>>>>>> 940efd108bff19c9f23843b39d9139e1ef37a5bc
       switch (filterValue) {
         case "Pending":
           return isVerified === false || isVerified === "Pending" || (!isVerified && isVerified !== true);

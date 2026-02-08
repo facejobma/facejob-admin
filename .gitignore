@@ -69,3 +69,9 @@ logs
 # Temporary folders
 tmp/
 temp/
+
+.env.*
+!.env.example
+!.env.*.example
+.env.backup
+.env.save
