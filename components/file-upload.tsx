@@ -123,6 +123,7 @@ export default function FileUpload({
                   // Map the response to construct proper CDN URLs
                   // Use ufsUrl (new) or fallback to url (deprecated) or construct from key
                   const mappedData = data.map(file => {
+                    // @ts-ignore - ufsUrl may exist in newer versions
                     const cdnUrl = file.ufsUrl || file.url || `https://utfs.io/f/${file.key}`;
                     console.log("Constructed CDN URL:", cdnUrl);
                     return {
