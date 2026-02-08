@@ -35,13 +35,22 @@ class AdminAPI {
   private getAuthToken(): string | null {
     if (typeof window === 'undefined') return null;
     
-    // Try multiple storage locations
-    return (
-      localStorage.getItem('authToken') ||
-      sessionStorage.getItem('authToken') ||
-      document.cookie.split('; ').find(row => row.startsWith('authToken='))?.split('=')[1] ||
-      null
-    );
+    // Try localStorage first (most reliable for API calls)
+    const localToken = localStorage.getItem('authToken');
+    if (localToken) return localToken;
+    
+    // Try sessionStorage
+    const sessionToken = sessionStorage.getItem('authToken');
+    if (sessionToken) return sessionToken;
+    
+    // Try cookies as fallback
+    const cookies = document.cookie.split('; ');
+    const authCookie = cookies.find(row => row.startsWith('authToken='));
+    if (authCookie) {
+      return authCookie.split('=')[1];
+    }
+    
+    return null;
   }
 
   /**

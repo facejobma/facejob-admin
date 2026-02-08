@@ -58,7 +58,11 @@ export default function UserAuthForm() {
 
       if (response.ok) {
         const { token } = result;
+        
+        // Store token in multiple locations for reliability
         Cookies.set("authToken", token, { expires: 7 });
+        localStorage.setItem("authToken", token);
+        sessionStorage.setItem("authToken", token);
         
         toast({
           title: "Connexion réussie!",
