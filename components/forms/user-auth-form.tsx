@@ -56,8 +56,13 @@ export default function UserAuthForm() {
 
       const result = await response.json();
 
-      if (response.ok) {
-        const { token } = result;
+      if (response.ok && result.success) {
+        // Extract token from result.data.token (backend response structure)
+        const token = result.data?.token;
+        
+        if (!token) {
+          throw new Error("Token non reçu du serveur");
+        }
         
         // Store token in multiple locations for reliability
         Cookies.set("authToken", token, { expires: 7 });
