@@ -101,13 +101,7 @@ export function CandidateForm({ initialData, onSubmit, loading = false }: Candid
 
   const handleSubmit = async (values: CandidateFormValues) => {
     try {
-      // Convert sector_id to number if provided
-      const formData = {
-        ...values,
-        sector_id: values.sector_id ? parseInt(values.sector_id) : undefined,
-      };
-
-      await onSubmit(formData);
+      await onSubmit(values);
     } catch (error) {
       console.error("Form submission error:", error);
     }
