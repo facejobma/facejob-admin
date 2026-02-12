@@ -11,9 +11,11 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface ProductsClientProps {
   data: User[];
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
-export const UserClient: FC<ProductsClientProps> = ({ data }) => {
+export const UserClient: FC<ProductsClientProps> = ({ data, onRefresh, isRefreshing }) => {
   const router = useRouter();
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
@@ -75,7 +77,13 @@ export const UserClient: FC<ProductsClientProps> = ({ data }) => {
       <Separator />
       
       <div className="w-full max-w-full overflow-x-hidden">
-        <CandidateDataTable searchKey="nomComplete" columns={columns} data={data} />
+        <CandidateDataTable 
+          searchKey="nomComplete" 
+          columns={columns} 
+          data={data} 
+          onRefresh={onRefresh}
+          isRefreshing={isRefreshing}
+        />
       </div>
     </div>
   );

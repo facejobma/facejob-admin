@@ -146,18 +146,120 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
       <Modal
         isOpen={showPreview}
         onClose={onClosePreview}
-        title={"Preview CV Video"}
+        title={"Aperçu du CV Vidéo"}
         description={
-          "Take a closer look at the candidate's CV video to gain insights into their qualifications and skills."
+          "Visualisez le CV vidéo du candidat et validez ou refusez sa demande."
         }
+        size="large"
       >
-        <VideoPlayer link={data.link} />
-        {/* <video autoPlay style={{ width: "500px", height: "500px" }}>
-          <source src={data.link} />
-        </video>
-        <video autoPlay style={{ width: '500px', height: '500px' }}>
-        <source src="/blue.mp4" />
-      </video> */}
+        <div className="space-y-6">
+          {/* Video Player */}
+          <div className="w-full">
+            <VideoPlayer link={data.link} />
+          </div>
+
+          {/* Candidate Information */}
+          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Candidat
+              </p>
+              <p className="text-sm font-semibold">{data.candidat_name}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Secteur
+              </p>
+              <p className="text-sm font-semibold">{data.secteur_name}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Statut
+              </p>
+              <span
+                className={`inline-block rounded-full py-1 px-3 text-xs font-medium ${
+                  data.is_verified === "Accepted"
+                    ? "bg-green-200 text-green-800"
+                    : data.is_verified === "Declined"
+                      ? "bg-yellow-200 text-yellow-800"
+                      : "bg-gray-200 text-gray-800"
+                }`}
+              >
+                {data.is_verified === "Accepted"
+                  ? "Accepté"
+                  : data.is_verified === "Declined"
+                    ? "Décliné"
+                    : "En attente"}
+              </span>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Date de création
+              </p>
+              <p className="text-sm font-semibold">
+                {new Date(data.created_at).toLocaleDateString("fr-FR")}
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4 border-t">
+            <Button
+              onClick={() => {
+                onVerify("Accepted");
+                onClosePreview();
+              }}
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              disabled={data.is_verified === "Accepted"}
+            >
+              <CheckSquare className="mr-2 h-4 w-4" />
+              Accepter
+            </Button>
+            <Button
+              onClick={() => setOpen(true)}
+              variant="destructive"
+              className="flex-1"
+              disabled={data.is_verified === "Declined"}
+            >
+              <XSquare className="mr-2 h-4 w-4" />
+              Refuser
+            </Button>
+          </div>
+
+          {/* Decline Comment Section */}
+          {open && (
+            <div className="space-y-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <label className="text-sm font-medium">
+                Commentaire de refus (obligatoire)
+              </label>
+              <Input
+                placeholder="Entrez la raison du refus..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    onVerify("Declined");
+                    setOpen(false);
+                    onClosePreview();
+                  }}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  Confirmer le refus
+                </Button>
+                <Button
+                  onClick={() => setOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </Modal>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>

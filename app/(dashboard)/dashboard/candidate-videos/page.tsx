@@ -12,17 +12,23 @@ const breadcrumbItems = [
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "cards">("cards");
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isRefresh = false) => {
     try {
-      setIsLoading(true);
-      // Fetch only pending videos by default
+      if (isRefresh) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
+      
+      // Fetch all videos to allow filtering by status
       const url = new URL(
         process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/candidate-videos"
       );
-      url.searchParams.append("status", "Pending");
 
       const response = await fetch(url.toString(), {
         headers: {
@@ -41,7 +47,11 @@ export default function UsersPage() {
         description: "Erreur lors de la récupération des données.",
       });
     } finally {
-      setIsLoading(false);
+      if (isRefresh) {
+        setIsRefreshing(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   }, [authToken, toast]);
 
@@ -53,7 +63,14 @@ export default function UsersPage() {
     <>
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <BreadCrumb items={breadcrumbItems} />
-        <CVRequests data={users} onRefresh={fetchData} isLoading={isLoading} />
+        <CVRequests 
+          data={users} 
+          onRefresh={() => fetchData(true)} 
+          isLoading={isLoading}
+          isRefreshing={isRefreshing}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
       </div>
     </>
   );

@@ -22,12 +22,16 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey: string;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 export function CandidateDataTable<TData, TValue>({
   columns,
   data,
-  searchKey
+  searchKey,
+  onRefresh,
+  isRefreshing
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [sectorFilter, setSectorFilter] = useState<string>("");
@@ -38,6 +42,9 @@ export function CandidateDataTable<TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      onRefresh,
+    },
     globalFilterFn: (row, columnId, filterValue) => {
       if (!filterValue) return true;
       
@@ -125,6 +132,7 @@ export function CandidateDataTable<TData, TValue>({
             value={searchValue}
             onChange={(event) => setSearchValue(event.target.value)}
             className="pl-10"
+            disabled={isRefreshing}
           />
         </div>
         
@@ -134,6 +142,7 @@ export function CandidateDataTable<TData, TValue>({
             value={sectorFilter || ""}
             onChange={handleSectorChange}
             className="w-full pl-10 pr-8 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+            disabled={isRefreshing}
           >
             <option value="">Tous les secteurs</option>
             {sectors.map((option) => (
@@ -150,6 +159,7 @@ export function CandidateDataTable<TData, TValue>({
             value={statusFilter || ""}
             onChange={handleStatusChange}
             className="w-full pl-10 pr-8 py-2 border border-input bg-background text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+            disabled={isRefreshing}
           >
             <option value="">Tous les statuts</option>
             <option value="actif">Actif</option>
@@ -159,7 +169,15 @@ export function CandidateDataTable<TData, TValue>({
       </div>
 
       {/* Table */}
-      <div className="w-full border rounded-lg overflow-hidden">
+      <div className="w-full border rounded-lg overflow-hidden relative min-h-[400px]">
+        {isRefreshing && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10 backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+              <span className="text-sm font-medium">Actualisation...</span>
+            </div>
+          </div>
+        )}
         <div className="w-full">
           <Table className="w-full table-fixed">
             <TableHeader>

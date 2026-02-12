@@ -36,7 +36,15 @@ export const columns: ColumnDef<CV>[] = [
           controls
           preload="metadata"
           playsInline
-          muted={false}
+          muted
+          onMouseEnter={(e) => {
+            e.currentTarget.muted = true;
+            e.currentTarget.play().catch(() => {});
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.pause();
+            e.currentTarget.currentTime = 0;
+          }}
         >
           <source src={row.original.link} type="video/mp4" />
           Votre navigateur ne supporte pas la lecture de vidéos.
@@ -63,19 +71,27 @@ export const columns: ColumnDef<CV>[] = [
   {
     accessorKey: "is_verified",
     header: "Status",
-    cell: ({ row }) => (
-      <div
-        className={
-          row.original.is_verified === "Accepted"
-            ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
-            : row.original.is_verified === "Declined"
-              ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
-              : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
-        }
-      >
-        {row.original.is_verified}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const statusTranslations: Record<string, string> = {
+        Accepted: "Accepté",
+        Declined: "Décliné",
+        Pending: "En attente"
+      };
+      
+      return (
+        <div
+          className={
+            row.original.is_verified === "Accepted"
+              ? "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center"
+              : row.original.is_verified === "Declined"
+                ? "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center"
+                : "bg-gray-200 text-gray-800 rounded-full py-1 px-2 text-center"
+          }
+        >
+          {statusTranslations[row.original.is_verified] || row.original.is_verified}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "created_at",

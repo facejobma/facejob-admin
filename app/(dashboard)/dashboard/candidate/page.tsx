@@ -13,84 +13,91 @@ const breadcrumbItems = [{ title: "Candidats", link: "/dashboard/candidate" }];
 export default function CandidatesPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!authToken) {
-        toast({
-          title: "Erreur d'authentification",
-          variant: "destructive",
-          description: "Token d'authentification manquant. Veuillez vous reconnecter.",
-        });
-        setLoading(false);
-        return;
-      }
+  const fetchData = async (isRefresh = false) => {
+    if (!authToken) {
+      toast({
+        title: "Erreur d'authentification",
+        variant: "destructive",
+        description: "Token d'authentification manquant. Veuillez vous reconnecter.",
+      });
+      setLoading(false);
+      return;
+    }
 
-      try {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
-        
-        // Vérifier que l'URL de l'API est définie
-        if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-          throw new Error("URL de l'API non configurée");
-        }
+      }
+      
+      // Vérifier que l'URL de l'API est définie
+      if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
+        throw new Error("URL de l'API non configurée");
+      }
 
-        const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidates`;
-        console.log("Fetching candidates from:", apiUrl);
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidates`;
 
-        const response = await fetch(apiUrl, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        });
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("API Error:", response.status, errorText);
-          throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error:", response.status, errorText);
+        throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+      }
 
-        const result = await response.json();
-        console.log("API Response:", result);
+      const result = await response.json();
 
-        // Vérifier la structure de la réponse
-        if (result && Array.isArray(result.data)) {
-          setUsers(result.data);
-        } else if (Array.isArray(result)) {
-          setUsers(result);
-        } else {
-          console.warn("Structure de réponse inattendue:", result);
-          setUsers([]);
-        }
-      } catch (error) {
-        console.error("Error fetching candidates:", error);
-        
-        let errorMessage = "Erreur lors de la récupération des candidats.";
-        
-        if (error instanceof TypeError && error.message.includes("fetch")) {
-          errorMessage = "Impossible de se connecter au serveur. Vérifiez votre connexion internet.";
-        } else if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-
-        toast({
-          title: "Erreur",
-          variant: "destructive",
-          description: errorMessage,
-        });
-        
-        // En cas d'erreur, on garde un tableau vide pour éviter les crashes
+      // Vérifier la structure de la réponse
+      if (result && Array.isArray(result.data)) {
+        setUsers(result.data);
+      } else if (Array.isArray(result)) {
+        setUsers(result);
+      } else {
+        console.warn("Structure de réponse inattendue:", result);
         setUsers([]);
-      } finally {
+      }
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+      
+      let errorMessage = "Erreur lors de la récupération des candidats.";
+      
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        errorMessage = "Impossible de se connecter au serveur. Vérifiez votre connexion internet.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: errorMessage,
+      });
+      
+      // En cas d'erreur, on garde un tableau vide pour éviter les crashes
+      setUsers([]);
+    } finally {
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
         setLoading(false);
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [authToken, toast]);
+  }, []);
 
   // Calculer les statistiques
   const totalCandidates = users.length;
@@ -224,7 +231,7 @@ export default function CandidatesPage() {
               </div>
             ) : (
               <div className="w-full overflow-x-hidden">
-                <UserClient data={users} />
+                <UserClient data={users} onRefresh={() => fetchData(true)} isRefreshing={refreshing} />
               </div>
             )}
           </CardContent>

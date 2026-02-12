@@ -26,6 +26,7 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
   onRefresh?: () => void;
   isLoading?: boolean;
+  isRefreshing?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +35,7 @@ export function DataTable<TData, TValue>({
   searchKey,
   onRefresh,
   isLoading,
+  isRefreshing,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>(""); // Default to show all
@@ -130,11 +132,13 @@ export function DataTable<TData, TValue>({
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full sm:max-w-sm"
+          disabled={isRefreshing}
         />
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
           className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+          disabled={isRefreshing}
         >
           <option value="">Tous les statuts</option>
           <option value="Pending">En cours</option>
@@ -145,6 +149,7 @@ export function DataTable<TData, TValue>({
           value={sectorValue || ""}
           onChange={handleSectorChange}
           className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+          disabled={isRefreshing}
         >
           <option value="">Tous les secteurs</option>
           {Array.isArray(sectors) && sectors.map((sector) => (
@@ -154,7 +159,15 @@ export function DataTable<TData, TValue>({
           ))}
         </select>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border relative min-h-[400px]">
+        {isRefreshing && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10 backdrop-blur-sm">
+            <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+              <span className="text-sm font-medium">Actualisation...</span>
+            </div>
+          </div>
+        )}
         <ScrollArea className="w-full">
           <div className="min-w-full overflow-x-auto">
             <Table className="relative min-w-full">

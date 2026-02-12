@@ -154,7 +154,7 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     header: "Actions",
     size: 80,
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row, table }) => <CellAction data={row.original} onRefresh={table.options.meta?.onRefresh} />,
   },
 ];
 

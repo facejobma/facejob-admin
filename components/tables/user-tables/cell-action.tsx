@@ -17,9 +17,10 @@ import Cookies from "js-cookie";
 
 interface CellActionProps {
   data: UserType | any; // any pour supporter les propriétés étendues
+  onRefresh?: () => void;
 }
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -46,8 +47,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           title: "Succès",
           description: "Candidat supprimé avec succès",
         });
-        // Refresh the page to update the list
-        window.location.reload();
+        // Use onRefresh if available, otherwise reload
+        if (onRefresh) {
+          onRefresh();
+        } else {
+          window.location.reload();
+        }
       } else {
         toast({
           title: "Erreur",
@@ -89,7 +94,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           title: "Succès",
           description: `Candidat ${activate ? "activé" : "désactivé"} avec succès`,
         });
-        window.location.reload();
+        // Use onRefresh if available, otherwise reload
+        if (onRefresh) {
+          onRefresh();
+        } else {
+          window.location.reload();
+        }
       } else {
         toast({
           title: "Erreur",
