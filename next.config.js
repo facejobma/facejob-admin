@@ -13,6 +13,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'utfs.io',
+      },
+      {
+        protocol: 'https',
         hostname: 'picsum.photos',
       },
       {
@@ -61,7 +65,7 @@ const nextConfig = {
       }
     ],
     // Fallback pour la compatibilité
-    domains: ["picsum.photos", "d1csarkz8obe9u.cloudfront.net", "via.placeholder.com", "placeholder.com", "images.unsplash.com", "source.unsplash.com", "cdn.vectorstock.com", "static.vecteezy.com", "lh3.googleusercontent.com"],
+    domains: ["utfs.io", "picsum.photos", "d1csarkz8obe9u.cloudfront.net", "via.placeholder.com", "placeholder.com", "images.unsplash.com", "source.unsplash.com", "cdn.vectorstock.com", "static.vecteezy.com", "lh3.googleusercontent.com"],
   },
   output: 'standalone'
 };
