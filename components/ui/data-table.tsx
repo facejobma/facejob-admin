@@ -126,32 +126,32 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700">
         <Input
-          placeholder={`Rechercher par ${searchKey}...`}
+          placeholder={`🔍 Rechercher par ${searchKey}...`}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full sm:max-w-sm"
+          className="w-full sm:max-w-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           disabled={isRefreshing}
         />
         <select
           value={selectValue || ""}
           onChange={handleSelectChange}
-          className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+          className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 min-w-[150px] font-medium transition-all"
           disabled={isRefreshing}
         >
-          <option value="">Tous les statuts</option>
-          <option value="Pending">En cours</option>
-          <option value="Accepted">Accepté</option>
-          <option value="Declined">Décliné</option>
+          <option value="">📊 Tous les statuts</option>
+          <option value="Pending">⏳ En cours</option>
+          <option value="Accepted">✅ Accepté</option>
+          <option value="Declined">❌ Décliné</option>
         </select>
         <select
           value={sectorValue || ""}
           onChange={handleSectorChange}
-          className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+          className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 min-w-[150px] font-medium transition-all"
           disabled={isRefreshing}
         >
-          <option value="">Tous les secteurs</option>
+          <option value="">🏢 Tous les secteurs</option>
           {Array.isArray(sectors) && sectors.map((sector) => (
             <option key={sector.id} value={sector.name}>
               {sector.name}
@@ -159,23 +159,23 @@ export function DataTable<TData, TValue>({
           ))}
         </select>
       </div>
-      <div className="rounded-md border relative min-h-[400px]">
+      <div className="rounded-xl border border-gray-200 dark:border-gray-700 relative min-h-[400px] overflow-hidden shadow-sm bg-white dark:bg-gray-800">
         {isRefreshing && (
-          <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10 backdrop-blur-sm">
-            <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-              <span className="text-sm font-medium">Actualisation...</span>
+          <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center z-10 backdrop-blur-sm">
+            <div className="flex items-center gap-3 bg-white dark:bg-gray-800 px-6 py-3 rounded-xl shadow-xl border-2 border-blue-500 dark:border-blue-400">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-t-2 border-blue-500 dark:border-blue-400"></div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Actualisation en cours...</span>
             </div>
           </div>
         )}
         <ScrollArea className="w-full">
           <div className="min-w-full overflow-x-auto">
             <Table className="relative min-w-full">
-              <TableHeader>
+              <TableHeader className="bg-gradient-to-r from-gray-100 to-blue-100 dark:from-gray-800 dark:to-blue-900">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow key={headerGroup.id} className="border-b-2 border-gray-300 dark:border-gray-600">
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="whitespace-nowrap">
+                      <TableHead key={header.id} className="whitespace-nowrap font-bold text-gray-900 dark:text-gray-100 text-xs uppercase tracking-wider">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -191,13 +191,19 @@ export function DataTable<TData, TValue>({
                 {table
                   .getFilteredRowModel()
                   .rows.slice(startIndex, endIndex)
-                  .map((row) => (
+                  .map((row, index) => (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() ? "selected" : undefined}
+                      className={`
+                        transition-all duration-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 
+                        ${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-800/50'}
+                        ${row.getIsSelected() ? 'bg-blue-100 dark:bg-blue-900/30' : ''}
+                        border-b border-gray-200 dark:border-gray-700
+                      `}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap">
+                        <TableCell key={cell.id} className="whitespace-nowrap py-4">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),
@@ -212,10 +218,18 @@ export function DataTable<TData, TValue>({
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} sur {" "}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+      <div className="flex items-center justify-between space-x-2 py-4 px-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="inline-flex items-center gap-2">
+            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-md font-semibold">
+              {table.getFilteredSelectedRowModel().rows.length}
+            </span>
+            sur
+            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md font-semibold">
+              {table.getFilteredRowModel().rows.length}
+            </span>
+            ligne(s) sélectionnée(s)
+          </span>
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -223,16 +237,21 @@ export function DataTable<TData, TValue>({
             size="sm"
             onClick={handlePreviousPage}
             disabled={currentPage === 0}
+            className="font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30 disabled:opacity-50 transition-all"
           >
-            Précédent
+            ← Précédent
           </Button>
+          <div className="px-3 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-semibold text-gray-700 dark:text-gray-300">
+            Page {currentPage + 1} / {Math.ceil(table.getFilteredRowModel().rows.length / pageSize) || 1}
+          </div>
           <Button
             variant="outline"
             size="sm"
             onClick={handleNextPage}
             disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
+            className="font-medium hover:bg-blue-50 dark:hover:bg-blue-900/30 disabled:opacity-50 transition-all"
           >
-            Suivant
+            Suivant →
           </Button>
         </div>
       </div>

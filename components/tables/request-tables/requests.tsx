@@ -73,11 +73,11 @@ export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
   const statusInfo = getStatusMessage();
   
   return (
-    <div className="space-y-4 p-6">
+    <div className="space-y-4 p-6 bg-gradient-to-br from-gray-50/50 to-blue-50/30 dark:from-gray-900/50 dark:to-blue-950/30 rounded-lg">
       {/* En-tête avec informations contextuelles */}
       <div className="flex items-start justify-between">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-lg font-semibold">
+          <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
             {statusInfo.icon}
             {statusInfo.text}
           </div>
@@ -124,7 +124,7 @@ export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
       
       {/* Table des données */}
       {data.length > 0 ? (
-        <div className="rounded-lg border bg-white dark:bg-gray-800">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
           <DataTable 
             searchKey="company_name" 
             columns={columns} 
@@ -133,11 +133,11 @@ export const EnterpriseRequests: FC<EntrepriseProps> = ({ data }) => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-muted p-3 mb-4">
-            <Building2 className="h-6 w-6 text-muted-foreground" />
+          <div className="rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 p-4 mb-4 shadow-sm">
+            <Building2 className="h-8 w-8 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-lg font-semibold mb-2">Aucune demande trouvée</h3>
-          <p className="text-muted-foreground max-w-md">
+          <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Aucune demande trouvée</h3>
+          <p className="text-muted-foreground max-w-md text-sm">
             Il n'y a actuellement aucune demande d'entreprise correspondant aux critères sélectionnés. 
             Les nouvelles demandes apparaîtront ici automatiquement.
           </p>
