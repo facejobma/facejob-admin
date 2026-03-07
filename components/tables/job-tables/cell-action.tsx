@@ -41,9 +41,10 @@ import { safeFetch, createSafeHeaders, sanitizeString } from "@/lib/security-uti
 
 interface CellActionProps {
   data: Job;
+  onUpdate?: (jobId?: number, newStatus?: string) => void; // Callback avec ID et statut optionnels
 }
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<CellActionProps> = ({ data, onUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -59,13 +60,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       // Sanitize the comment text
       const sanitizedComment = commentText ? sanitizeString(commentText) : sanitizeString(comment);
 
-      // Essayer d'abord l'endpoint spécifique pour l'acceptation/refus
-      let endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/accept/${data.id}`;
-      
-      // Si c'est un refus, essayer un endpoint spécifique pour le refus
-      if (is_verified === "Declined") {
-        endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/decline/${data.id}`;
-      }
+      // Utiliser l'endpoint unique pour acceptation et refus
+      const endpoint = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/accept/${data.id}`;
+
+      console.log('Sending request:', {
+        endpoint,
+        is_verified,
+        comment: sanitizedComment,
+      });
 
       const response = await safeFetch(endpoint, {
         method: "PUT",
@@ -76,6 +78,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         },
       });
 
+      console.log('Response status:', response.status);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+
       if (response.ok) {
         const actionText = is_verified === "Accepted" ? "acceptée et publiée" : "refusée";
         toast({
@@ -83,51 +89,23 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           description: `L'offre "${data.titre}" a été ${actionText}.`,
         });
         
-        // Mise à jour locale des données
-        data.is_verified = is_verified;
-        
         // Fermer les dialogs
         setDeclineDialogOpen(false);
         setComment("");
         
-        // Recharger pour actualiser les données
-        window.location.reload();
+        // Appeler le callback avec l'ID et le nouveau statut pour mise à jour immédiate
+        if (onUpdate) {
+          onUpdate(data.id, is_verified);
+        }
       } else {
         // Check if it's a security error
         if (response.status === 400) {
-          const errorData = await response.json().catch(() => ({}));
-          if (errorData.error_code === 'CLIENT_ERROR' && errorData.message?.includes('Suspicious activity')) {
+          if (responseData.error_code === 'CLIENT_ERROR' && responseData.message?.includes('Suspicious activity')) {
             throw new Error('Accès temporairement restreint en raison d\'une activité suspecte détectée.');
           }
         }
         
-        // Si l'endpoint spécifique n'existe pas, essayer l'endpoint générique
-        const fallbackResponse = await safeFetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/update-status/${data.id}`,
-          {
-            method: "PUT",
-            headers: createSafeHeaders(authToken || ''),
-            body: {
-              status: is_verified,
-              comment: sanitizedComment,
-            },
-          },
-        );
-
-        if (fallbackResponse.ok) {
-          const actionText = is_verified === "Accepted" ? "acceptée et publiée" : "refusée";
-          toast({
-            title: "Succès !",
-            description: `L'offre "${data.titre}" a été ${actionText}.`,
-          });
-          
-          data.is_verified = is_verified;
-          setDeclineDialogOpen(false);
-          setComment("");
-          window.location.reload();
-        } else {
-          throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-        }
+        throw new Error(`Erreur ${response.status}: ${responseData.message || response.statusText}`);
       }
     } catch (error) {
       console.error("Error updating job status:", error);
@@ -145,38 +123,31 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     try {
       setLoading(true);
 
-      // Essayer d'abord l'endpoint spécifique pour la suppression
-      let response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/delete/${data.id}`,
+      // Utiliser l'endpoint correct pour la suppression
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/offre/delete/${data.id}`,
         {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
           },
         },
       );
-
-      // Si l'endpoint spécifique n'existe pas, essayer l'endpoint générique
-      if (!response.ok && response.status === 404) {
-        response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres/${data.id}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          },
-        );
-      }
 
       if (response.ok) {
         toast({
           title: "Succès",
           description: `L'offre "${data.titre}" a été supprimée avec succès.`,
         });
-        window.location.reload();
+        
+        // Appeler le callback pour rafraîchir toutes les données (suppression)
+        if (onUpdate) {
+          onUpdate(); // Pas d'ID car l'offre est supprimée, on recharge tout
+        }
       } else {
-        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Erreur ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error deleting job:", error);

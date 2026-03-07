@@ -199,6 +199,8 @@ export type Job = {
   contractType?: string;
   location?: string;
   created_at: string;
+  applications_count?: number; // Nombre de candidatures
+  views_count?: number; // Nombre de vues
 };
 
 

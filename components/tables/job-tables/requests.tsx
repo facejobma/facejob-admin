@@ -3,16 +3,49 @@ import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { FC } from "react";
 import { JobDataTable } from "@/components/ui/job-table";
-import { columns } from "@/components/tables/job-tables/columns";
+import { createColumns } from "@/components/tables/job-tables/columns";
+import { JobCardView } from "@/components/tables/job-tables/job-card-view";
 import { Job } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase, Clock, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 interface JobProps {
   data: Job[];
+  onUpdate?: (jobId?: number, newStatus?: string) => void; // Callback avec ID et statut optionnels
+  viewMode?: "table" | "cards"; // Mode d'affichage
+  // Filter props
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  statusFilter?: string;
+  onStatusChange?: (value: string) => void;
+  sectorFilter?: string;
+  onSectorChange?: (value: string) => void;
+  // Pagination props
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  pageSize?: number;
+  onPageSizeChange?: (size: number) => void;
+  totalItems?: number;
+  totalPages?: number;
 }
 
-export const JobRequests: FC<JobProps> = ({ data }) => {
+export const JobRequests: FC<JobProps> = ({ 
+  data, 
+  onUpdate, 
+  viewMode = "table",
+  searchValue = "",
+  onSearchChange,
+  statusFilter = "all",
+  onStatusChange,
+  sectorFilter = "all",
+  onSectorChange,
+  currentPage = 1,
+  onPageChange,
+  pageSize = 12,
+  onPageSizeChange,
+  totalItems = 0,
+  totalPages = 0,
+}) => {
   // Statistiques rapides pour cette vue
   const pendingCount = data.filter(
     (job) => 
@@ -122,11 +155,30 @@ export const JobRequests: FC<JobProps> = ({ data }) => {
       
       {data.length > 0 && <Separator />}
       
-      {/* Table des données */}
+      {/* Affichage selon le mode */}
       {data.length > 0 ? (
-        <div className="rounded-lg border bg-white">
-          <JobDataTable searchKey="titre" columns={columns} data={data} />
-        </div>
+        viewMode === "cards" ? (
+          <JobCardView 
+            data={data} 
+            onUpdate={onUpdate}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
+            statusFilter={statusFilter}
+            onStatusChange={onStatusChange}
+            sectorFilter={sectorFilter}
+            onSectorChange={onSectorChange}
+            currentPage={currentPage}
+            onPageChange={onPageChange}
+            pageSize={pageSize}
+            onPageSizeChange={onPageSizeChange}
+            totalItems={totalItems}
+            totalPages={totalPages}
+          />
+        ) : (
+          <div className="rounded-lg border bg-white">
+            <JobDataTable searchKey="titre" columns={createColumns(onUpdate)} data={data} />
+          </div>
+        )
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="rounded-full bg-muted p-3 mb-4">

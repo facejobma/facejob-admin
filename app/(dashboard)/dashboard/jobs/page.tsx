@@ -23,7 +23,9 @@ import {
   BarChart3,
   Activity,
   MapPin,
-  Users
+  Users,
+  LayoutGrid,
+  List
 } from "lucide-react";
 import { Job } from "@/types";
 
@@ -35,8 +37,29 @@ export default function JobsPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("cards"); // Cards par défaut
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
   const [, forceUpdate] = useState({});
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  
+  // Filter state
+  const [searchValue, setSearchValue] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sectorFilter, setSectorFilter] = useState("all");
+  
+  // Global statistics state
+  const [globalStats, setGlobalStats] = useState({
+    pending: 0,
+    accepted: 0,
+    declined: 0,
+    total: 0,
+  });
+  
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
@@ -62,8 +85,26 @@ export default function JobsPage() {
       setError(null);
       setLastFetchTime(now);
       
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        per_page: pageSize.toString(),
+      });
+      
+      // Add filters only if they're not default values
+      if (statusFilter !== "all") {
+        params.append('status', statusFilter);
+      }
+      if (sectorFilter !== "all") {
+        params.append('sector', sectorFilter);
+      }
+      if (searchValue) {
+        params.append('search', searchValue);
+      }
+      
+      // Fetch paginated data
       const response = await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/offres",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -115,6 +156,15 @@ export default function JobsPage() {
       const result = await response.json();
       setJobs(result.data || []);
       
+      // Update pagination metadata
+      if (result.pagination) {
+        setTotalItems(result.pagination.total);
+        setTotalPages(result.pagination.last_page);
+      }
+      
+      // Fetch global statistics (without filters)
+      fetchGlobalStats();
+      
       if (showRefreshToast) {
         toast({
           title: "Données actualisées",
@@ -140,9 +190,97 @@ export default function JobsPage() {
     }
   };
 
+  // Fetch global statistics for tabs
+  const fetchGlobalStats = async () => {
+    try {
+      // Fetch counts for each status
+      const [pendingRes, acceptedRes, declinedRes, totalRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=Pending&per_page=1`, {
+          headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=Accepted&per_page=1`, {
+          headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=Declined&per_page=1`, {
+          headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=all&per_page=1`, {
+          headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
+        }),
+      ]);
+
+      const [pending, accepted, declined, total] = await Promise.all([
+        pendingRes.json(),
+        acceptedRes.json(),
+        declinedRes.json(),
+        totalRes.json(),
+      ]);
+
+      setGlobalStats({
+        pending: pending.pagination?.total || 0,
+        accepted: accepted.pagination?.total || 0,
+        declined: declined.pagination?.total || 0,
+        total: total.pagination?.total || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching global stats:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, [authToken]);
+  }, [authToken, currentPage, pageSize, statusFilter, sectorFilter, searchValue]);
+
+  // Fonction optimisée pour mettre à jour une seule offre
+  const updateSingleJob = async (jobId: number, newStatus?: string) => {
+    try {
+      // Si on a le nouveau statut, mettre à jour immédiatement l'UI
+      if (newStatus) {
+        setJobs(prevJobs => 
+          prevJobs.map(job => 
+            job.id === jobId ? { ...job, is_verified: newStatus } : job
+          )
+        );
+        
+        // Mettre à jour les statistiques globales
+        fetchGlobalStats();
+        return;
+      }
+      
+      // Sinon, récupérer les données depuis le backend
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/offres_by_id/${jobId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.ok) {
+        const updatedJob = await response.json();
+        
+        // Mettre à jour uniquement l'offre modifiée dans le state
+        setJobs(prevJobs => 
+          prevJobs.map(job => 
+            job.id === jobId ? { ...job, ...updatedJob } : job
+          )
+        );
+        
+        // Mettre à jour les statistiques globales
+        fetchGlobalStats();
+      } else {
+        // Si l'endpoint spécifique échoue, recharger toutes les données
+        console.warn('Failed to fetch single job, refreshing all data');
+        fetchData(false);
+      }
+    } catch (error) {
+      console.error('Error updating single job:', error);
+      // En cas d'erreur, recharger toutes les données
+      fetchData(false);
+    }
+  };
 
   // Update button text every second when rate limited
   useEffect(() => {
@@ -156,39 +294,19 @@ export default function JobsPage() {
     return () => clearInterval(interval);
   }, [lastFetchTime]);
 
-  // Statistiques des offres
-  const pendingJobs = jobs.filter(
-    (job) => 
-      job?.is_verified === false || 
-      job?.is_verified === "Pending" ||
-      (!job?.is_verified && job?.is_verified !== true)
-  );
+  // Statistiques des offres - use global stats instead of filtered data
+  const pendingJobs = { length: globalStats.pending };
+  const acceptedJobs = { length: globalStats.accepted };
+  const declinedJobs = { length: globalStats.declined };
 
-  const acceptedJobs = jobs.filter(
-    (job) => job?.is_verified === true || job?.is_verified === "Accepted"
-  );
-
-  const declinedJobs = jobs.filter(
-    (job) => job?.is_verified === "Declined"
-  );
-
-  // Données filtrées selon l'onglet actif
+  // Données filtrées selon l'onglet actif - now just returns jobs since filtering is server-side
   const getFilteredData = () => {
-    switch (activeTab) {
-      case "pending":
-        return pendingJobs;
-      case "accepted":
-        return acceptedJobs;
-      case "declined":
-        return declinedJobs;
-      default:
-        return jobs;
-    }
+    return jobs;
   };
 
-  // Calcul du taux d'acceptation
-  const acceptanceRate = jobs.length > 0 
-    ? Math.round((acceptedJobs.length / jobs.length) * 100)
+  // Calcul du taux d'acceptation - based on global stats
+  const acceptanceRate = globalStats.total > 0 
+    ? Math.round((globalStats.accepted / globalStats.total) * 100)
     : 0;
 
   // Offres récentes (dernières 7 jours)
@@ -209,6 +327,22 @@ export default function JobsPage() {
   const topSectors = Object.entries(sectorStats)
     .sort(([,a], [,b]) => b - a)
     .slice(0, 3);
+  
+  // Handle tab change - update status filter
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setCurrentPage(1); // Reset to first page
+    
+    // Map tab to status filter
+    const statusMap: Record<string, string> = {
+      'all': 'all',
+      'pending': 'Pending',
+      'accepted': 'Accepted',
+      'declined': 'Declined',
+    };
+    
+    setStatusFilter(statusMap[value] || 'all');
+  };
 
   if (loading) {
     return (
@@ -307,6 +441,26 @@ export default function JobsPage() {
         </div>
         
         <div className="flex items-center gap-2">
+          {/* Toggle vue cartes/tableau */}
+          <div className="flex items-center border rounded-md">
+            <Button
+              variant={viewMode === "table" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+              className="rounded-r-none"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "cards" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("cards")}
+              className="rounded-l-none"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+          
           <Button
             onClick={() => fetchData(true)}
             variant="outline"
@@ -336,11 +490,11 @@ export default function JobsPage() {
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{pendingJobs.length}</div>
+            <div className="text-2xl font-bold text-yellow-600">{globalStats.pending}</div>
             <p className="text-xs text-muted-foreground">
               Offres à valider
             </p>
-            {pendingJobs.length > 0 && (
+            {globalStats.pending > 0 && (
               <div className="absolute top-2 right-2">
                 <div className="h-2 w-2 bg-yellow-500 rounded-full animate-pulse"></div>
               </div>
@@ -354,7 +508,7 @@ export default function JobsPage() {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{acceptedJobs.length}</div>
+            <div className="text-2xl font-bold text-green-600">{globalStats.accepted}</div>
             <p className="text-xs text-muted-foreground">
               Offres publiées
             </p>
@@ -367,7 +521,7 @@ export default function JobsPage() {
             <XCircle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{declinedJobs.length}</div>
+            <div className="text-2xl font-bold text-red-600">{globalStats.declined}</div>
             <p className="text-xs text-muted-foreground">
               Offres rejetées
             </p>
@@ -382,7 +536,7 @@ export default function JobsPage() {
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{acceptanceRate}%</div>
             <p className="text-xs text-muted-foreground">
-              Sur {jobs.length} offres
+              Sur {globalStats.total} offres
             </p>
           </CardContent>
         </Card>
@@ -499,7 +653,7 @@ export default function JobsPage() {
       </div>
 
       {/* Alerte pour actions requises */}
-      {pendingJobs.length > 0 && (
+      {globalStats.pending > 0 && (
         <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-orange-50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -508,7 +662,7 @@ export default function JobsPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-yellow-900">
-                  {pendingJobs.length} offre{pendingJobs.length > 1 ? 's' : ''} en attente de validation
+                  {globalStats.pending} offre{globalStats.pending > 1 ? 's' : ''} en attente de validation
                 </h3>
                 <p className="text-sm text-yellow-700 mt-1">
                   Des entreprises attendent la validation de leurs offres d'emploi pour les publier.
@@ -543,30 +697,62 @@ export default function JobsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <div className="px-6 pt-2">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="all" className="flex items-center gap-2">
                   <TrendingUp className="h-3 w-3" />
-                  Toutes ({jobs.length})
+                  Toutes ({globalStats.total})
                 </TabsTrigger>
                 <TabsTrigger value="pending" className="flex items-center gap-2">
                   <Clock className="h-3 w-3" />
-                  En attente ({pendingJobs.length})
+                  En attente ({globalStats.pending})
                 </TabsTrigger>
                 <TabsTrigger value="accepted" className="flex items-center gap-2">
                   <CheckCircle className="h-3 w-3" />
-                  Acceptées ({acceptedJobs.length})
+                  Acceptées ({globalStats.accepted})
                 </TabsTrigger>
                 <TabsTrigger value="declined" className="flex items-center gap-2">
                   <XCircle className="h-3 w-3" />
-                  Refusées ({declinedJobs.length})
+                  Refusées ({globalStats.declined})
                 </TabsTrigger>
               </TabsList>
             </div>
             
             <TabsContent value={activeTab} className="mt-0">
-              <JobRequests data={getFilteredData()} />
+              <JobRequests 
+                data={getFilteredData()} 
+                onUpdate={(jobId, newStatus) => {
+                  if (jobId) {
+                    updateSingleJob(jobId, newStatus);
+                  } else {
+                    fetchData(false);
+                  }
+                }}
+                viewMode={viewMode}
+                // Pass filter and pagination props
+                searchValue={searchValue}
+                onSearchChange={setSearchValue}
+                statusFilter={statusFilter}
+                onStatusChange={(value) => {
+                  setStatusFilter(value);
+                  setCurrentPage(1);
+                }}
+                sectorFilter={sectorFilter}
+                onSectorChange={(value) => {
+                  setSectorFilter(value);
+                  setCurrentPage(1);
+                }}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                pageSize={pageSize}
+                onPageSizeChange={(value) => {
+                  setPageSize(value);
+                  setCurrentPage(1);
+                }}
+                totalItems={totalItems}
+                totalPages={totalPages}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>

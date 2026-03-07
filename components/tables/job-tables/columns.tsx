@@ -18,7 +18,7 @@ import {
 import moment from "moment";
 import "moment/locale/fr";
 
-export const columns: ColumnDef<Job>[] = [
+export const createColumns = (onUpdate?: (jobId?: number) => void): ColumnDef<Job>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -190,6 +190,9 @@ export const columns: ColumnDef<Job>[] = [
     id: "actions",
     header: "Actions",
     size: 80,
-    cell: ({ row }) => <CellAction data={row.original} />,
+    cell: ({ row }) => <CellAction data={row.original} onUpdate={onUpdate} />,
   },
 ];
+
+// Export default columns for backward compatibility
+export const columns = createColumns();
