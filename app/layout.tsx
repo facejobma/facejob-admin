@@ -22,6 +22,17 @@ const inter = localFont({
   display: 'swap',
 });
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
+
 export default async function RootLayout({
   children,
 }: {
