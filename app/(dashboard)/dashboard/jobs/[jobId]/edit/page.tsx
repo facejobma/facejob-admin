@@ -168,7 +168,7 @@ export default function JobEditPage() {
     
     const currentSkills = jobData?.required_skills || [];
     const newSkills = skillText.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    const uniqueSkills = [...new Set([...currentSkills, ...newSkills])];
+    const uniqueSkills = Array.from(new Set([...currentSkills, ...newSkills]));
     
     handleInputChange('required_skills', uniqueSkills);
   };
