@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import BreadCrumb from "@/components/breadcrumb";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useParams, useRouter } from "next/navigation";
@@ -18,11 +19,18 @@ import {
   Building2,
   MapPin,
   Calendar,
-  FileText
+  FileText,
+  Languages,
+  Wrench,
+  Info,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
+
+// Import RichTextEditor and MultiSelect dynamically
+const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), { ssr: false });
+const MultiSelect = dynamic(() => import("@/components/MultiSelect"), { ssr: false });
 
 interface JobFormData {
   id: number;
@@ -32,12 +40,15 @@ interface JobFormData {
   date_fin: string;
   company_name: string;
   sector_name: string;
-  location?: string;
-  contractType?: string;
-  // Required IDs for validation - peuvent être des strings depuis l'API
+  location: string;
+  contractType: string;
+  // Required IDs for validation
   sector_id: number | string;
   job_id: number | string;
   entreprise_id: number | string;
+  // Matching criteria fields (used in scoring)
+  required_languages: string[];
+  required_skills: string[];
 }
 
 export default function JobEditPage() {
@@ -48,6 +59,15 @@ export default function JobEditPage() {
   const { jobId } = useParams();
   const router = useRouter();
   const { toast } = useToast();
+
+  // Liste étendue des langues disponibles
+  const availableLanguages = [
+    'Arabe', 'Français', 'Anglais', 'Espagnol', 'Allemand', 'Italien', 
+    'Portugais', 'Russe', 'Chinois (Mandarin)', 'Japonais', 'Coréen', 
+    'Turc', 'Néerlandais', 'Polonais', 'Suédois', 'Norvégien', 'Danois', 
+    'Finnois', 'Grec', 'Hébreu', 'Hindi', 'Bengali', 'Ourdou', 'Persan', 
+    'Thaï', 'Vietnamien', 'Indonésien', 'Malais', 'Tagalog', 'Swahili'
+  ];
 
   const breadcrumbItems = [
     { title: "Offres d'emploi", link: "/dashboard/jobs" },
@@ -84,7 +104,26 @@ export default function JobEditPage() {
             job_id: data.job_id,
             entreprise_id: data.entreprise_id
           });
-          setJobData(data);
+          
+          // Normalize data to ensure proper types
+          const normalizedData = {
+            ...data,
+            location: data.location || '',
+            contractType: data.contractType || '',
+            required_languages: Array.isArray(data.required_languages) 
+              ? data.required_languages 
+              : (data.required_languages ? JSON.parse(data.required_languages) : []),
+            required_skills: Array.isArray(data.required_skills) 
+              ? data.required_skills 
+              : (data.required_skills ? JSON.parse(data.required_skills) : []),
+          };
+          
+          console.log("Normalized data:", {
+            required_languages: normalizedData.required_languages,
+            required_skills: normalizedData.required_skills,
+          });
+          
+          setJobData(normalizedData);
         } catch (error) {
           console.error("Error fetching job data:", error);
           const errorMessage = error instanceof Error ? error.message : "Erreur lors de la récupération des données.";
@@ -103,13 +142,41 @@ export default function JobEditPage() {
     }
   }, [jobId, toast]);
 
-  const handleInputChange = (field: keyof JobFormData, value: string) => {
+  const handleInputChange = (field: keyof JobFormData, value: string | number | string[]) => {
     if (jobData) {
       setJobData({
         ...jobData,
         [field]: value
       });
     }
+  };
+
+  // Fonction pour gérer les langues
+  const handleLanguagesChange = (selectedLanguages: string[]) => {
+    handleInputChange('required_languages', selectedLanguages);
+  };
+
+  // Fonction pour gérer les compétences - permettre les virgules dans le texte
+  const handleSkillsInputChange = (value: string) => {
+    // Ne pas split automatiquement, juste stocker la valeur
+    handleInputChange('required_skills', [value]);
+  };
+
+  // Fonction pour ajouter une compétence
+  const addSkill = (skillText: string) => {
+    if (!skillText.trim()) return;
+    
+    const currentSkills = jobData?.required_skills || [];
+    const newSkills = skillText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const uniqueSkills = [...new Set([...currentSkills, ...newSkills])];
+    
+    handleInputChange('required_skills', uniqueSkills);
+  };
+
+  // Fonction pour supprimer une compétence
+  const removeSkill = (skillToRemove: string) => {
+    const currentSkills = jobData?.required_skills || [];
+    handleInputChange('required_skills', currentSkills.filter(s => s !== skillToRemove));
   };
 
   const handleSave = async () => {
@@ -136,18 +203,21 @@ export default function JobEditPage() {
 
       console.log("Sending job update with data:", {
         titre: jobData.titre,
-        description: jobData.description,
+        titre_length: jobData.titre.length,
+        description_length: jobData.description.length,
         date_debut: jobData.date_debut,
         date_fin: jobData.date_fin,
         location: jobData.location,
         contractType: jobData.contractType,
-        sector_id: jobData.sector_id,
-        job_id: jobData.job_id,
-        entreprise_id: jobData.entreprise_id,
+        sector_id: Number(jobData.sector_id),
+        job_id: Number(jobData.job_id),
+        entreprise_id: Number(jobData.entreprise_id),
+        required_languages: jobData.required_languages || [],
+        required_skills: jobData.required_skills || [],
       });
 
-      // Essayer d'abord l'endpoint spécifique pour la mise à jour
-      let response = await fetch(
+      // Use the correct admin endpoint
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/update/${jobId}`,
         {
           method: "PUT",
@@ -166,35 +236,12 @@ export default function JobEditPage() {
             sector_id: Number(jobData.sector_id),
             job_id: Number(jobData.job_id),
             entreprise_id: Number(jobData.entreprise_id),
+            // Matching criteria (used in scoring algorithm)
+            required_languages: jobData.required_languages || [],
+            required_skills: jobData.required_skills || [],
           }),
         },
       );
-
-      // Si l'endpoint spécifique n'existe pas, essayer l'endpoint générique
-      if (!response.ok && response.status === 404) {
-        response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres/${jobId}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              titre: jobData.titre,
-              description: jobData.description,
-              date_debut: jobData.date_debut,
-              date_fin: jobData.date_fin,
-              location: jobData.location,
-              contractType: jobData.contractType,
-              // Include required IDs for validation - convertir en nombres
-              sector_id: Number(jobData.sector_id),
-              job_id: Number(jobData.job_id),
-              entreprise_id: Number(jobData.entreprise_id),
-            }),
-          },
-        );
-      }
 
       if (response.ok) {
         toast({
@@ -214,7 +261,21 @@ export default function JobEditPage() {
           });
         } else {
           const errorText = await response.text();
-          console.error("Server error:", errorText);
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { message: errorText };
+          }
+          console.error("Server error:", errorData);
+          console.error("Response status:", response.status);
+          console.error("Response headers:", Object.fromEntries(response.headers.entries()));
+          
+          toast({
+            title: "Erreur serveur",
+            variant: "destructive",
+            description: errorData.message || `Erreur ${response.status}: ${response.statusText}`,
+          });
           throw new Error(`Erreur ${response.status}: ${response.statusText}`);
         }
       }
@@ -345,13 +406,15 @@ export default function JobEditPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description du poste *</Label>
-                <Textarea
-                  id="description"
-                  value={jobData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                <RichTextEditor
+                  content={jobData.description}
+                  onChange={(value) => handleInputChange('description', value)}
                   placeholder="Décrivez le poste, les missions, les compétences requises..."
-                  className="min-h-[150px]"
+                  minHeight="300px"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Utilisez la barre d'outils pour formater le texte (gras, listes, titres, liens, etc.)
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -406,24 +469,135 @@ export default function JobEditPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="location">Localisation</Label>
+                  <Label htmlFor="location">Localisation *</Label>
                   <Input
                     id="location"
                     value={jobData.location || ''}
                     onChange={(e) => handleInputChange('location', e.target.value)}
-                    placeholder="Ex: Paris, France"
+                    placeholder="Ex: Casablanca, Maroc"
+                    required
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="contractType">Type de contrat</Label>
-                  <Input
+                  <select
                     id="contractType"
                     value={jobData.contractType || ''}
                     onChange={(e) => handleInputChange('contractType', e.target.value)}
-                    placeholder="Ex: CDI, CDD, Stage"
-                  />
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Sélectionner un type</option>
+                    <option value="CDI">CDI</option>
+                    <option value="CDD">CDD</option>
+                    <option value="Stage">Stage</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Alternance">Alternance</option>
+                  </select>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Critères de matching */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                Critères de matching
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Ces critères sont utilisés pour le score de matching candidat-offre
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Langues requises - MultiSelect */}
+              <div className="space-y-2">
+                <Label htmlFor="required_languages" className="flex items-center gap-2">
+                  <Languages className="h-4 w-4" />
+                  Langues requises (Poids: 10%)
+                </Label>
+                <MultiSelect
+                  options={availableLanguages}
+                  value={jobData.required_languages || []}
+                  onChange={handleLanguagesChange}
+                  placeholder="Sélectionner les langues requises..."
+                />
+                <p className="text-xs text-muted-foreground flex items-start gap-1">
+                  <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                  <span>Cliquez pour ouvrir la liste et sélectionner plusieurs langues</span>
+                </p>
+              </div>
+
+              {/* Compétences requises - Input avec bouton Ajouter */}
+              <div className="space-y-2">
+                <Label htmlFor="required_skills" className="flex items-center gap-2">
+                  <Wrench className="h-4 w-4" />
+                  Compétences requises (Poids: 15%)
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="required_skills"
+                    placeholder="Ex: React.js, Python, SQL (séparez par des virgules)"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const input = e.currentTarget;
+                        addSkill(input.value);
+                        input.value = '';
+                      }
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    onClick={(e) => {
+                      const input = document.getElementById('required_skills') as HTMLInputElement;
+                      if (input) {
+                        addSkill(input.value);
+                        input.value = '';
+                      }
+                    }}
+                    variant="outline"
+                  >
+                    Ajouter
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground flex items-start gap-1">
+                  <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                  <span>Tapez les compétences séparées par des virgules, puis cliquez sur "Ajouter" ou appuyez sur Entrée</span>
+                </p>
+                {jobData.required_skills && Array.isArray(jobData.required_skills) && jobData.required_skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {jobData.required_skills.map((skill, index) => (
+                      <div key={index} className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-md border border-green-200">
+                        <span className="text-sm">{skill}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSkill(skill)}
+                          className="ml-1 text-green-600 hover:text-red-600 transition-colors"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Info sur les autres critères */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Autres critères de matching automatiques
+                </h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• <strong>Secteur</strong> (30%) - Défini par l'entreprise</li>
+                  <li>• <strong>Titre du poste</strong> (20%) - Champ "Titre de l'offre"</li>
+                  <li>• <strong>Expérience</strong> (20%) - Basé sur le profil candidat</li>
+                  <li>• <strong>Localisation</strong> (3%) - Champ "Localisation"</li>
+                  <li>• <strong>Type de contrat</strong> (2%) - Champ "Type de contrat"</li>
+                </ul>
               </div>
             </CardContent>
           </Card>

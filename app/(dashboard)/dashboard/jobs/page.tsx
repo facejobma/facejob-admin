@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { JobRequests } from "@/components/tables/job-tables/requests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,12 +62,36 @@ export default function JobsPage() {
   });
   
   const { toast } = useToast();
+  const router = useRouter();
   const authToken = Cookies.get("authToken");
+
+  // Check authentication on mount
+  useEffect(() => {
+    if (!authToken) {
+      toast({
+        title: "Authentification requise",
+        description: "Veuillez vous connecter pour accéder à cette page.",
+        variant: "destructive",
+      });
+      router.push("/");
+    }
+  }, [authToken, router, toast]);
 
   // Minimum time between requests (5 seconds)
   const MIN_FETCH_INTERVAL = 5000;
 
   const fetchData = async (showRefreshToast = false) => {
+    // Check if token exists
+    if (!authToken) {
+      toast({
+        title: "Session expirée",
+        description: "Veuillez vous reconnecter.",
+        variant: "destructive",
+      });
+      router.push("/");
+      return;
+    }
+
     // Check if enough time has passed since last fetch
     const now = Date.now();
     if (now - lastFetchTime < MIN_FETCH_INTERVAL && showRefreshToast) {
@@ -112,6 +137,23 @@ export default function JobsPage() {
           },
         },
       );
+
+      // Handle 401 Unauthorized - redirect to login
+      if (response.status === 401) {
+        // Clear invalid tokens
+        Cookies.remove("authToken");
+        localStorage.removeItem("authToken");
+        sessionStorage.removeItem("authToken");
+        
+        toast({
+          title: "Session expirée",
+          description: "Votre session a expiré. Veuillez vous reconnecter.",
+          variant: "destructive",
+        });
+        
+        router.push("/");
+        return;
+      }
 
       if (response.status === 429) {
         // Rate limit exceeded - wait and retry
