@@ -27,6 +27,8 @@ import {
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/use-toast";
 import moment from "moment";
+import languagesData from "@/data/languages.json";
+import skillsData from "@/data/skills.json";
 
 // Import RichTextEditor and MultiSelect dynamically
 const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), { ssr: false });
@@ -60,14 +62,17 @@ export default function JobEditPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Liste étendue des langues disponibles
-  const availableLanguages = [
-    'Arabe', 'Français', 'Anglais', 'Espagnol', 'Allemand', 'Italien', 
-    'Portugais', 'Russe', 'Chinois (Mandarin)', 'Japonais', 'Coréen', 
-    'Turc', 'Néerlandais', 'Polonais', 'Suédois', 'Norvégien', 'Danois', 
-    'Finnois', 'Grec', 'Hébreu', 'Hindi', 'Bengali', 'Ourdou', 'Persan', 
-    'Thaï', 'Vietnamien', 'Indonésien', 'Malais', 'Tagalog', 'Swahili'
-  ];
+  // Liste des langues disponibles depuis le fichier JSON local
+  const availableLanguages = languagesData.languages;
+
+  // Liste des compétences disponibles depuis le fichier JSON local
+  const availableSkills = Array.from(new Set([
+    ...(skillsData.technical_skills || []),
+    ...(skillsData.soft_skills || []),
+    ...(skillsData.business_skills || []),
+    ...(skillsData.language_skills || []),
+    ...(skillsData.industry_specific || []),
+  ]));
 
   const breadcrumbItems = [
     { title: "Offres d'emploi", link: "/dashboard/jobs" },
@@ -538,6 +543,7 @@ export default function JobEditPage() {
                 <div className="flex gap-2">
                   <Input
                     id="required_skills"
+                    list="skills-list"
                     placeholder="Ex: React.js, Python, SQL (séparez par des virgules)"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -549,6 +555,11 @@ export default function JobEditPage() {
                     }}
                     className="flex-1"
                   />
+                  <datalist id="skills-list">
+                    {availableSkills.map((skill) => (
+                      <option key={skill} value={skill} />
+                    ))}
+                  </datalist>
                   <Button
                     type="button"
                     onClick={(e) => {
