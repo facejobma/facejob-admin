@@ -3,17 +3,55 @@ import { CalendarDateRangePicker } from "@/components/date-range-picker";
 import { RecentSales } from "@/components/recent-sales";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Statistiques } from "@/types";
 import { SimpleBarChart } from "@/components/simple-bar-chart";
+import { CandidateAccountsChart } from "@/components/candidate-accounts-chart";
 
 import * as React from "react";
 import { DateRange } from "react-day-picker";
-import { addYears } from "date-fns";
+import { addDays, addMonths, addYears } from "date-fns";
 import Cookies from "js-cookie";
 import { Building2, Users, Briefcase, FileText, TrendingUp } from "lucide-react";
+
+type DurationPreset = "7d" | "30d" | "3m" | "6m" | "1y" | "custom";
+
+const durationOptions: { label: string; value: DurationPreset }[] = [
+  { label: "7 derniers jours", value: "7d" },
+  { label: "30 derniers jours", value: "30d" },
+  { label: "3 derniers mois", value: "3m" },
+  { label: "6 derniers mois", value: "6m" },
+  { label: "12 derniers mois", value: "1y" },
+  { label: "Période personnalisée", value: "custom" },
+];
+
+function getDateRangeFromPreset(preset: DurationPreset): DateRange {
+  const today = new Date();
+
+  switch (preset) {
+    case "7d":
+      return { from: addDays(today, -7), to: today };
+    case "30d":
+      return { from: addDays(today, -30), to: today };
+    case "3m":
+      return { from: addMonths(today, -3), to: today };
+    case "6m":
+      return { from: addMonths(today, -6), to: today };
+    case "1y":
+    case "custom":
+    default:
+      return { from: addYears(today, -1), to: today };
+  }
+}
 
 function OverViewTab() {
   const [stats, setStats] = useState<Statistiques>({
@@ -32,9 +70,43 @@ function OverViewTab() {
     from: addYears(new Date(), -1),
     to: new Date(),
   });
+  const [durationPreset, setDurationPreset] = useState<DurationPreset>("1y");
+  const [candidateChartDate, setCandidateChartDate] = React.useState<DateRange | undefined>({
+    from: addYears(new Date(), -1),
+    to: new Date(),
+  });
+  const [candidateChartPreset, setCandidateChartPreset] = useState<DurationPreset>("1y");
+  const [candidateChartStats, setCandidateChartStats] = useState<Statistiques["candidates"]>([]);
+  const [candidateChartLoading, setCandidateChartLoading] = useState(true);
   const { toast } = useToast();
 
   const authToken = Cookies.get("authToken");
+
+  const handleDurationChange = (value: DurationPreset) => {
+    setDurationPreset(value);
+
+    if (value !== "custom") {
+      setDate(getDateRangeFromPreset(value));
+    }
+  };
+
+  const handleDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
+    setDurationPreset("custom");
+    setDate(value);
+  };
+
+  const handleCandidateChartDurationChange = (value: DurationPreset) => {
+    setCandidateChartPreset(value);
+
+    if (value !== "custom") {
+      setCandidateChartDate(getDateRangeFromPreset(value));
+    }
+  };
+
+  const handleCandidateChartDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
+    setCandidateChartPreset("custom");
+    setCandidateChartDate(value);
+  };
 
   useEffect(() => {
     async function getStats() {
@@ -127,6 +199,64 @@ function OverViewTab() {
     getStats();
   }, [date?.from, date?.to, toast, authToken]);
 
+  useEffect(() => {
+    async function getCandidateChartStats() {
+      if (!authToken) {
+        setCandidateChartLoading(false);
+        return;
+      }
+
+      try {
+        setCandidateChartLoading(true);
+
+        if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
+          throw new Error("URL de l'API non configurée");
+        }
+
+        const params = new URLSearchParams();
+
+        if (candidateChartDate?.from) {
+          params.set("from", candidateChartDate.from.toISOString());
+        }
+
+        if (candidateChartDate?.to) {
+          params.set("to", candidateChartDate.to.toISOString());
+        }
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/statics?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        setCandidateChartStats(Array.isArray(result.candidates) ? result.candidates : []);
+      } catch (error) {
+        console.error("Error fetching candidate chart stats:", error);
+        setCandidateChartStats([]);
+
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: "Erreur lors du chargement du graphe des candidats.",
+        });
+      } finally {
+        setCandidateChartLoading(false);
+      }
+    }
+
+    getCandidateChartStats();
+  }, [candidateChartDate?.from, candidateChartDate?.to, authToken, toast]);
+
   const statsCards = [
     {
       title: "Total des secteurs",
@@ -178,8 +308,20 @@ function OverViewTab() {
               Bienvenue dans votre interface d'administration FaceJob
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <CalendarDateRangePicker date={date} setDate={setDate} />
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Select value={durationPreset} onValueChange={handleDurationChange}>
+              <SelectTrigger className="w-full sm:w-[210px]">
+                <SelectValue placeholder="Choisir une durée" />
+              </SelectTrigger>
+              <SelectContent>
+                {durationOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <CalendarDateRangePicker date={date} setDate={handleDateChange} />
           </div>
         </div>
 
@@ -213,6 +355,54 @@ function OverViewTab() {
                 );
               })}
             </div>
+
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader className="gap-4">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Évolution des créations de comptes candidats
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Nombre de nouveaux comptes candidats sur la période sélectionnée
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Select
+                      value={candidateChartPreset}
+                      onValueChange={handleCandidateChartDurationChange}
+                    >
+                      <SelectTrigger className="w-full sm:w-[210px]">
+                        <SelectValue placeholder="Choisir une durée" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {durationOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <CalendarDateRangePicker
+                      date={candidateChartDate}
+                      setDate={handleCandidateChartDateChange}
+                    />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {candidateChartLoading ? (
+                  <div className="flex h-[320px] items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <div className="text-gray-500 dark:text-gray-400">Chargement des données...</div>
+                    </div>
+                  </div>
+                ) : (
+                  <CandidateAccountsChart stats={candidateChartStats} />
+                )}
+              </CardContent>
+            </Card>
 
             {/* Charts Section */}
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-7">
