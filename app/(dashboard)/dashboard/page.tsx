@@ -16,6 +16,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { Statistiques } from "@/types";
 import { SimpleBarChart } from "@/components/simple-bar-chart";
 import { CandidateAccountsChart } from "@/components/candidate-accounts-chart";
+import { VideoCvUploadsChart } from "@/components/video-cv-uploads-chart";
+import { CandidateSectorsChart } from "@/components/candidate-sectors-chart";
 
 import * as React from "react";
 import { DateRange } from "react-day-picker";
@@ -24,6 +26,7 @@ import Cookies from "js-cookie";
 import { Building2, Users, Briefcase, FileText, TrendingUp } from "lucide-react";
 
 type DurationPreset = "7d" | "30d" | "3m" | "6m" | "1y" | "custom";
+type CandidateAccountStatus = "all" | "active" | "inactive";
 
 const durationOptions: { label: string; value: DurationPreset }[] = [
   { label: "7 derniers jours", value: "7d" },
@@ -32,6 +35,12 @@ const durationOptions: { label: string; value: DurationPreset }[] = [
   { label: "6 derniers mois", value: "6m" },
   { label: "12 derniers mois", value: "1y" },
   { label: "Période personnalisée", value: "custom" },
+];
+
+const candidateStatusOptions: { label: string; value: CandidateAccountStatus }[] = [
+  { label: "Tous les statuts", value: "all" },
+  { label: "Actifs", value: "active" },
+  { label: "Inactifs", value: "inactive" },
 ];
 
 function getDateRangeFromPreset(preset: DurationPreset): DateRange {
@@ -62,6 +71,8 @@ function OverViewTab() {
     entreprises_count: 0,
     sales: [],
     candidates: [],
+    video_cvs: [],
+    candidate_sectors: [],
     entreprises: [],
     last_n_sales: []
   });
@@ -76,8 +87,16 @@ function OverViewTab() {
     to: new Date(),
   });
   const [candidateChartPreset, setCandidateChartPreset] = useState<DurationPreset>("1y");
+  const [candidateChartStatus, setCandidateChartStatus] = useState<CandidateAccountStatus>("all");
   const [candidateChartStats, setCandidateChartStats] = useState<Statistiques["candidates"]>([]);
   const [candidateChartLoading, setCandidateChartLoading] = useState(true);
+  const [videoCvChartDate, setVideoCvChartDate] = React.useState<DateRange | undefined>({
+    from: addYears(new Date(), -1),
+    to: new Date(),
+  });
+  const [videoCvChartPreset, setVideoCvChartPreset] = useState<DurationPreset>("1y");
+  const [videoCvChartStats, setVideoCvChartStats] = useState<Statistiques["video_cvs"]>([]);
+  const [videoCvChartLoading, setVideoCvChartLoading] = useState(true);
   const { toast } = useToast();
 
   const authToken = Cookies.get("authToken");
@@ -106,6 +125,19 @@ function OverViewTab() {
   const handleCandidateChartDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
     setCandidateChartPreset("custom");
     setCandidateChartDate(value);
+  };
+
+  const handleVideoCvChartDurationChange = (value: DurationPreset) => {
+    setVideoCvChartPreset(value);
+
+    if (value !== "custom") {
+      setVideoCvChartDate(getDateRangeFromPreset(value));
+    }
+  };
+
+  const handleVideoCvChartDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
+    setVideoCvChartPreset("custom");
+    setVideoCvChartDate(value);
   };
 
   useEffect(() => {
@@ -157,6 +189,8 @@ function OverViewTab() {
           entreprises_count: result.entreprises_count || 0,
           sales: Array.isArray(result.sales) ? result.sales : [],
           candidates: Array.isArray(result.candidates) ? result.candidates : [],
+          video_cvs: Array.isArray(result.video_cvs) ? result.video_cvs : [],
+          candidate_sectors: Array.isArray(result.candidate_sectors) ? result.candidate_sectors : [],
           entreprises: Array.isArray(result.entreprises) ? result.entreprises : [],
           last_n_sales: Array.isArray(result.last_n_sales) ? result.last_n_sales : []
         };
@@ -188,6 +222,8 @@ function OverViewTab() {
           entreprises_count: 0,
           sales: [],
           candidates: [],
+          video_cvs: [],
+          candidate_sectors: [],
           entreprises: [],
           last_n_sales: []
         });
@@ -223,6 +259,10 @@ function OverViewTab() {
           params.set("to", candidateChartDate.to.toISOString());
         }
 
+        if (candidateChartStatus !== "all") {
+          params.set("candidate_status", candidateChartStatus);
+        }
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/statics?${params.toString()}`,
           {
@@ -255,7 +295,65 @@ function OverViewTab() {
     }
 
     getCandidateChartStats();
-  }, [candidateChartDate?.from, candidateChartDate?.to, authToken, toast]);
+  }, [candidateChartDate?.from, candidateChartDate?.to, candidateChartStatus, authToken, toast]);
+
+  useEffect(() => {
+    async function getVideoCvChartStats() {
+      if (!authToken) {
+        setVideoCvChartLoading(false);
+        return;
+      }
+
+      try {
+        setVideoCvChartLoading(true);
+
+        if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
+          throw new Error("URL de l'API non configurÃ©e");
+        }
+
+        const params = new URLSearchParams();
+
+        if (videoCvChartDate?.from) {
+          params.set("from", videoCvChartDate.from.toISOString());
+        }
+
+        if (videoCvChartDate?.to) {
+          params.set("to", videoCvChartDate.to.toISOString());
+        }
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/statics?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        setVideoCvChartStats(Array.isArray(result.video_cvs) ? result.video_cvs : []);
+      } catch (error) {
+        console.error("Error fetching video CV chart stats:", error);
+        setVideoCvChartStats([]);
+
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: "Erreur lors du chargement du graphe des CV video.",
+        });
+      } finally {
+        setVideoCvChartLoading(false);
+      }
+    }
+
+    getVideoCvChartStats();
+  }, [videoCvChartDate?.from, videoCvChartDate?.to, authToken, toast]);
 
   const statsCards = [
     {
@@ -305,7 +403,7 @@ function OverViewTab() {
               Tableau de bord
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              Bienvenue dans votre interface d'administration FaceJob
+              Bienvenue dans votre interface d&apos;administration FaceJob
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -361,6 +459,77 @@ function OverViewTab() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Evolution des CV video uploades
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Nombre de CV video ajoutes sur la periode selectionnee
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Select
+                      value={videoCvChartPreset}
+                      onValueChange={handleVideoCvChartDurationChange}
+                    >
+                      <SelectTrigger className="w-full sm:w-[210px]">
+                        <SelectValue placeholder="Choisir une durÃ©e" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {durationOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <CalendarDateRangePicker
+                      date={videoCvChartDate}
+                      setDate={handleVideoCvChartDateChange}
+                    />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {videoCvChartLoading ? (
+                  <div className="flex h-[320px] items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <div className="text-gray-500 dark:text-gray-400">Chargement des donnÃ©es...</div>
+                    </div>
+                  </div>
+                ) : (
+                  <VideoCvUploadsChart stats={videoCvChartStats} />
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Top secteurs par nombre de candidats
+                </CardTitle>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Les secteurs les plus representes dans les profils candidats
+                </p>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="flex h-[360px] items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <div className="text-gray-500 dark:text-gray-400">Chargement des donnees...</div>
+                    </div>
+                  </div>
+                ) : (
+                  <CandidateSectorsChart stats={stats.candidate_sectors} />
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <CardHeader className="gap-4">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       Évolution des créations de comptes candidats
                     </CardTitle>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -368,6 +537,21 @@ function OverViewTab() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <Select
+                      value={candidateChartStatus}
+                      onValueChange={(value) => setCandidateChartStatus(value as CandidateAccountStatus)}
+                    >
+                      <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Statut du compte" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {candidateStatusOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Select
                       value={candidateChartPreset}
                       onValueChange={handleCandidateChartDurationChange}
@@ -476,7 +660,7 @@ function OverViewTab() {
                     Nouvelles entreprises
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Évolution des inscriptions d'entreprises
+                    Évolution des inscriptions d&apos;entreprises
                   </p>
                 </CardHeader>
                 <CardContent className="pl-2">
@@ -490,7 +674,7 @@ function OverViewTab() {
                     <div className="flex items-center justify-center h-[350px] text-gray-500 dark:text-gray-400">
                       <div className="text-center space-y-2">
                         <div className="text-lg">🏢</div>
-                        <div>Aucune donnée d'entreprise disponible</div>
+                        <div>Aucune donnée d&apos;entreprise disponible</div>
                         <div className="text-sm">Les statistiques apparaîtront ici</div>
                       </div>
                     </div>

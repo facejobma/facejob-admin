@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import BreadCrumb from "@/components/breadcrumb";
@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { User as UserType } from "@/types";
+import { CVRequests } from "@/components/tables/cv-tables/requests";
+import { CV } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
 
@@ -32,9 +34,59 @@ export default function CandidateDetailPage() {
   const { toast } = useToast();
   const [candidate, setCandidate] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [candidateVideos, setCandidateVideos] = useState<CV[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+  const [videosRefreshing, setVideosRefreshing] = useState(false);
+  const [videosViewMode, setVideosViewMode] = useState<"table" | "cards">("cards");
   
   const candidateId = params.id as string;
   const authToken = Cookies.get("authToken");
+
+  const fetchCandidateVideos = useCallback(async (isRefresh = false) => {
+    if (!authToken || !candidateId) {
+      setVideosLoading(false);
+      return;
+    }
+
+    try {
+      if (isRefresh) {
+        setVideosRefreshing(true);
+      } else {
+        setVideosLoading(true);
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate/${candidateId}/videos`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      setCandidateVideos(Array.isArray(result.data) ? result.data : []);
+    } catch {
+      setCandidateVideos([]);
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Erreur lors du chargement des CV vidéo du candidat.",
+      });
+    } finally {
+      if (isRefresh) {
+        setVideosRefreshing(false);
+      } else {
+        setVideosLoading(false);
+      }
+    }
+  }, [authToken, candidateId, toast]);
 
   const breadcrumbItems = [
     { title: "Candidats", link: "/dashboard/candidate" },
@@ -107,6 +159,10 @@ export default function CandidateDetailPage() {
     }
   }, [candidateId, authToken, toast, router]);
 
+  useEffect(() => {
+    fetchCandidateVideos();
+  }, [fetchCandidateVideos]);
+
   const handleBack = () => {
     router.push("/dashboard/candidate");
   };
@@ -138,7 +194,7 @@ export default function CandidateDetailPage() {
             <User className="h-12 w-12 mx-auto text-muted-foreground" />
             <div>
               <h3 className="text-lg font-medium">Candidat non trouvé</h3>
-              <p className="text-muted-foreground">Le candidat demandé n'existe pas ou a été supprimé.</p>
+              <p className="text-muted-foreground">Le candidat demandé n&apos;existe pas ou a été supprimé.</p>
             </div>
             <Button onClick={handleBack} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -277,7 +333,7 @@ export default function CandidateDetailPage() {
                 <div className="flex items-center space-x-3">
                   <Briefcase className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Secteur d'activité</p>
+                    <p className="text-sm font-medium">Secteur d&apos;activité</p>
                     <p className="text-sm text-muted-foreground">
                       {sectorName || 'Non renseigné'}
                     </p>
@@ -287,7 +343,7 @@ export default function CandidateDetailPage() {
                 <div className="flex items-center space-x-3">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Date d'inscription</p>
+                    <p className="text-sm font-medium">Date d&apos;inscription</p>
                     <p className="text-sm text-muted-foreground">
                       {moment(candidate.created_at).format("DD MMMM YYYY à HH:mm")}
                     </p>
@@ -324,6 +380,18 @@ export default function CandidateDetailPage() {
             </CardContent>
           </Card>
         )}
+
+        <div className="space-y-4">
+          <CVRequests
+            data={candidateVideos}
+            onRefresh={() => fetchCandidateVideos(true)}
+            isLoading={videosLoading}
+            isRefreshing={videosRefreshing}
+            viewMode={videosViewMode}
+            onViewModeChange={setVideosViewMode}
+            title={`CV vidéos du candidat (${candidateVideos.length})`}
+          />
+        </div>
       </div>
     </div>
   );

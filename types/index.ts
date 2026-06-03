@@ -32,6 +32,12 @@ export type StatsItem = {
   year: number;
 }
 
+export type SectorCountItem = {
+  id: number;
+  name: string;
+  total: number;
+}
+
 
 
 
@@ -75,6 +81,8 @@ export interface Statistiques {
   postules_count: number;
   offres_count: number;
   candidates: StatsItem[];
+  video_cvs: StatsItem[];
+  candidate_sectors: SectorCountItem[];
   candidates_count: number;
   entreprises: StatsItem[];
   entreprises_count: number;

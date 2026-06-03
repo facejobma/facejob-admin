@@ -6,7 +6,10 @@ import {
   useReactTable
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
+import { AlertModal } from "@/components/modal/alert-modal";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -15,8 +18,9 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
 import { Input } from "./input";
-import { Search, Filter } from "lucide-react";
+import { CheckCircle, Filter, Loader2, Search, Trash2, XCircle } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -36,6 +40,9 @@ export function CandidateDataTable<TData, TValue>({
   const [searchValue, setSearchValue] = useState<string>("");
   const [sectorFilter, setSectorFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { toast } = useToast();
 
   const table = useReactTable<TData>({
     data,
@@ -108,6 +115,93 @@ export function CandidateDataTable<TData, TValue>({
   };
 
   const filteredRows = table.getFilteredRowModel().rows;
+  const selectedRows = table.getSelectedRowModel().rows;
+  const selectedCandidates = selectedRows.map((row) => row.original as any);
+  const selectedCount = selectedCandidates.length;
+
+  const runBulkAction = async (action: "activate" | "deactivate" | "delete") => {
+    if (selectedCount === 0) return;
+
+    const authToken = Cookies.get("authToken");
+
+    if (!authToken) {
+      toast({
+        title: "Erreur d'authentification",
+        variant: "destructive",
+        description: "Token d'authentification manquant. Veuillez vous reconnecter.",
+      });
+      return;
+    }
+
+    if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "URL de l'API non configurée.",
+      });
+      return;
+    }
+
+    try {
+      setBulkLoading(true);
+
+      const requests = selectedCandidates.map((candidate) => {
+        const endpoint =
+          action === "delete"
+            ? `/api/v1/admin/candidate/delete/${candidate.id}`
+            : `/api/v1/admin/candidate/${candidate.id}/${action}`;
+
+        return fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
+          method: action === "delete" ? "DELETE" : "PATCH",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+      });
+
+      const results = await Promise.allSettled(requests);
+      const successCount = results.filter(
+        (result) => result.status === "fulfilled" && result.value.ok,
+      ).length;
+      const failedCount = selectedCount - successCount;
+
+      if (successCount > 0) {
+        const actionLabel =
+          action === "activate"
+            ? "activé"
+            : action === "deactivate"
+              ? "désactivé"
+              : "supprimé";
+
+        toast({
+          title: failedCount > 0 ? "Action partiellement terminée" : "Succès",
+          description: `${successCount} candidat(s) ${actionLabel}(s).${
+            failedCount > 0 ? ` ${failedCount} échec(s).` : ""
+          }`,
+          variant: failedCount > 0 ? "destructive" : "default",
+        });
+
+        table.resetRowSelection();
+        onRefresh?.();
+      } else {
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: "Aucune action n'a pu être effectuée.",
+        });
+      }
+    } catch {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Une erreur est survenue pendant l'action groupée.",
+      });
+    } finally {
+      setBulkLoading(false);
+      setDeleteModalOpen(false);
+    }
+  };
 
   const sectors = Array.from(new Set(
     data
@@ -123,6 +217,13 @@ export function CandidateDataTable<TData, TValue>({
 
   return (
     <div className="w-full space-y-4 overflow-x-hidden">
+      <AlertModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => runBulkAction("delete")}
+        loading={bulkLoading}
+      />
+
       {/* Search and Filter */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-sm">
@@ -167,6 +268,51 @@ export function CandidateDataTable<TData, TValue>({
           </select>
         </div>
       </div>
+
+      {selectedCount > 0 && (
+        <div className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            {selectedCount} candidat(s) sélectionné(s)
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => runBulkAction("activate")}
+              disabled={bulkLoading || isRefreshing}
+            >
+              {bulkLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+              )}
+              Activer
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => runBulkAction("deactivate")}
+              disabled={bulkLoading || isRefreshing}
+            >
+              {bulkLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <XCircle className="mr-2 h-4 w-4 text-red-600" />
+              )}
+              Désactiver
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setDeleteModalOpen(true)}
+              disabled={bulkLoading || isRefreshing}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Supprimer
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="w-full border rounded-lg overflow-hidden relative min-h-[400px]">

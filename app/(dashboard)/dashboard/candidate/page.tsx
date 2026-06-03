@@ -1,19 +1,54 @@
 "use client";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
 import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, UserCheck, UserX, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, TrendingUp, UserCheck, Users, UserX } from "lucide-react";
 
 import Cookies from "js-cookie";
 
 const breadcrumbItems = [{ title: "Candidats", link: "/dashboard/candidate" }];
 
+type PaginationMeta = {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  from: number | null;
+  to: number | null;
+  has_more_pages: boolean;
+};
+
+type CandidateStats = {
+  total: number;
+  active: number;
+  inactive: number;
+  recent_30_days: number;
+};
+
 export default function CandidatesPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    current_page: 1,
+    per_page: 15,
+    total: 0,
+    last_page: 1,
+    from: null,
+    to: null,
+    has_more_pages: false,
+  });
+  const [stats, setStats] = useState<CandidateStats>({
+    total: 0,
+    active: 0,
+    inactive: 0,
+    recent_30_days: 0,
+  });
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
 
@@ -40,7 +75,11 @@ export default function CandidatesPage() {
         throw new Error("URL de l'API non configurée");
       }
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidates`;
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        per_page: pageSize.toString(),
+      });
+      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidates?${params.toString()}`;
 
       const response = await fetch(apiUrl, {
         method: "GET",
@@ -61,8 +100,28 @@ export default function CandidatesPage() {
       // Vérifier la structure de la réponse
       if (result && Array.isArray(result.data)) {
         setUsers(result.data);
+        if (result.pagination) {
+          setPagination(result.pagination);
+        }
+        if (result.stats) {
+          setStats({
+            total: Number(result.stats.total || 0),
+            active: Number(result.stats.active || 0),
+            inactive: Number(result.stats.inactive || 0),
+            recent_30_days: Number(result.stats.recent_30_days || 0),
+          });
+        }
       } else if (Array.isArray(result)) {
         setUsers(result);
+        setPagination({
+          current_page: 1,
+          per_page: result.length,
+          total: result.length,
+          last_page: 1,
+          from: result.length > 0 ? 1 : null,
+          to: result.length > 0 ? result.length : null,
+          has_more_pages: false,
+        });
       } else {
         console.warn("Structure de réponse inattendue:", result);
         setUsers([]);
@@ -97,18 +156,20 @@ export default function CandidatesPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [currentPage, pageSize]);
 
   // Calculer les statistiques
-  const totalCandidates = users.length;
-  const activeCandidates = users.filter((user: any) => user.email_verified_at).length;
-  const inactiveCandidates = totalCandidates - activeCandidates;
-  const recentCandidates = users.filter((user: any) => {
-    const createdAt = new Date(user.created_at);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return createdAt > thirtyDaysAgo;
-  }).length;
+  const totalCandidates = stats.total;
+  const activeCandidates = stats.active;
+  const inactiveCandidates = stats.inactive;
+  const recentCandidates = stats.recent_30_days;
+  const canGoPrevious = pagination.current_page > 1;
+  const canGoNext = pagination.current_page < pagination.last_page;
+
+  const handlePageSizeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(event.target.value));
+    setCurrentPage(1);
+  };
 
   const statsCards = [
     {
@@ -224,7 +285,7 @@ export default function CandidatesPage() {
                       Aucun candidat trouvé
                     </h3>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
-                      Il n'y a actuellement aucun candidat dans la base de données.
+                      Il n&apos;y a actuellement aucun candidat dans la base de données.
                     </p>
                   </div>
                 </div>
@@ -232,6 +293,87 @@ export default function CandidatesPage() {
             ) : (
               <div className="w-full overflow-x-hidden">
                 <UserClient data={users} onRefresh={() => fetchData(true)} isRefreshing={refreshing} />
+              </div>
+            )}
+            {pagination.total > 0 && (
+              <div className="mt-6 flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {pagination.from ?? 0}-{pagination.to ?? 0}
+                  </span>{" "}
+                  sur{" "}
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {pagination.total.toLocaleString()}
+                  </span>{" "}
+                  candidats
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                    Par page
+                    <select
+                      value={pageSize}
+                      onChange={handlePageSizeChange}
+                      disabled={refreshing}
+                      className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+                    >
+                      <option value={15}>15</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </label>
+
+                  <div className="flex items-center gap-2">
+                    <div className="min-w-[112px] text-center text-sm text-muted-foreground">
+                      Page{" "}
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {pagination.current_page}
+                      </span>{" "}
+                      / {pagination.last_page || 1}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={!canGoPrevious || refreshing}
+                      title="Première page"
+                      className="h-9 w-9"
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                      disabled={!canGoPrevious || refreshing}
+                      title="Page précédente"
+                      className="h-9 w-9"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentPage((page) => Math.min(page + 1, pagination.last_page))}
+                      disabled={!canGoNext || refreshing}
+                      title="Page suivante"
+                      className="h-9 w-9"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setCurrentPage(pagination.last_page)}
+                      disabled={!canGoNext || refreshing}
+                      title="Dernière page"
+                      className="h-9 w-9"
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>

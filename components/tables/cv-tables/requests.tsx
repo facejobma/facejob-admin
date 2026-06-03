@@ -16,6 +16,7 @@ interface CVProps {
   isRefreshing?: boolean;
   viewMode?: "table" | "cards";
   onViewModeChange?: (mode: "table" | "cards") => void;
+  title?: string;
 }
 
 export const CVRequests: FC<CVProps> = ({ 
@@ -24,13 +25,14 @@ export const CVRequests: FC<CVProps> = ({
   isLoading,
   isRefreshing,
   viewMode = "table",
-  onViewModeChange
+  onViewModeChange,
+  title
 }) => {
   return (
     <>
       <div className="flex items-start justify-between">
         <Heading
-          title={`Demandes (${data.length})`}
+          title={title ?? `Demandes (${data.length})`}
           description="Valider les CV Vidéos"
         />
         <div className="flex gap-2">
