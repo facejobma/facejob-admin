@@ -27,6 +27,8 @@ interface DataTableProps<TData, TValue> {
   onRefresh?: () => void;
   isLoading?: boolean;
   isRefreshing?: boolean;
+  renderBulkActions?: (selectedRows: TData[], resetSelection: () => void) => React.ReactNode;
+  disablePagination?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -36,17 +38,17 @@ export function DataTable<TData, TValue>({
   onRefresh,
   isLoading,
   isRefreshing,
+  renderBulkActions,
+  disablePagination = false,
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>(""); // Default to show all
   const [sectorValue, setSectorValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(20);
+  const [pageSize] = useState<number>(20);
   const [sectors, setSectors] = useState<Sector[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setLoading(true);
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`,
       {
         headers:{
@@ -59,11 +61,8 @@ export function DataTable<TData, TValue>({
         // Handle both array and object responses
         const sectorsData = Array.isArray(result) ? result : (result.data || []);
         setSectors(sectorsData);
-        setLoading(false);
       })
-      .catch((error) => {
-        setLoading(false);
-        console.error("Error fetching secteur options:", error);
+      .catch(() => {
         setSectors([]); // Set empty array on error
       });
   }, []);
@@ -123,6 +122,10 @@ export function DataTable<TData, TValue>({
 
   const startIndex = currentPage * pageSize;
   const endIndex = Math.min(startIndex + pageSize, data.length);
+  const selectedRows = table.getFilteredSelectedRowModel().rows.map((row) => row.original);
+  const visibleRows = disablePagination
+    ? table.getFilteredRowModel().rows
+    : table.getFilteredRowModel().rows.slice(startIndex, endIndex);
 
   return (
     <div className="space-y-4">
@@ -159,6 +162,11 @@ export function DataTable<TData, TValue>({
           ))}
         </select>
       </div>
+      {renderBulkActions && selectedRows.length > 0 && (
+        <div className="rounded-lg border bg-muted/30 p-3">
+          {renderBulkActions(selectedRows, () => table.resetRowSelection())}
+        </div>
+      )}
       <div className="rounded-xl border border-gray-200 dark:border-gray-700 relative min-h-[400px] overflow-hidden shadow-sm bg-white dark:bg-gray-800">
         {isRefreshing && (
           <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center z-10 backdrop-blur-sm">
@@ -188,10 +196,7 @@ export function DataTable<TData, TValue>({
                 ))}
               </TableHeader>
               <TableBody>
-                {table
-                  .getFilteredRowModel()
-                  .rows.slice(startIndex, endIndex)
-                  .map((row, index) => (
+                {visibleRows.map((row, index) => (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() ? "selected" : undefined}
@@ -211,13 +216,14 @@ export function DataTable<TData, TValue>({
                         </TableCell>
                       ))}
                     </TableRow>
-                  ))}
+                ))}
               </TableBody>
             </Table>
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
       </div>
+      {!disablePagination && (
       <div className="flex items-center justify-between space-x-2 py-4 px-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300">
           <span className="inline-flex items-center gap-2">
@@ -255,6 +261,7 @@ export function DataTable<TData, TValue>({
           </Button>
         </div>
       </div>
+      )}
     </div>
   );
 }

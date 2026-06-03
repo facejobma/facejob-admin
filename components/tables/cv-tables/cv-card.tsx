@@ -19,9 +19,10 @@ interface CVCardProps {
   onRefresh?: () => void;
   isLoading?: boolean;
   isRefreshing?: boolean;
+  disablePagination?: boolean;
 }
 
-export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshing }) => {
+export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshing, disablePagination = false }) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [sectorValue, setSectorValue] = useState<string>("");
@@ -47,8 +48,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
         const sectorsData = Array.isArray(result) ? result : result.data || [];
         setSectors(sectorsData);
       })
-      .catch((error) => {
-        console.error("Error fetching secteur options:", error);
+      .catch(() => {
         setSectors([]);
       });
   }, []);
@@ -64,7 +64,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
 
   const startIndex = currentPage * pageSize;
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
-  const paginatedData = filteredData.slice(startIndex, endIndex);
+  const paginatedData = disablePagination ? filteredData : filteredData.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
@@ -268,6 +268,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
             </div>
           )}
 
+          {!disablePagination && (
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="flex-1 text-sm text-muted-foreground">
               Affichage de {startIndex + 1} à {endIndex} sur{" "}
@@ -294,6 +295,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
               </Button>
             </div>
           </div>
+          )}
         </>
       )}
 

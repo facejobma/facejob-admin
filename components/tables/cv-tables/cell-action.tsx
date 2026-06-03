@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { AlertModal } from "@/components/modal/alert-modal";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -11,12 +13,12 @@ import {
   XSquare,
   // Edit,
   MoreHorizontal,
+  Trash,
   View,
 } from "lucide-react";
 
 import { useState } from "react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -29,21 +31,17 @@ interface CellActionProps {
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
-  console.log("data,", data.link);
-
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [comment, setComment] = useState("");
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
   const [showPreview, setShowPreview] = useState(false);
-  // const router = useRouter();
 
   const onDelete = async () => {
     try {
       setLoading(true);
-
-      const authToken = localStorage.getItem("authToken");
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/delete_cv/${data.id}`,
@@ -56,15 +54,28 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
       );
 
       if (response.ok) {
-        console.log("Candidate deleted successfully!");
+        toast({
+          title: "Succès",
+          description: "CV vidéo supprimé avec succès.",
+        });
+        setShowPreview(false);
+        onRefresh?.();
       } else {
-        console.error("Failed to delete candidate");
+        toast({
+          title: "Erreur",
+          variant: "destructive",
+          description: "Impossible de supprimer le CV vidéo.",
+        });
       }
-    } catch (error) {
-      console.error("An error occurred while deleting the candidate:", error);
+    } catch {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Une erreur est survenue lors de la suppression.",
+      });
     } finally {
       setLoading(false);
-      setOpen(false);
+      setDeleteOpen(false);
     }
   };
 
@@ -137,12 +148,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
 
   return (
     <>
-      {/* <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
+      <AlertModal
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
         onConfirm={onDelete}
         loading={loading}
-      /> */}
+      />
       <Modal
         isOpen={showPreview}
         onClose={onClosePreview}
@@ -287,6 +298,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
           </DropdownMenuItem>
           <DropdownMenuItem onClick={onPreview}>
             <View className="mr-2 h-4 w-4" /> Preview
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setDeleteOpen(true)}
+            className="text-red-600 focus:text-red-600"
+          >
+            <Trash className="mr-2 h-4 w-4" /> Supprimer
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
