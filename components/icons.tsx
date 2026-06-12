@@ -16,6 +16,7 @@ import {
   Loader2,
   LogIn,
   LogOut,
+  Mail,
   Moon,
   MoreVertical,
   Pizza,
@@ -72,5 +73,6 @@ export const Icons = {
   check: Check,
   logout: LogOut,
   payments: DollarSign,
-  sales: HandCoins
+  sales: HandCoins,
+  mail: Mail
 };

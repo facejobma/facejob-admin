@@ -38,6 +38,12 @@ export const navItems: NavItem[] = [
     label: "candidateVideos"
   },
   {
+    title: "Relances Email",
+    href: "/dashboard/email-campaigns",
+    icon: "mail",
+    label: "emailCampaigns"
+  },
+  {
     title: "Ventes",
     href: "/dashboard/sales",
     icon: "sales",
