@@ -28,6 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Eye,
   Loader2,
   Plus,
   RefreshCw,
@@ -400,19 +401,28 @@ export default function EmailCampaignsPage() {
                       {formatDate(campaign.launched_at || campaign.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {campaign.failed_count > 0 ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => retryFailed(campaign.id)}
-                          disabled={isLoading}
-                        >
-                          Relancer
+                      <div className="flex justify-end gap-2">
+                        <Button asChild type="button" variant="outline" size="icon">
+                          <Link
+                            href={`/dashboard/email-campaigns/${campaign.id}`}
+                            aria-label="Voir les details de la relance"
+                            title="Voir les details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
                         </Button>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
+                        {campaign.failed_count > 0 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => retryFailed(campaign.id)}
+                            disabled={isLoading}
+                          >
+                            Relancer
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
