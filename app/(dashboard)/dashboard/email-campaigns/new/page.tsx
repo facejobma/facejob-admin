@@ -153,7 +153,7 @@ export default function NewEmailCampaignPage() {
   const launchCampaign = async () => {
     try {
       setIsSending(true);
-      await fetchJson("/email-campaigns", {
+      const data = await fetchJson("/email-campaigns", {
         method: "POST",
         body: JSON.stringify({
           name,
@@ -166,8 +166,12 @@ export default function NewEmailCampaignPage() {
       });
 
       toast({
-        title: "Campagne programmee",
-        description: "Les emails seront envoyes en arriere-plan par lots.",
+        title: isSingleCandidate ? "Email traite" : "Campagne programmee",
+        variant:
+          isSingleCandidate && data.campaign?.status !== "completed"
+            ? "destructive"
+            : "default",
+        description: data.message,
       });
 
       router.push("/dashboard/email-campaigns");
@@ -379,7 +383,7 @@ export default function NewEmailCampaignPage() {
                   ) : (
                     <Send className="h-4 w-4" />
                   )}
-                  Programmer
+                  {isSingleCandidate ? "Envoyer maintenant" : "Programmer"}
                 </Button>
               </div>
             </div>
