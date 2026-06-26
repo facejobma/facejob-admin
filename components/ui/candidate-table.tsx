@@ -28,6 +28,7 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
   onRefresh?: () => void;
   isRefreshing?: boolean;
+  onSearchChange?: (value: string) => void;
 }
 
 export function CandidateDataTable<TData, TValue>({
@@ -35,7 +36,8 @@ export function CandidateDataTable<TData, TValue>({
   data,
   searchKey,
   onRefresh,
-  isRefreshing
+  isRefreshing,
+  onSearchChange
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [sectorFilter, setSectorFilter] = useState<string>("");
@@ -102,9 +104,17 @@ export function CandidateDataTable<TData, TValue>({
     table.setGlobalFilter({
       sector: sectorFilter,
       status: statusFilter,
-      search: searchValue
+      search: onSearchChange ? "" : searchValue
     });
-  }, [sectorFilter, statusFilter, searchValue, table]);
+  }, [onSearchChange, sectorFilter, statusFilter, searchValue, table]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      onSearchChange?.(searchValue.trim());
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [onSearchChange, searchValue]);
 
   const handleSectorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSectorFilter(event.target.value);

@@ -31,7 +31,6 @@ const breadcrumbItems = [
 ];
 
 const recommendedTemplateByAudience: Record<string, string> = {
-  inactive_candidates: "activation_account",
   incomplete_profiles: "incomplete_profile",
   no_video_cv: "video_cv",
   single_candidate: "custom",
@@ -42,6 +41,9 @@ type Option = {
   label: string;
   subject?: string;
 };
+
+const disabledAudienceValues = new Set(["inactive_candidates"]);
+const disabledTemplateValues = new Set(["activation_account"]);
 
 export default function NewEmailCampaignPage() {
   const router = useRouter();
@@ -100,8 +102,16 @@ export default function NewEmailCampaignPage() {
       try {
         setIsLoading(true);
         const data = await fetchJson("/email-campaigns/options");
-        setAudiences(data.audiences || []);
-        setTemplates(data.templates || []);
+        setAudiences(
+          (data.audiences || []).filter(
+            (option: Option) => !disabledAudienceValues.has(option.value),
+          ),
+        );
+        setTemplates(
+          (data.templates || []).filter(
+            (option: Option) => !disabledTemplateValues.has(option.value),
+          ),
+        );
       } catch (error) {
         toast({
           title: "Whoops!",

@@ -45,6 +45,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "date-fns": "^4.1.0",
+    "deep-email-validator": "^0.1.27",
     "eslint": "8.57.0",
     "eslint-config-next": "^15.4.2",
     "js-cookie": "^3.0.7",

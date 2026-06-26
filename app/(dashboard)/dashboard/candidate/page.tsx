@@ -1,11 +1,11 @@
 "use client";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import BreadCrumb from "@/components/breadcrumb";
 import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, TrendingUp, UserCheck, Users, UserX } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download, TrendingUp, UserCheck, Users, UserX } from "lucide-react";
 
 import Cookies from "js-cookie";
 
@@ -32,8 +32,12 @@ export default function CandidatesPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [exportingActive, setExportingActive] = useState(false);
+  const [exportingInactive, setExportingInactive] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
+  const [searchQuery, setSearchQuery] = useState("");
+  const hasLoadedRef = useRef(false);
   const [pagination, setPagination] = useState<PaginationMeta>({
     current_page: 1,
     per_page: 15,
@@ -64,7 +68,9 @@ export default function CandidatesPage() {
     }
 
     try {
-      if (isRefresh) {
+      const shouldShowPageLoader = !isRefresh && !hasLoadedRef.current;
+
+      if (isRefresh || !shouldShowPageLoader) {
         setRefreshing(true);
       } else {
         setLoading(true);
@@ -79,6 +85,11 @@ export default function CandidatesPage() {
         page: currentPage.toString(),
         per_page: pageSize.toString(),
       });
+
+      if (searchQuery) {
+        params.set("search", searchQuery);
+      }
+
       const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidates?${params.toString()}`;
 
       const response = await fetch(apiUrl, {
@@ -146,7 +157,9 @@ export default function CandidatesPage() {
       // En cas d'erreur, on garde un tableau vide pour éviter les crashes
       setUsers([]);
     } finally {
-      if (isRefresh) {
+      hasLoadedRef.current = true;
+
+      if (isRefresh || !loading) {
         setRefreshing(false);
       } else {
         setLoading(false);
@@ -156,7 +169,7 @@ export default function CandidatesPage() {
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, searchQuery]);
 
   // Calculer les statistiques
   const totalCandidates = stats.total;
@@ -169,6 +182,125 @@ export default function CandidatesPage() {
   const handlePageSizeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setPageSize(Number(event.target.value));
     setCurrentPage(1);
+  };
+
+  const handleSearchChange = useCallback((value: string) => {
+    if (value === searchQuery) {
+      return;
+    }
+
+    setSearchQuery(value);
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const exportInactiveCandidates = async () => {
+    if (!authToken) {
+      toast({
+        title: "Erreur d'authentification",
+        variant: "destructive",
+        description: "Token d'authentification manquant. Veuillez vous reconnecter.",
+      });
+      return;
+    }
+
+    try {
+      setExportingInactive(true);
+
+      const response = await fetch("/api/admin/candidates/inactive/export", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Erreur API: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+
+      link.href = url;
+      link.download = `candidats_non_actifs_${date}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export reussi",
+        description: "La liste des candidats non actifs a ete exportee.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur d'export",
+        variant: "destructive",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Une erreur est survenue lors de l'export.",
+      });
+    } finally {
+      setExportingInactive(false);
+    }
+  };
+
+  const exportActiveCandidates = async () => {
+    if (!authToken) {
+      toast({
+        title: "Erreur d'authentification",
+        variant: "destructive",
+        description: "Token d'authentification manquant. Veuillez vous reconnecter.",
+      });
+      return;
+    }
+
+    try {
+      setExportingActive(true);
+
+      const response = await fetch("/api/admin/candidates/active/export", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Erreur API: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+
+      link.href = url;
+      link.download = `candidats_actifs_${date}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export reussi",
+        description: "La liste des candidats actifs a ete exportee.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur d'export",
+        variant: "destructive",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Une erreur est survenue lors de l'export.",
+      });
+    } finally {
+      setExportingActive(false);
+    }
   };
 
   const statsCards = [
@@ -244,6 +376,28 @@ export default function CandidatesPage() {
             Gérez et supervisez tous les candidats de la plateforme
           </p>
         </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={exportActiveCandidates}
+            disabled={exportingActive || activeCandidates === 0}
+            className="gap-2 self-start lg:self-auto"
+          >
+            <Download className="h-4 w-4" />
+            {exportingActive ? "Export..." : "Exporter actifs"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={exportInactiveCandidates}
+            disabled={exportingInactive || inactiveCandidates === 0}
+            className="gap-2 self-start lg:self-auto"
+          >
+            <Download className="h-4 w-4" />
+            {exportingInactive ? "Export..." : "Exporter non actifs"}
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -274,7 +428,7 @@ export default function CandidatesPage() {
       <div className="w-full">
         <Card className="w-full border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <CardContent className="p-6">
-            {users.length === 0 ? (
+            {users.length === 0 && !searchQuery ? (
               <div className="text-center py-12">
                 <div className="space-y-4">
                   <div className="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
@@ -292,7 +446,12 @@ export default function CandidatesPage() {
               </div>
             ) : (
               <div className="w-full overflow-x-hidden">
-                <UserClient data={users} onRefresh={() => fetchData(true)} isRefreshing={refreshing} />
+                <UserClient
+                  data={users}
+                  onRefresh={() => fetchData(true)}
+                  isRefreshing={refreshing}
+                  onSearchChange={handleSearchChange}
+                />
               </div>
             )}
             {pagination.total > 0 && (

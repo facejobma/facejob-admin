@@ -249,12 +249,14 @@ export default function EmailCampaignsPage() {
             Campagnes candidats, relances automatiques et messages individuels.
           </p>
         </div>
-        <Button asChild className="gap-2 bg-[#60894B] hover:bg-[#50743f]">
-          <Link href="/dashboard/email-campaigns/new">
-            <Plus className="h-4 w-4" />
-            Nouvelle relance
-          </Link>
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button asChild className="gap-2 bg-[#60894B] hover:bg-[#50743f]">
+            <Link href="/dashboard/email-campaigns/new">
+              <Plus className="h-4 w-4" />
+              Nouvelle relance
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">

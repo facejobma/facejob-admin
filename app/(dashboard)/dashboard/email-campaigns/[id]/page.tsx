@@ -82,7 +82,7 @@ const statusStyles: Record<string, string> = {
 };
 
 const templateLabels: Record<string, string> = {
-  activation_account: "Relance activation du compte",
+  activation_account: "Relance activation desactivee",
   incomplete_profile: "Relance profil incomplet",
   activation_profile: "Relance profil incomplet",
   video_cv: "Relance creation CV video",
@@ -197,7 +197,7 @@ export default function EmailCampaignDetailPage() {
             Details de la relance
           </h1>
           <p className="text-sm text-muted-foreground">
-            Emails notifies, statut d'envoi et template utilise.
+            Emails notifies, statut d&apos;envoi et template utilise.
           </p>
         </div>
         <div className="flex gap-2">
