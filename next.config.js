@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // reactStrictMode: false,
-    typescript: {
-    ignoreBuildErrors: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
   images: {
     remotePatterns: [
@@ -62,8 +61,16 @@ const nextConfig = {
         hostname: 'lh3.googleusercontent.com',
       }
     ],
-    // Fallback pour la compatibilité
     domains: ["utfs.io", "picsum.photos", "d1csarkz8obe9u.cloudfront.net", "via.placeholder.com", "placeholder.com", "images.unsplash.com", "source.unsplash.com", "cdn.vectorstock.com", "static.vecteezy.com", "lh3.googleusercontent.com"],
+  },
+  // Proxy API requests to backend ALB to avoid Mixed Content (HTTPS -> HTTP) and double /api
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://facejobalb-1619101788.eu-west-3.elb.amazonaws.com/api/:path*',
+      },
+    ];
   },
   output: 'standalone'
 };
