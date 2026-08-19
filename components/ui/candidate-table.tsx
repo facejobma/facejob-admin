@@ -143,17 +143,11 @@ export function CandidateDataTable<TData, TValue>({
       return;
     }
 
-    if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-      toast({
-        title: "Erreur",
-        variant: "destructive",
-        description: "URL de l'API non configurée.",
-      });
-      return;
-    }
-
     try {
       setBulkLoading(true);
+
+      const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+      const apiBase = rawBackend.replace(/\/api\/?$/, '');
 
       const requests = selectedCandidates.map((candidate) => {
         const endpoint =
@@ -161,7 +155,7 @@ export function CandidateDataTable<TData, TValue>({
             ? `/api/v1/admin/candidate/delete/${candidate.id}`
             : `/api/v1/admin/candidate/${candidate.id}/${action}`;
 
-        return fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${endpoint}`, {
+        return fetch(`${apiBase}${endpoint}`, {
           method: action === "delete" ? "DELETE" : "PATCH",
           headers: {
             Authorization: `Bearer ${authToken}`,

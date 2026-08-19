@@ -155,12 +155,9 @@ function OverViewTab() {
       try {
         setLoading(true);
         
-        // Vérifier que l'URL de l'API est définie
-        if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-          throw new Error("URL de l'API non configurée");
-        }
-
-        const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/statics?from=${date?.from?.toISOString()}&to=${date?.to?.toISOString()}`;
+        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+        const apiBase = rawBackend.replace(/\/api\/?$/, '');
+        const apiUrl = `${apiBase}/api/v1/admin/statics?from=${date?.from?.toISOString()}&to=${date?.to?.toISOString()}`;
         console.log("Fetching stats from:", apiUrl);
 
         const response = await fetch(apiUrl, {
@@ -245,10 +242,6 @@ function OverViewTab() {
       try {
         setCandidateChartLoading(true);
 
-        if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-          throw new Error("URL de l'API non configurée");
-        }
-
         const params = new URLSearchParams();
 
         if (candidateChartDate?.from) {
@@ -263,8 +256,11 @@ function OverViewTab() {
           params.set("candidate_status", candidateChartStatus);
         }
 
+        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+        const apiBase = rawBackend.replace(/\/api\/?$/, '');
+
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/statics?${params.toString()}`,
+          `${apiBase}/api/v1/admin/statics?${params.toString()}`,
           {
             method: "GET",
             headers: {
@@ -307,10 +303,6 @@ function OverViewTab() {
       try {
         setVideoCvChartLoading(true);
 
-        if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-          throw new Error("URL de l'API non configurÃ©e");
-        }
-
         const params = new URLSearchParams();
 
         if (videoCvChartDate?.from) {
@@ -321,8 +313,11 @@ function OverViewTab() {
           params.set("to", videoCvChartDate.to.toISOString());
         }
 
+        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+        const apiBase = rawBackend.replace(/\/api\/?$/, '');
+
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/statics?${params.toString()}`,
+          `${apiBase}/api/v1/admin/statics?${params.toString()}`,
           {
             method: "GET",
             headers: {

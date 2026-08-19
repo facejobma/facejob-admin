@@ -76,11 +76,6 @@ export default function CandidatesPage() {
         setLoading(true);
       }
       
-      // Vérifier que l'URL de l'API est définie
-      if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
-        throw new Error("URL de l'API non configurée");
-      }
-
       const params = new URLSearchParams({
         page: currentPage.toString(),
         per_page: pageSize.toString(),
@@ -90,7 +85,9 @@ export default function CandidatesPage() {
         params.set("search", searchQuery);
       }
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidates?${params.toString()}`;
+      const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+      const apiBase = rawBackend.replace(/\/api\/?$/, '');
+      const apiUrl = `${apiBase}/api/v1/admin/candidates?${params.toString()}`;
 
       const response = await fetch(apiUrl, {
         method: "GET",
