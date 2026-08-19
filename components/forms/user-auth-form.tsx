@@ -46,7 +46,9 @@ export default function UserAuthForm() {
     setIsLoading(true);
     
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/auth/admin/login", {
+      const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+      const apiBase = rawBackend.replace(/\/api\/?$/, '');
+      const response = await fetch(`${apiBase}/api/v1/auth/admin/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

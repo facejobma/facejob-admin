@@ -5,7 +5,8 @@
  * Handles authentication, error handling, and security headers
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000/api';
+const rawBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+const API_BASE_URL = rawBackendUrl.replace(/\/api\/?$/, '');
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
 
 interface ApiResponse<T = any> {
@@ -26,7 +27,7 @@ class AdminAPI {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = `${API_BASE_URL}/${API_VERSION}`;
+    this.baseUrl = `${API_BASE_URL}/api/${API_VERSION}`;
   }
 
   /**
