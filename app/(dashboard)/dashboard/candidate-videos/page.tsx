@@ -49,19 +49,28 @@ export default function UsersPage() {
         setIsLoading(true);
       }
       
-      // Fetch all videos to allow filtering by status
-      const url = new URL(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/candidate-videos"
-      );
-      url.searchParams.set("page", currentPage.toString());
-      url.searchParams.set("per_page", pageSize.toString());
-
-      const response = await fetch(url.toString(), {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
+      // Fetch all videos to allow filtering by status.
+      // Build the query string separately and pass a plain relative path to
+      // fetch() — new URL() requires an absolute URL (or a base arg) and
+      // throws synchronously otherwise, which NEXT_PUBLIC_BACKEND_URL being
+      // empty in production (relying on the next.config.js /api rewrite
+      // instead) triggered every time, silently, since the catch below
+      // didn't log anything.
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        per_page: pageSize.toString(),
       });
+
+      const response = await fetch(
+        `${backendUrl}/api/v1/admin/candidate-videos?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       const result = await response.json();
 
       // Extract the data array from the API response
@@ -69,7 +78,8 @@ export default function UsersPage() {
       if (result.pagination) {
         setPagination(result.pagination);
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to fetch candidate videos:", error);
       toast({
         title: "Whoops!",
         variant: "destructive",
