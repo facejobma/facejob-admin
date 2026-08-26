@@ -1,93 +1,61 @@
-import { AlertModal } from "@/components/modal/alert-modal";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreHorizontal, Trash } from "lucide-react";
-import { useRouter } from "next/navigation";
+"use client";
+
 import { useState } from "react";
-import { EnterpriseData } from "@/types";
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { Edit, Eye, Loader2, MoreHorizontal, Trash2 } from "lucide-react";
+import { EnterpriseData } from "@/types";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-interface CellActionProps {
-  data: EnterpriseData;
-}
-
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
+export const CellAction = ({ data }: { data: EnterpriseData }) => {
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
-  const onDelete = async () => {
+  const deleteEnterprise = async () => {
+    setDeleting(true);
     try {
-      setLoading(true);
-
-      const authToken = Cookies.get("authToken");
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/delete/${data.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        },
-      );
-
-      if (response.ok) {
-        console.log("Enterprise deleted successfully!");
-        // Refresh the page to update the list
-        window.location.reload();
-      } else {
-        console.error("Failed to delete enterprise");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/delete/${data.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${Cookies.get("authToken")}`, Accept: "application/json" },
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.message || "La suppression a échoué.");
       }
+      toast({ title: "Entreprise supprimée", description: `Le compte ${data.company_name} a été supprimé.` });
+      setDeleteOpen(false);
+      window.dispatchEvent(new Event("enterprises:refresh"));
     } catch (error) {
-      console.error("An error occurred while deleting the enterprise:", error);
+      toast({ title: "Suppression impossible", description: error instanceof Error ? error.message : "Veuillez réessayer.", variant: "destructive" });
     } finally {
-      setLoading(false);
-      setOpen(false);
+      setDeleting(false);
     }
   };
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          
-          <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/entreprise/${data.id}`)}
-          >
-            <Eye className="mr-2 h-4 w-4" /> Visualiser
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/entreprise/${data.id}/edit`)}
-          >
-            <Edit className="mr-2 h-4 w-4" /> Modifier
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4" /> Supprimer
-          </DropdownMenuItem>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-9 w-9" aria-label={`Actions pour ${data.company_name}`}><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuLabel>Gérer l’entreprise</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => router.push(`/dashboard/entreprise/${data.id}`)}><Eye className="mr-2 h-4 w-4" />Consulter</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(`/dashboard/entreprise/${data.id}/edit`)}><Edit className="mr-2 h-4 w-4" />Modifier</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setDeleteOpen(true)} className="text-red-700 focus:text-red-700"><Trash2 className="mr-2 h-4 w-4" />Supprimer</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Supprimer cette entreprise ?</DialogTitle><DialogDescription>Le compte de {data.company_name} et son accès seront supprimés définitivement. Cette action est irréversible.</DialogDescription></DialogHeader>
+          <DialogFooter><Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleting}>Annuler</Button><Button variant="destructive" onClick={deleteEnterprise} disabled={deleting}>{deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Supprimer définitivement</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

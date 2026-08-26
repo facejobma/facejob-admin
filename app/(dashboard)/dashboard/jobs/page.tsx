@@ -18,15 +18,12 @@ import {
   XCircle, 
   TrendingUp, 
   RefreshCw,
-  Download,
   Calendar,
   Building2,
   BarChart3,
   Activity,
-  MapPin,
-  Users,
-  LayoutGrid,
-  List
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Job } from "@/types";
 
@@ -38,7 +35,8 @@ export default function JobsPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("cards"); // Cards par défaut
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
   const [, forceUpdate] = useState({});
   
@@ -49,9 +47,7 @@ export default function JobsPage() {
   const [totalPages, setTotalPages] = useState(0);
   
   // Filter state
-  const [searchValue, setSearchValue] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [sectorFilter, setSectorFilter] = useState("all");
   
   // Global statistics state
   const [globalStats, setGlobalStats] = useState({
@@ -119,12 +115,6 @@ export default function JobsPage() {
       // Add filters only if they're not default values
       if (statusFilter !== "all") {
         params.append('status', statusFilter);
-      }
-      if (sectorFilter !== "all") {
-        params.append('sector', sectorFilter);
-      }
-      if (searchValue) {
-        params.append('search', searchValue);
       }
       
       // Fetch paginated data
@@ -271,7 +261,27 @@ export default function JobsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [authToken, currentPage, pageSize, statusFilter, sectorFilter, searchValue]);
+  }, [authToken, currentPage, pageSize, statusFilter]);
+
+  useEffect(() => {
+    setShowStatistics(localStorage.getItem("jobs:show-statistics") === "true");
+    setShowActivity(localStorage.getItem("jobs:show-activity") === "true");
+  }, []);
+
+  const toggleStatistics = () => {
+    setShowStatistics((current) => {
+      localStorage.setItem("jobs:show-statistics", String(!current));
+      return !current;
+    });
+  };
+
+  const toggleActivity = () => {
+    setShowActivity((current) => {
+      localStorage.setItem("jobs:show-activity", String(!current));
+      return !current;
+    });
+  };
+
 
   // Fonction optimisée pour mettre à jour une seule offre
   const updateSingleJob = async (jobId: number, newStatus?: string) => {
@@ -335,11 +345,6 @@ export default function JobsPage() {
 
     return () => clearInterval(interval);
   }, [lastFetchTime]);
-
-  // Statistiques des offres - use global stats instead of filtered data
-  const pendingJobs = { length: globalStats.pending };
-  const acceptedJobs = { length: globalStats.accepted };
-  const declinedJobs = { length: globalStats.declined };
 
   // Données filtrées selon l'onglet actif - now just returns jobs since filtering is server-side
   const getFilteredData = () => {
@@ -470,6 +475,8 @@ export default function JobsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <BreadCrumb items={breadcrumbItems} />
+          <h1 className="pt-2 text-2xl font-semibold tracking-tight">Gestion des offres d’emploi</h1>
+          <p className="text-sm text-muted-foreground">Examinez, validez et suivez les offres publiées par les entreprises.</p>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Briefcase className="h-4 w-4" />
             <span>
@@ -483,26 +490,6 @@ export default function JobsPage() {
         </div>
         
         <div className="flex items-center gap-2">
-          {/* Toggle vue cartes/tableau */}
-          <div className="flex items-center border rounded-md">
-            <Button
-              variant={viewMode === "table" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("table")}
-              className="rounded-r-none"
-            >
-              <List className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "cards" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setViewMode("cards")}
-              className="rounded-l-none"
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-          </div>
-          
           <Button
             onClick={() => fetchData(true)}
             variant="outline"
@@ -517,15 +504,23 @@ export default function JobsPage() {
                 : "Actualiser"
             }
           </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Exporter
-          </Button>
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 rounded-xl border bg-card p-2 shadow-sm">
+        <Button variant="ghost" size="sm" onClick={toggleStatistics} aria-expanded={showStatistics} className="gap-2">
+          <BarChart3 className="h-4 w-4" />Statistiques
+          {showStatistics ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={toggleActivity} aria-expanded={showActivity} className="gap-2">
+          <Activity className="h-4 w-4" />Activité et tendances
+          {showActivity ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+        {!showStatistics && !showActivity && <span className="self-center px-2 text-xs text-muted-foreground">Panneaux masqués pour libérer l’espace de travail</span>}
+      </div>
+
       {/* Statistiques principales */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {showStatistics && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">En attente</CardTitle>
@@ -582,10 +577,10 @@ export default function JobsPage() {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Statistiques secondaires */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {showActivity && <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -602,19 +597,15 @@ export default function JobsPage() {
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Offres traitées aujourd'hui</span>
-                <Badge variant="outline" className="font-semibold">0</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Temps de validation moyen</span>
-                <Badge variant="outline" className="font-semibold">1.5j</Badge>
+                <span className="text-sm text-muted-foreground">Offres traitées</span>
+                <Badge variant="outline" className="font-semibold">{globalStats.accepted + globalStats.declined}</Badge>
               </div>
               <div className="pt-2 border-t">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Taux de traitement</span>
                   <span className="font-semibold text-blue-600">
-                    {jobs.length > 0 
-                      ? Math.round(((acceptedJobs.length + declinedJobs.length) / jobs.length) * 100)
+                    {globalStats.total > 0
+                      ? Math.round(((globalStats.accepted + globalStats.declined) / globalStats.total) * 100)
                       : 0}%
                   </span>
                 </div>
@@ -677,22 +668,14 @@ export default function JobsPage() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Pic d'activité</span>
-                  <Badge variant="outline" className="text-xs">
-                    Mardi
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Délai moyen</span>
-                  <Badge variant="outline" className="text-xs">
-                    1-2 jours
-                  </Badge>
+                  <span className="text-sm text-muted-foreground">Total enregistré</span>
+                  <Badge variant="outline" className="text-xs">{globalStats.total}</Badge>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Alerte pour actions requises */}
       {globalStats.pending > 0 && (
@@ -716,7 +699,7 @@ export default function JobsPage() {
                 </Badge>
                 <Button 
                   size="sm" 
-                  onClick={() => setActiveTab("pending")}
+                  onClick={() => handleTabChange("pending")}
                   className="bg-yellow-600 hover:bg-yellow-700"
                 >
                   Voir les offres
@@ -728,20 +711,19 @@ export default function JobsPage() {
       )}
 
       {/* Table avec onglets */}
-      <Card>
-        <CardHeader>
+      <Card className="overflow-hidden shadow-sm">
+        <CardHeader className="border-b bg-muted/20 pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">Gestion des offres d'emploi</CardTitle>
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Filtrer par statut</span>
+            <div>
+              <CardTitle className="text-lg">Catalogue des offres</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">Filtrez les offres par statut puis ouvrez une fiche pour la contrôler.</p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <div className="px-6 pt-2">
-              <TabsList className="grid w-full grid-cols-4">
+            <div className="overflow-x-auto px-6 pt-4">
+              <TabsList className="inline-flex h-auto min-w-full justify-start gap-1 p-1 sm:min-w-0">
                 <TabsTrigger value="all" className="flex items-center gap-2">
                   <TrendingUp className="h-3 w-3" />
                   Toutes ({globalStats.total})
@@ -770,20 +752,6 @@ export default function JobsPage() {
                   } else {
                     fetchData(false);
                   }
-                }}
-                viewMode={viewMode}
-                // Pass filter and pagination props
-                searchValue={searchValue}
-                onSearchChange={setSearchValue}
-                statusFilter={statusFilter}
-                onStatusChange={(value) => {
-                  setStatusFilter(value);
-                  setCurrentPage(1);
-                }}
-                sectorFilter={sectorFilter}
-                onSectorChange={(value) => {
-                  setSectorFilter(value);
-                  setCurrentPage(1);
                 }}
                 currentPage={currentPage}
                 onPageChange={setCurrentPage}

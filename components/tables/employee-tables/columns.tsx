@@ -1,181 +1,76 @@
-import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
-import { CellAction } from "./cell-action";
-import { TruncatedCell } from "@/components/ui/truncated-cell";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useState } from "react";
-import { EnterpriseData } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
+import { Badge } from "@/components/ui/badge";
+import { EnterpriseData } from "@/types";
+import { CellAction } from "./cell-action";
+import { Building2, CalendarDays, CheckCircle2, Clock3, Mail, Phone, Users, XCircle } from "lucide-react";
 
-export const columns: ColumnDef<
-  EnterpriseData,
-  Dispatch<SetStateAction<EnterpriseData[]>>
->[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    size: 50,
-  },
-  {
-    accessorKey: "logo",
-    header: "Logo",
-    size: 80,
-    cell: ({ row }) => {
-      const [imageError, setImageError] = useState(false);
-      
-      return (
-        <div className="w-10 h-10 relative rounded-lg overflow-hidden bg-gray-100 border">
-          {row.original?.logo && typeof row.original.logo === "string" && !imageError ? (
-            <Image
-              src={
-                row.original.logo.startsWith("http") 
-                  ? row.original.logo
-                  : row.original.logo.startsWith("/")
-                  ? row.original.logo
-                  : `/${row.original.logo}`
-              }
-              alt={`${row.original.company_name} Logo`}
-              fill
-              className="object-cover"
-              onError={() => {
-                console.log("Image load error for:", row.original.logo);
-                setImageError(true);
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs text-gray-500 bg-gray-50">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-              </svg>
-            </div>
-          )}
-        </div>
-      );
-    },
-  },
+const getStatus = (enterprise: EnterpriseData) => {
+  if (enterprise.is_verified === true || enterprise.is_verified === "Accepted") {
+    return { label: "Active", icon: CheckCircle2, className: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" };
+  }
+  if (enterprise.is_verified === "Declined" || enterprise.comment) {
+    return { label: "Refusée", icon: XCircle, className: "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300" };
+  }
+  return { label: "En attente", icon: Clock3, className: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300" };
+};
+
+export const columns: ColumnDef<EnterpriseData>[] = [
   {
     accessorKey: "company_name",
-    header: "Nom de l'Entreprise",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true,
-    size: 200,
-    cell: ({ row }) => (
-      <TruncatedCell 
-        content={row.getValue("company_name")} 
-        maxWidth="200px"
-      />
-    ),
-  },
-  {
-    accessorKey: "plan",
-    header: "Plan",
-    enableColumnFilter: true,
-    enableSorting: true,
-    enableHiding: true,
-    size: 150,
+    header: "Entreprise",
     cell: ({ row }) => {
-      const plan = row.original.plan;
-      const planName = plan?.name || 'Aucun plan';
+      const enterprise = row.original;
       return (
-        <TruncatedCell 
-          content={planName} 
-          maxWidth="150px"
-        />
-      );
-    },
-  },
-  {
-    accessorKey: "sector",
-    header: "Secteur",
-    size: 150,
-    cell: ({ row }) => {
-      const sector = row.original.sector;
-      const sectorName = sector?.name || 'Non défini';
-      return (
-        <TruncatedCell 
-          content={sectorName} 
-          maxWidth="150px"
-        />
+        <div className="flex min-w-[230px] items-center gap-3">
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
+            {enterprise.logo ? <Image src={enterprise.logo} alt="" fill sizes="40px" className="object-cover" /> : <Building2 className="h-5 w-5 text-muted-foreground" />}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate font-medium">{enterprise.company_name}</p>
+            <p className="truncate text-xs text-muted-foreground">{enterprise.sector?.name || "Secteur non renseigné"}</p>
+          </div>
+        </div>
       );
     },
   },
   {
     accessorKey: "email",
-    header: "EMAIL",
-    size: 250,
+    header: "Contact",
     cell: ({ row }) => (
-      <TruncatedCell 
-        content={row.getValue("email")} 
-        maxWidth="250px"
-      />
+      <div className="min-w-[220px] space-y-1.5 text-sm">
+        <a href={`mailto:${row.original.email}`} className="flex items-center gap-2 hover:text-primary"><Mail className="h-3.5 w-3.5 text-muted-foreground" /><span className="max-w-[190px] truncate">{row.original.email}</span></a>
+        <div className="flex items-center gap-2 text-muted-foreground"><Phone className="h-3.5 w-3.5" />{row.original.phone || "Non renseigné"}</div>
+      </div>
     ),
   },
   {
-    accessorKey: "phone",
-    header: "TEL",
-    size: 120,
+    id: "details",
+    header: "Informations",
     cell: ({ row }) => (
-      <TruncatedCell 
-        content={row.getValue("phone")} 
-        maxWidth="120px"
-      />
+      <div className="space-y-1.5">
+        <Badge variant="secondary" className="font-normal">{row.original.plan?.name || "Gratuit"}</Badge>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Users className="h-3.5 w-3.5" />{row.original.effectif || "—"} employés</div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: "Inscription",
+    cell: ({ row }) => (
+      <div className="flex min-w-[130px] items-center gap-2"><CalendarDays className="h-4 w-4 text-muted-foreground" /><div><p className="text-sm font-medium">{moment(row.original.created_at).format("DD MMM YYYY")}</p><p className="text-xs text-muted-foreground">{moment(row.original.created_at).format("HH:mm")}</p></div></div>
     ),
   },
   {
     accessorKey: "is_verified",
     header: "Statut",
-    size: 120,
     cell: ({ row }) => {
-      const isVerified = row.original.is_verified;
-      let status = "En attente";
-      let className = "bg-yellow-200 text-yellow-800 rounded-full py-1 px-2 text-center text-xs";
-      
-      if (isVerified === true || isVerified === "Accepted") {
-        status = "Accepté";
-        className = "bg-green-200 text-green-800 rounded-full py-1 px-2 text-center text-xs";
-      } else if (isVerified === false || isVerified === "Declined") {
-        status = "Refusé";
-        className = "bg-red-200 text-red-800 rounded-full py-1 px-2 text-center text-xs";
-      }
-      
-      return (
-        <div className={className}>
-          {status}
-        </div>
-      );
+      const status = getStatus(row.original);
+      const Icon = status.icon;
+      return <Badge variant="outline" className={`${status.className} gap-1.5 whitespace-nowrap font-medium`}><Icon className="h-3.5 w-3.5" />{status.label}</Badge>;
     },
   },
-  {
-    accessorKey: "created_at",
-    header: "Date de création",
-    size: 120,
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap">
-        {moment(row.original.created_at).format("DD/MM/yyyy")}
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    size: 80,
-    cell: ({ row }) => <CellAction data={row.original} />,
-  },
+  { id: "actions", header: () => <span className="sr-only">Actions</span>, cell: ({ row }) => <CellAction data={row.original} /> },
 ];
