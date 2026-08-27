@@ -1,132 +1,109 @@
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CheckSquare, XSquare, MoreHorizontal, View } from "lucide-react";
+"use client";
 
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
-
-import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { Check, Eye, Loader2, MoreHorizontal, X } from "lucide-react";
 import { EnterpriseData, EntrepriseStatus } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-interface CellActionProps {
-  data: EnterpriseData;
-}
-
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const [open, setOpen] = useState(false);
+export const CellAction = ({ data }: { data: EnterpriseData }) => {
+  const [rejectOpen, setRejectOpen] = useState(false);
   const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState<EntrepriseStatus | null>(null);
   const { toast } = useToast();
-  const authToken = Cookies.get("authToken");
   const router = useRouter();
 
-  const onVerify = async (is_verified: EntrepriseStatus) => {
+  const updateStatus = async (status: EntrepriseStatus) => {
+    if (status === "Declined" && !comment.trim()) {
+      toast({ title: "Motif requis", description: "Ajoutez un motif avant de refuser la demande.", variant: "destructive" });
+      return;
+    }
+
+    setSubmitting(status);
     try {
-      if (is_verified === "Declined" && !comment) {
-        toast({
-          title: "Error!",
-          variant: "destructive",
-          description: "Please provide a comment.",
-        });
-        return;
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/accept/${data.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            is_verified,
-            comment,
-          }),
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/accept/${data.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("authToken")}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      );
-
-      if (response.ok) {
-        toast({
-          title: "Success!",
-          description: "Entreprise a été vérifiée avec succès.",
-        });
-        data.is_verified = is_verified;
-      } else {
-        data.is_verified = "Pending";
-      }
-    } catch (error) {
-      toast({
-        title: "Whoops!",
-        variant: "destructive",
-        description:
-          error?.toString() || "Erreur lors de la récupération des données.",
+        body: JSON.stringify({ is_verified: status, comment: comment.trim() || null }),
       });
+
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.message || "La mise à jour a échoué.");
+      }
+
+      toast({
+        title: status === "Accepted" ? "Entreprise activée" : "Demande refusée",
+        description: status === "Accepted"
+          ? "Le compte est actif et l’entreprise a été informée par e-mail."
+          : "Le refus et son motif ont été enregistrés.",
+      });
+      setRejectOpen(false);
+      setComment("");
+      router.refresh();
+      window.dispatchEvent(new Event("requests:refresh"));
+    } catch (error) {
+      toast({ title: "Mise à jour impossible", description: error instanceof Error ? error.message : "Veuillez réessayer.", variant: "destructive" });
+    } finally {
+      setSubmitting(null);
     }
   };
 
+  const isAccepted = data.is_verified === true || data.is_verified === "Accepted";
+
   return (
     <>
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
+          <Button variant="ghost" size="icon" className="h-9 w-9" aria-label={`Actions pour ${data.company_name}`}>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-          <DropdownMenuItem
-            onClick={() => {
-              onVerify("Accepted" as EntrepriseStatus);
-            }}
-          >
-            <CheckSquare className="mr-2 h-4 w-4" /> Accept
+        <DropdownMenuContent align="end" className="w-52">
+          <DropdownMenuLabel>Gérer la demande</DropdownMenuLabel>
+          <DropdownMenuItem onClick={() => router.push(`/dashboard/requests/${data.id}`)}>
+            <Eye className="mr-2 h-4 w-4" /> Consulter le dossier
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              setOpen(true);
-            }}
-          >
-            <XSquare className="mr-2 h-4 w-4" /> Decline
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              router.push(`/dashboard/requests/${data.id}`);
-            }}
-          >
-            <View className="mr-2 h-4 w-4" /> Consult
+          <DropdownMenuSeparator />
+          {!isAccepted && (
+            <DropdownMenuItem onClick={() => updateStatus("Accepted" as EntrepriseStatus)} disabled={submitting !== null} className="text-emerald-700 focus:text-emerald-700">
+              {submitting === "Accepted" ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
+              Valider et activer
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem onClick={() => setRejectOpen(true)} disabled={submitting !== null} className="text-red-700 focus:text-red-700">
+            <X className="mr-2 h-4 w-4" /> Refuser la demande
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {open && (
-        <div className="mt-4">
-          <Input
-            className="mb-2"
-            placeholder="Enter comment..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <Button
-            onClick={() => {
-              onVerify("Declined" as EntrepriseStatus);
-              setOpen(false);
-            }}
-          >
-            Confirm Decline
-          </Button>
-        </div>
-      )}
+      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Refuser la demande</DialogTitle>
+            <DialogDescription>
+              Indiquez pourquoi la demande de {data.company_name} est refusée. Ce motif restera associé au dossier.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Motif du refus…" rows={4} autoFocus />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectOpen(false)} disabled={submitting !== null}>Annuler</Button>
+            <Button variant="destructive" onClick={() => updateStatus("Declined" as EntrepriseStatus)} disabled={submitting !== null || !comment.trim()}>
+              {submitting === "Declined" && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

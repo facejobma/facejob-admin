@@ -29,6 +29,7 @@ interface DataTableProps<TData, TValue> {
   isRefreshing?: boolean;
   renderBulkActions?: (selectedRows: TData[], resetSelection: () => void) => React.ReactNode;
   disablePagination?: boolean;
+  appearance?: "default" | "clean";
 }
 
 export function DataTable<TData, TValue>({
@@ -40,6 +41,7 @@ export function DataTable<TData, TValue>({
   isRefreshing,
   renderBulkActions,
   disablePagination = false,
+  appearance = "default",
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>(""); // Default to show all
@@ -129,15 +131,15 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className={appearance === "clean" ? "flex flex-col gap-3 rounded-lg border bg-background p-3 sm:flex-row" : "flex flex-col sm:flex-row gap-3 p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700"}>
         <Input
-          placeholder={`🔍 Rechercher par ${searchKey}...`}
+          placeholder="Rechercher une entreprise…"
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full sm:max-w-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          className="w-full sm:max-w-sm"
           disabled={isRefreshing}
         />
-        <select
+        {appearance !== "clean" && <select
           value={selectValue || ""}
           onChange={handleSelectChange}
           className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 min-w-[150px] font-medium transition-all"
@@ -147,8 +149,8 @@ export function DataTable<TData, TValue>({
           <option value="Pending">⏳ En cours</option>
           <option value="Accepted">✅ Accepté</option>
           <option value="Declined">❌ Décliné</option>
-        </select>
-        <select
+        </select>}
+        {appearance !== "clean" && <select
           value={sectorValue || ""}
           onChange={handleSectorChange}
           className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-2.5 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-50 min-w-[150px] font-medium transition-all"
@@ -160,14 +162,14 @@ export function DataTable<TData, TValue>({
               {sector.name}
             </option>
           ))}
-        </select>
+        </select>}
       </div>
       {renderBulkActions && selectedRows.length > 0 && (
         <div className="rounded-lg border bg-muted/30 p-3">
           {renderBulkActions(selectedRows, () => table.resetRowSelection())}
         </div>
       )}
-      <div className="rounded-xl border border-gray-200 dark:border-gray-700 relative min-h-[400px] overflow-hidden shadow-sm bg-white dark:bg-gray-800">
+      <div className={appearance === "clean" ? "relative min-h-[360px] overflow-hidden rounded-lg border bg-background" : "rounded-xl border border-gray-200 dark:border-gray-700 relative min-h-[400px] overflow-hidden shadow-sm bg-white dark:bg-gray-800"}>
         {isRefreshing && (
           <div className="absolute inset-0 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center z-10 backdrop-blur-sm">
             <div className="flex items-center gap-3 bg-white dark:bg-gray-800 px-6 py-3 rounded-xl shadow-xl border-2 border-blue-500 dark:border-blue-400">
@@ -179,7 +181,7 @@ export function DataTable<TData, TValue>({
         <ScrollArea className="w-full">
           <div className="min-w-full overflow-x-auto">
             <Table className="relative min-w-full">
-              <TableHeader className="bg-gradient-to-r from-gray-100 to-blue-100 dark:from-gray-800 dark:to-blue-900">
+              <TableHeader className={appearance === "clean" ? "bg-muted/50" : "bg-gradient-to-r from-gray-100 to-blue-100 dark:from-gray-800 dark:to-blue-900"}>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id} className="border-b-2 border-gray-300 dark:border-gray-600">
                     {headerGroup.headers.map((header) => (
@@ -200,7 +202,7 @@ export function DataTable<TData, TValue>({
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() ? "selected" : undefined}
-                      className={`
+                      className={appearance === "clean" ? "border-b transition-colors hover:bg-muted/40" : `
                         transition-all duration-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 
                         ${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-800/50'}
                         ${row.getIsSelected() ? 'bg-blue-100 dark:bg-blue-900/30' : ''}
@@ -224,7 +226,7 @@ export function DataTable<TData, TValue>({
         </ScrollArea>
       </div>
       {!disablePagination && (
-      <div className="flex items-center justify-between space-x-2 py-4 px-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className={appearance === "clean" ? "flex flex-col items-center justify-between gap-3 border-t px-1 pt-4 sm:flex-row" : "flex items-center justify-between space-x-2 py-4 px-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700"}>
         <div className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300">
           <span className="inline-flex items-center gap-2">
             <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-md font-semibold">

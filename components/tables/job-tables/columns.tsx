@@ -1,4 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { TruncatedCell } from "@/components/ui/truncated-cell";
@@ -19,35 +18,6 @@ import moment from "moment";
 import "moment/locale/fr";
 
 export const createColumns = (onUpdate?: (jobId?: number) => void): ColumnDef<Job>[] => [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    size: 50,
-  },
-  {
-    accessorKey: "sector_name",
-    header: "Secteur",
-    enableColumnFilter: true,
-    enableSorting: false,
-    enableHiding: true,
-    size: 0,
-    cell: () => null, // Hidden column for filtering
-  },
   {
     accessorKey: "titre",
     header: "Offre d'emploi",
@@ -159,7 +129,7 @@ export const createColumns = (onUpdate?: (jobId?: number) => void): ColumnDef<Jo
             Publiée
           </Badge>
         );
-      } else if (isVerified === false || isVerified === "Declined") {
+      } else if (isVerified === "Declined") {
         return (
           <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">
             <XCircle className="w-3 h-3 mr-1" />

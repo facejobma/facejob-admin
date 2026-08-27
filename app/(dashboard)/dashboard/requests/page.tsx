@@ -17,12 +17,13 @@ import {
   XCircle, 
   TrendingUp, 
   RefreshCw,
-  Filter,
-  Download,
   Calendar,
   Users,
   BarChart3,
-  Activity
+  Activity,
+  ChevronDown,
+  ChevronUp,
+  LayoutDashboard
 } from "lucide-react";
 import { EnterpriseData } from "@/types";
 
@@ -35,6 +36,8 @@ export default function RequestsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [lastFetchTime, setLastFetchTime] = useState<number>(0);
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
   const [, forceUpdate] = useState({});
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
@@ -143,6 +146,29 @@ export default function RequestsPage() {
     fetchData();
   }, [authToken]);
 
+  useEffect(() => {
+    setShowStatistics(localStorage.getItem("requests:show-statistics") === "true");
+    setShowActivity(localStorage.getItem("requests:show-activity") === "true");
+
+    const refreshRequests = () => fetchData();
+    window.addEventListener("requests:refresh", refreshRequests);
+    return () => window.removeEventListener("requests:refresh", refreshRequests);
+  }, []);
+
+  const toggleStatistics = () => {
+    setShowStatistics((current) => {
+      localStorage.setItem("requests:show-statistics", String(!current));
+      return !current;
+    });
+  };
+
+  const toggleActivity = () => {
+    setShowActivity((current) => {
+      localStorage.setItem("requests:show-activity", String(!current));
+      return !current;
+    });
+  };
+
   // Update button text every second when rate limited
   useEffect(() => {
     const interval = setInterval(() => {
@@ -157,10 +183,11 @@ export default function RequestsPage() {
 
   // Statistiques des demandes
   const pendingRequests = entrepriseRequests.filter(
-    (entreprise) => 
-      entreprise?.is_verified === false || 
-      entreprise?.is_verified === "Pending" ||
-      (!entreprise?.is_verified && entreprise?.is_verified !== true)
+    (entreprise) => {
+      const isAccepted = entreprise?.is_verified === true || entreprise?.is_verified === "Accepted";
+      const isDeclined = entreprise?.is_verified === "Declined" || Boolean(entreprise?.comment);
+      return !isAccepted && !isDeclined;
+    }
   );
 
   const acceptedRequests = entrepriseRequests.filter(
@@ -168,7 +195,7 @@ export default function RequestsPage() {
   );
 
   const declinedRequests = entrepriseRequests.filter(
-    (entreprise) => entreprise?.is_verified === "Declined"
+    (entreprise) => entreprise?.is_verified === "Declined" || Boolean(entreprise?.comment)
   );
 
   // Données filtrées selon l'onglet actif
@@ -282,6 +309,8 @@ export default function RequestsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <BreadCrumb items={breadcrumbItems} />
+          <h1 className="pt-2 text-2xl font-semibold tracking-tight">Demandes d’entreprises</h1>
+          <p className="text-sm text-muted-foreground">Examinez les dossiers et contrôlez l’accès des entreprises à la plateforme.</p>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Building2 className="h-4 w-4" />
             <span>
@@ -309,15 +338,27 @@ export default function RequestsPage() {
                 : "Actualiser"
             }
           </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Exporter
-          </Button>
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2 rounded-xl border bg-card p-2 shadow-sm">
+        <Button variant="ghost" size="sm" onClick={toggleStatistics} aria-expanded={showStatistics} className="justify-start gap-2">
+          <LayoutDashboard className="h-4 w-4" />
+          Statistiques
+          {showStatistics ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={toggleActivity} aria-expanded={showActivity} className="justify-start gap-2">
+          <Activity className="h-4 w-4" />
+          Activité et tendances
+          {showActivity ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+        {!showStatistics && !showActivity && (
+          <span className="self-center px-2 text-xs text-muted-foreground">Panneaux masqués pour libérer l’espace de travail</span>
+        )}
+      </div>
+
       {/* Statistiques principales */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {showStatistics && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">En attente</CardTitle>
@@ -374,10 +415,10 @@ export default function RequestsPage() {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Statistiques secondaires */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {showActivity && <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -499,7 +540,7 @@ export default function RequestsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div>}
 
       {/* Alerte pour actions requises */}
       {pendingRequests.length > 0 && (
@@ -536,20 +577,19 @@ export default function RequestsPage() {
       )}
 
       {/* Table avec onglets */}
-      <Card>
-        <CardHeader>
+      <Card className="overflow-hidden shadow-sm">
+        <CardHeader className="border-b bg-muted/20 pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">Gestion des demandes</CardTitle>
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Filtrer par statut</span>
+            <div>
+              <CardTitle className="text-lg">Gestion des demandes</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">Commencez par les dossiers en attente, puis consultez l’historique si nécessaire.</p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="px-6 pt-2">
-              <TabsList className="grid w-full grid-cols-4">
+            <div className="overflow-x-auto px-6 pt-4">
+              <TabsList className="inline-flex h-auto min-w-full justify-start gap-1 p-1 sm:min-w-0">
                 <TabsTrigger value="all" className="flex items-center gap-2">
                   <TrendingUp className="h-3 w-3" />
                   Toutes ({entrepriseRequests.length})
@@ -570,7 +610,9 @@ export default function RequestsPage() {
             </div>
             
             <TabsContent value={activeTab} className="mt-0">
-              <EnterpriseRequests data={getFilteredData()} />
+              <div className="p-6">
+                <EnterpriseRequests data={getFilteredData()} onRefresh={() => fetchData()} isRefreshing={refreshing} />
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>

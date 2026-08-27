@@ -103,6 +103,7 @@ export interface EnterpriseData {
   effectif: number | string;
   description: string;
   is_verified: boolean | string;
+  comment?: string | null;
   is_validated?: boolean;
   plan: Plan | null;
   created_at: string;
