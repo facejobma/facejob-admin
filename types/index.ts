@@ -118,6 +118,7 @@ export interface EnterpriseData {
 export interface Sector {
   id: number;
   name: string;
+  jobs?: Array<{ id: number; name: string }>;
   created_at: string;
   updated_at: string;
 }
@@ -160,11 +161,14 @@ export type User = {
   nomComplete?: string;
   first_name?: string;
   last_name?: string;
-  sector: Sector | string;
+  sector?: Sector | string | null;
   email: string;
   tel?: string;
   phone?: string;
   bio?: string;
+  is_active?: boolean;
+  preferred_contract_type?: string | null;
+  job?: { id: number; name: string; sector_id: number; sector?: Sector | null } | null;
   avatar?: string;
   email_verified_at?: string | null;
   created_at: string;
@@ -197,16 +201,24 @@ export type Job = {
   titre: string;
   description: string;
   date_debut: string;
-  date_fin: string;
+  date_fin: string | null;
   company_name: string;
   sector_name: string; // Changed from secteur_name
   sector_id: number;
-  job_name: string;
-  job_id: number;
+  job_name: string | null;
+  job_id: number | null;
   entreprise_id: number;
   is_verified: boolean | string; // Support both boolean and string
+  status: "Pending" | "Accepted" | "Declined" | "Expired";
   contractType?: string;
   location?: string;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  currency?: string;
+  experience_required?: number | null;
+  benefits?: string[];
+  required_languages?: string[];
+  required_skills?: string[];
   created_at: string;
   applications_count?: number; // Nombre de candidatures
   views_count?: number; // Nombre de vues

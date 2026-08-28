@@ -41,6 +41,8 @@ export default function EntrepriseProfilePage() {
   const { toast } = useToast();
   const [entreprise, setEntreprise] = useState<EnterpriseData | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobsTotal, setJobsTotal] = useState(0);
+  const [activeJobsTotal, setActiveJobsTotal] = useState(0);
   const [payments, setPayments] = useState<PaymentDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
@@ -72,19 +74,29 @@ export default function EntrepriseProfilePage() {
 
         // Fetch jobs for this enterprise
         try {
-          const jobsResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/jobs?entreprise_id=${params.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${authToken}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          if (jobsResponse.ok) {
-            const jobsResult = await jobsResponse.json();
-            setJobs(jobsResult.data || []);
+          const jobsBaseUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres`;
+          const headers = {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          };
+          const [jobsResponse, activeJobsResponse] = await Promise.all([
+            fetch(`${jobsBaseUrl}?entreprise_id=${params.id}&per_page=100`, { headers }),
+            fetch(`${jobsBaseUrl}?entreprise_id=${params.id}&status=Accepted&per_page=1`, { headers }),
+          ]);
+
+          if (!jobsResponse.ok || !activeJobsResponse.ok) {
+            const failedResponse = !jobsResponse.ok ? jobsResponse : activeJobsResponse;
+            const errorData = await failedResponse.json().catch(() => null);
+            throw new Error(errorData?.message || `Erreur ${failedResponse.status} lors du chargement des offres`);
           }
+
+          const [jobsResult, activeJobsResult] = await Promise.all([
+            jobsResponse.json(),
+            activeJobsResponse.json(),
+          ]);
+          setJobs(Array.isArray(jobsResult.data) ? jobsResult.data : []);
+          setJobsTotal(Number(jobsResult.pagination?.total || 0));
+          setActiveJobsTotal(Number(activeJobsResult.pagination?.total || 0));
         } catch (error) {
           console.error("Error fetching jobs:", error);
         }
@@ -150,10 +162,12 @@ export default function EntrepriseProfilePage() {
     }
   };
 
-  const getJobStatusBadge = (isVerified: boolean | string) => {
-    if (isVerified === true || isVerified === "Accepted") {
+  const getJobStatusBadge = (job: Job) => {
+    if (job.status === "Expired") {
+      return <Badge variant="secondary" className="bg-slate-100 text-slate-800">Expirée</Badge>;
+    } else if (job.status === "Accepted") {
       return <Badge variant="default" className="bg-green-100 text-green-800">Actif</Badge>;
-    } else if (isVerified === false || isVerified === "Declined") {
+    } else if (job.status === "Declined") {
       return <Badge variant="destructive">Refusé</Badge>;
     } else {
       return <Badge variant="secondary">En attente</Badge>;
@@ -161,10 +175,10 @@ export default function EntrepriseProfilePage() {
   };
 
   const calculateStats = () => {
-    const totalJobs = jobs.length;
-    const activeJobs = jobs.filter(job => job.is_verified === true || job.is_verified === "Accepted").length;
+    const totalJobs = jobsTotal;
+    const activeJobs = activeJobsTotal;
     const totalPayments = payments.reduce((sum, payment) => sum + parseFloat(payment.amount || "0"), 0);
-    const lastPayment = payments.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+    const lastPayment = [...payments].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
     
     return {
       totalJobs,
@@ -472,7 +486,7 @@ export default function EntrepriseProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Briefcase className="w-5 h-5 mr-2" />
-                Offres d'emploi ({jobs.length})
+                Offres d'emploi ({jobsTotal})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -501,8 +515,8 @@ export default function EntrepriseProfilePage() {
                           </div>
                         </div>
                         <div className="ml-4 flex flex-col items-end space-y-2">
-                          {getJobStatusBadge(job.is_verified)}
-                          <Button variant="outline" size="sm">
+                          {getJobStatusBadge(job)}
+                          <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/jobs/${job.id}`)}>
                             <Eye className="w-3 h-3 mr-1" />
                             Voir
                           </Button>

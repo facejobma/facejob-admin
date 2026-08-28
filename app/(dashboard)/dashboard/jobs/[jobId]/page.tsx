@@ -34,14 +34,23 @@ interface JobData {
   titre: string;
   description: string;
   date_debut: string;
-  date_fin: string;
+  date_fin: string | null;
   company_name: string;
-  sector_name: string;
+  sector_name: string | null;
   location?: string;
   contractType?: string;
   is_verified: string | boolean;
+  status: "Pending" | "Accepted" | "Declined" | "Expired";
   created_at: string;
   updated_at?: string;
+  job_name?: string | null;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  currency?: string;
+  experience_required?: number | null;
+  benefits?: string[];
+  required_languages?: string[];
+  required_skills?: string[];
 }
 
 export default function JobDetailPage() {
@@ -79,8 +88,8 @@ export default function JobDetailPage() {
             throw new Error(`Erreur ${response.status}: ${response.statusText}`);
           }
 
-          const data = await response.json();
-          setJobData(data);
+          const result = await response.json();
+          setJobData(result.data);
         } catch (error) {
           console.error("Error fetching job data:", error);
           const errorMessage = error instanceof Error ? error.message : "Erreur lors de la récupération des données.";
@@ -104,7 +113,9 @@ export default function JobDetailPage() {
 
     const isVerified = jobData.is_verified;
     
-    if (isVerified === true || isVerified === "Accepted") {
+    if (jobData.status === "Expired") {
+      return { color: "gray", text: "Expirée", icon: Calendar };
+    } else if (isVerified === true || isVerified === "Accepted") {
       return { color: "green", text: "Publiée", icon: CheckCircle };
     } else if (isVerified === false || isVerified === "Declined") {
       return { color: "red", text: "Refusée", icon: XCircle };
@@ -176,6 +187,11 @@ export default function JobDetailPage() {
   const statusInfo = getStatusInfo();
   const StatusIcon = statusInfo.icon;
 
+  const openPublicJob = () => {
+    const frontendUrl = (process.env.NEXT_PUBLIC_FRONTEND_URL || window.location.origin).replace(/\/$/, "");
+    window.open(`${frontendUrl}/offres/${jobId}`, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-6 p-6 max-w-4xl mx-auto">
@@ -225,7 +241,8 @@ export default function JobDetailPage() {
               
               <Badge className={`
                 ${statusInfo.color === 'green' ? 'bg-green-100 text-green-800 border-green-200' : 
-                  statusInfo.color === 'red' ? 'bg-red-100 text-red-800 border-red-200' : 
+                  statusInfo.color === 'red' ? 'bg-red-100 text-red-800 border-red-200' :
+                  statusInfo.color === 'gray' ? 'bg-slate-100 text-slate-800 border-slate-200' :
                   'bg-yellow-100 text-yellow-800 border-yellow-200'}
               `}>
                 <StatusIcon className="w-3 h-3 mr-1" />
@@ -251,6 +268,23 @@ export default function JobDetailPage() {
                   {jobData.description || "Aucune description disponible."}
                 </p>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="md:col-span-2">
+            <CardHeader><CardTitle>Critères de matching</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div><span className="text-gray-500">Métier</span><p className="font-medium">{jobData.job_name || "Non renseigné"}</p></div>
+                <div><span className="text-gray-500">Expérience requise</span><p className="font-medium">{jobData.experience_required != null ? `${jobData.experience_required} an(s)` : "Non renseignée"}</p></div>
+                <div><span className="text-gray-500">Salaire</span><p className="font-medium">{jobData.salary_min != null || jobData.salary_max != null ? `${jobData.salary_min ?? "—"} – ${jobData.salary_max ?? "—"} ${jobData.currency || "MAD"}` : "Non renseigné"}</p></div>
+              </div>
+              {[['Langues', jobData.required_languages], ['Compétences', jobData.required_skills], ['Avantages', jobData.benefits]].map(([label, values]) => (
+                <div key={label as string}>
+                  <p className="text-sm text-gray-500 mb-1">{label as string}</p>
+                  <div className="flex flex-wrap gap-2">{Array.isArray(values) && values.length > 0 ? values.map((value) => <Badge key={value}>{value}</Badge>) : <span className="text-sm">Non renseigné</span>}</div>
+                </div>
+              ))}
             </CardContent>
           </Card>
 
@@ -363,9 +397,9 @@ export default function JobDetailPage() {
                 Modifier l'offre
               </Button>
 
-              {(jobData.is_verified === true || jobData.is_verified === "Accepted") && (
+              {jobData.status === "Accepted" && (
                 <Button 
-                  onClick={() => window.open(`/jobs/${jobId}`, '_blank')}
+                  onClick={openPublicJob}
                   variant="outline"
                 >
                   <Briefcase className="h-4 w-4 mr-2" />

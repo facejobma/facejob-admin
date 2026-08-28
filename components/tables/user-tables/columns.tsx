@@ -105,9 +105,9 @@ export const columns: ColumnDef<User>[] = [
     size: 120,
     cell: ({ row }) => {
       const user = row.original as any;
-      const isVerified = user.email_verified_at;
+      const isActive = user.is_active !== false;
       
-      if (isVerified) {
+      if (isActive) {
         return (
           <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
             <CheckCircle className="w-3 h-3 mr-1" />
@@ -118,7 +118,7 @@ export const columns: ColumnDef<User>[] = [
         return (
           <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
             <Clock className="w-3 h-3 mr-1" />
-            Inactif
+            Désactivé
           </Badge>
         );
       }

@@ -17,7 +17,7 @@ import {
 import moment from "moment";
 import "moment/locale/fr";
 
-export const createColumns = (onUpdate?: (jobId?: number) => void): ColumnDef<Job>[] => [
+export const createColumns = (onUpdate?: (jobId?: number, newStatus?: string) => void): ColumnDef<Job>[] => [
   {
     accessorKey: "titre",
     header: "Offre d'emploi",
@@ -120,16 +120,23 @@ export const createColumns = (onUpdate?: (jobId?: number) => void): ColumnDef<Jo
     header: "Statut",
     size: 130,
     cell: ({ row }) => {
-      const isVerified = row.original.is_verified;
+      const status = row.original.status;
       
-      if (isVerified === true || isVerified === "Accepted") {
+      if (status === "Expired") {
+        return (
+          <Badge className="bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100">
+            <Calendar className="w-3 h-3 mr-1" />
+            Expirée
+          </Badge>
+        );
+      } else if (status === "Accepted") {
         return (
           <Badge className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100">
             <CheckCircle className="w-3 h-3 mr-1" />
             Publiée
           </Badge>
         );
-      } else if (isVerified === "Declined") {
+      } else if (status === "Declined") {
         return (
           <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">
             <XCircle className="w-3 h-3 mr-1" />

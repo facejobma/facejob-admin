@@ -39,7 +39,14 @@ export const JobRequests = ({
   return (
     <div className="space-y-3 p-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground"><Briefcase className="h-4 w-4" />{totalItems || data.length} résultat{(totalItems || data.length) > 1 ? "s" : ""}</div>
-      <DataTable searchKey="titre" columns={createColumns(onUpdate)} data={data} appearance="clean" disablePagination />
+      <DataTable
+        searchKey="titre"
+        searchPlaceholder="Rechercher une offre sur cette page…"
+        columns={createColumns(onUpdate)}
+        data={data}
+        appearance="clean"
+        disablePagination
+      />
       <div className="flex flex-col items-center justify-between gap-3 border-t pt-4 sm:flex-row">
         <div className="text-sm text-muted-foreground">
           Page {currentPage} sur {totalPages || 1} · {totalItems} offre{totalItems > 1 ? "s" : ""}
