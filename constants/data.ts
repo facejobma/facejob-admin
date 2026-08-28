@@ -49,6 +49,12 @@ export const navItems: NavItem[] = [
     icon: "sales",
     label: "sales"
   },
+  {
+    title: "Fonctionnalités IA",
+    href: "/dashboard/ai-features",
+    icon: "settings",
+    label: "aiFeatures"
+  },
   // {
   //   title: "Service de Payment",
   //   href: "/dashboard/payments",
