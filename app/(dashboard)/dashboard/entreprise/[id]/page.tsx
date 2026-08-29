@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BreadCrumb from "@/components/breadcrumb";
 import { useToast } from "@/components/ui/use-toast";
+import { SafeLogo } from "@/components/ui/safe-logo";
 import Cookies from "js-cookie";
 import { 
   Building2, 
@@ -32,7 +33,6 @@ import {
   Award,
   Shield
 } from "lucide-react";
-import Image from "next/image";
 import { EnterpriseData, Job, PaymentDetail } from "@/types";
 
 export default function EntrepriseProfilePage() {
@@ -251,28 +251,11 @@ export default function EntrepriseProfilePage() {
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-4">
               <div className="w-20 h-20 relative rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 shadow-sm">
-                {entreprise?.logo ? (
-                  <Image
-                    src={
-                      entreprise.logo.startsWith("http") 
-                        ? entreprise.logo
-                        : entreprise.logo.startsWith("/")
-                        ? entreprise.logo
-                        : `/${entreprise.logo}`
-                    }
-                    alt={`${entreprise.company_name} Logo`}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      console.log("Enterprise logo load error for:", entreprise.logo);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Building2 className="w-10 h-10 text-gray-400" />
-                  </div>
-                )}
+                <SafeLogo
+                  src={entreprise?.logo}
+                  alt={`Logo de ${entreprise?.company_name || "l'entreprise"}`}
+                  fallbackClassName="h-10 w-10 text-gray-400"
+                />
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{entreprise?.company_name}</h2>
