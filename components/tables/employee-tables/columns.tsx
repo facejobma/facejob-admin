@@ -1,11 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
-import Image from "next/image";
 import moment from "moment";
 import "moment/locale/fr";
 import { Badge } from "@/components/ui/badge";
 import { EnterpriseData } from "@/types";
 import { CellAction } from "./cell-action";
-import { Building2, CalendarDays, CheckCircle2, Clock3, Mail, Phone, Users, XCircle } from "lucide-react";
+import { SafeLogo } from "@/components/ui/safe-logo";
+import { CalendarDays, CheckCircle2, Clock3, Mail, Phone, Users, XCircle } from "lucide-react";
 
 const getStatus = (enterprise: EnterpriseData) => {
   if (enterprise.is_verified === true || enterprise.is_verified === "Accepted") {
@@ -26,7 +26,7 @@ export const columns: ColumnDef<EnterpriseData>[] = [
       return (
         <div className="flex min-w-[230px] items-center gap-3">
           <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted">
-            {enterprise.logo ? <Image src={enterprise.logo} alt="" fill sizes="40px" className="object-cover" /> : <Building2 className="h-5 w-5 text-muted-foreground" />}
+            <SafeLogo src={enterprise.logo} alt={`Logo de ${enterprise.company_name || "l'entreprise"}`} />
           </div>
           <div className="min-w-0">
             <p className="truncate font-medium">{enterprise.company_name}</p>

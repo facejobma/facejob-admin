@@ -68,11 +68,15 @@ export function JobDataTable<TData, TValue>({
       
       // @ts-ignore - is_verified exists on job data
       const isVerified = row.original?.is_verified;
+      // @ts-ignore - status exists on job data
+      const status = row.original?.status;
       switch (filterValue) {
         case "Pending":
           return isVerified === false || isVerified === "Pending" || (!isVerified && isVerified !== true);
         case "Accepted":
-          return isVerified === true || isVerified === "Accepted";
+          return status === "Accepted";
+        case "Expired":
+          return status === "Expired";
         case "Declined":
           return isVerified === "Declined";
         default:
@@ -153,6 +157,7 @@ export function JobDataTable<TData, TValue>({
           <option value="Pending">En attente</option>
           <option value="Accepted">Acceptées</option>
           <option value="Declined">Refusées</option>
+          <option value="Expired">Expirées</option>
         </select>
         <select
           value={sectorValue || ""}

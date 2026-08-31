@@ -87,8 +87,8 @@ export function CandidateDataTable<TData, TValue>({
       
       // Filtre par statut
       if (statusValue) {
-        const isVerified = (row.original as any).email_verified_at;
-        const candidateStatus = isVerified ? 'actif' : 'inactif';
+        const isActive = (row.original as any).is_active !== false;
+        const candidateStatus = isActive ? 'actif' : 'inactif';
         
         if (candidateStatus !== statusValue) {
           return false;

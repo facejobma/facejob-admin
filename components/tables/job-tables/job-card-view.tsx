@@ -67,15 +67,22 @@ export const JobCardView: FC<JobCardViewProps> = ({
   // No client-side filtering - data is already filtered by server
   // Just display the data as-is
 
-  const getStatusBadge = (isVerified: any) => {
-    if (isVerified === true || isVerified === "Accepted") {
+  const getStatusBadge = (job: Job) => {
+    if (job.status === "Expired") {
+      return (
+        <Badge className="bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-100 shadow-sm text-xs py-0 h-5">
+          <Calendar className="w-3 h-3 mr-1" />
+          Expirée
+        </Badge>
+      );
+    } else if (job.status === "Accepted") {
       return (
         <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50 shadow-sm text-xs py-0 h-5">
           <CheckCircle className="w-3 h-3 mr-1" />
           Publiée
         </Badge>
       );
-    } else if (isVerified === false || isVerified === "Declined") {
+    } else if (job.status === "Declined") {
       return (
         <Badge className="bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-50 shadow-sm text-xs py-0 h-5">
           <XCircle className="w-3 h-3 mr-1" />
@@ -143,7 +150,7 @@ export const JobCardView: FC<JobCardViewProps> = ({
                 </div>
               </div>
               <div className="flex-shrink-0">
-                {getStatusBadge(job.is_verified)}
+                {getStatusBadge(job)}
               </div>
             </div>
           </CardHeader>

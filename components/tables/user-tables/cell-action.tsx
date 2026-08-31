@@ -123,7 +123,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
     ? `${data.first_name} ${data.last_name}`
     : data.nomComplete || 'Candidat';
 
-  const isActive = data.email_verified_at;
+  // L'activation fonctionnelle est distincte de la vérification de l'adresse
+  // email. C'est `is_active` qui pilote notamment l'éligibilité au matching.
+  const isActive = data.is_active !== false;
 
   return (
     <>

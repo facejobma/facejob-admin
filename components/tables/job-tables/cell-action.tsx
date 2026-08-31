@@ -125,7 +125,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onUpdate }) => {
 
       // Utiliser l'endpoint correct pour la suppression
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/offre/delete/${data.id}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offre/delete/${data.id}`,
         {
           method: "DELETE",
           headers: {
@@ -179,8 +179,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onUpdate }) => {
     onVerify("Declined", sanitizedComment);
   };
 
+  const getPublicJobUrl = () => {
+    const frontendUrl = (process.env.NEXT_PUBLIC_FRONTEND_URL || window.location.origin).replace(/\/$/, "");
+    return `${frontendUrl}/offres/${data.id}`;
+  };
+
   const copyJobLink = () => {
-    const jobUrl = `${window.location.origin}/jobs/${data.id}`;
+    const jobUrl = getPublicJobUrl();
     navigator.clipboard.writeText(jobUrl);
     toast({
       title: "Lien copié",
@@ -189,21 +194,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onUpdate }) => {
   };
 
   const getStatusBadge = () => {
-    const isVerified = data.is_verified;
-    
-    if (isVerified === true || isVerified === "Accepted") {
+    if (data.status === "Expired") {
+      return <Badge className="bg-slate-100 text-slate-800 border-slate-200">Expirée</Badge>;
+    }
+
+    if (data.status === "Accepted") {
       return <Badge className="bg-green-100 text-green-800 border-green-200">Publiée</Badge>;
-    } else if (isVerified === false || isVerified === "Declined") {
+    } else if (data.status === "Declined") {
       return <Badge className="bg-red-100 text-red-800 border-red-200">Refusée</Badge>;
     }
     return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">En attente</Badge>;
   };
 
-  const isPending = data.is_verified === "Pending" || 
-                   data.is_verified === false || 
-                   (data.is_verified !== true && data.is_verified !== "Accepted");
+  const isPending = data.status === "Pending";
 
-  const isPublished = data.is_verified === true || data.is_verified === "Accepted";
+  const isPublished = data.status === "Accepted";
 
   return (
     <>
@@ -256,7 +261,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onUpdate }) => {
 
           {isPublished && (
             <DropdownMenuItem
-              onClick={() => window.open(`/jobs/${data.id}`, '_blank')}
+              onClick={() => window.open(getPublicJobUrl(), '_blank', 'noopener,noreferrer')}
               className="flex items-center gap-2"
             >
               <ExternalLink className="h-4 w-4" />

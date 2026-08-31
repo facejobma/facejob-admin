@@ -210,8 +210,10 @@ export default function CandidateDetailPage() {
     ? `${candidate.first_name} ${candidate.last_name}`
     : candidate.nomComplete || 'Nom non défini';
 
-  const isActive = candidate.email_verified_at;
-  const sectorName = typeof candidate.sector === 'object' ? candidate.sector?.name : candidate.sector;
+  const isActive = candidate.is_active !== false;
+  const isEmailVerified = Boolean(candidate.email_verified_at);
+  const sectorName = candidate.job?.sector?.name
+    || (typeof candidate.sector === 'object' ? candidate.sector?.name : candidate.sector);
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -351,11 +353,29 @@ export default function CandidateDetailPage() {
                 </div>
 
                 <div className="flex items-center space-x-3">
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Contrat préféré</p>
+                    <p className="text-sm text-muted-foreground">{candidate.preferred_contract_type || 'Aucune préférence'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <Briefcase className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Métier ciblé</p>
+                    <p className="text-sm text-muted-foreground">
+                      {candidate.job?.name || 'Non renseigné'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Statut du compte</p>
                     <p className="text-sm text-muted-foreground">
-                      {isActive ? 'Compte vérifié et actif' : 'Compte non vérifié'}
+                      {isActive ? 'Compte actif' : 'Compte désactivé'} · {isEmailVerified ? 'email vérifié' : 'email non vérifié'}
                     </p>
                   </div>
                 </div>

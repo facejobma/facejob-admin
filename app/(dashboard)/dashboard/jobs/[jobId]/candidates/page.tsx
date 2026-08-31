@@ -37,6 +37,7 @@ import "moment/locale/fr";
 
 interface Candidate {
   id: number;
+  application_id: number;
   nom: string;
   prenom: string;
   email: string;
@@ -44,8 +45,9 @@ interface Candidate {
   ville?: string;
   cv_path?: string;
   video_path?: string;
-  status?: string;
+  status?: "submitted" | "viewed" | "accepted" | "rejected";
   applied_at: string;
+  viewed_at?: string | null;
   experience_years?: number;
   skills?: string[];
 }
@@ -96,11 +98,10 @@ export default function JobCandidatesPage() {
             throw new Error(`Erreur ${jobResponse.status}: ${jobResponse.statusText}`);
           }
 
-          const jobData = await jobResponse.json();
-          setJobData(jobData);
+          const jobResult = await jobResponse.json();
+          setJobData(jobResult.data);
 
-          // Récupérer les candidatures (simulé pour l'exemple)
-          // En réalité, vous devriez avoir un endpoint pour récupérer les candidatures d'une offre
+          // Récupérer les candidatures réelles de cette offre.
           const candidatesResponse = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/job/${jobId}/candidates`,
             {
@@ -115,8 +116,8 @@ export default function JobCandidatesPage() {
             const candidatesData = await candidatesResponse.json();
             setCandidates(candidatesData.data || []);
           } else {
-            // Si l'endpoint n'existe pas encore, on simule des données vides
-            setCandidates([]);
+            const errorData = await candidatesResponse.json().catch(() => null);
+            throw new Error(errorData?.message || `Erreur ${candidatesResponse.status}: impossible de charger les candidatures`);
           }
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -153,14 +154,47 @@ export default function JobCandidatesPage() {
         return <Badge className="bg-green-100 text-green-800 border-green-200"><CheckCircle className="w-3 h-3 mr-1" />Accepté</Badge>;
       case "rejected":
         return <Badge className="bg-red-100 text-red-800 border-red-200"><XCircle className="w-3 h-3 mr-1" />Rejeté</Badge>;
-      case "pending":
+      case "withdrawn":
+        return <Badge className="bg-gray-100 text-gray-700 border-gray-200">Retirée</Badge>;
+      case "viewed":
+        return <Badge className="bg-blue-100 text-blue-800 border-blue-200"><Eye className="w-3 h-3 mr-1" />Consultée</Badge>;
+      case "submitted":
       default:
-        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200"><Clock className="w-3 h-3 mr-1" />En attente</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200"><Clock className="w-3 h-3 mr-1" />Soumise</Badge>;
     }
   };
 
   const getInitials = (prenom: string, nom: string) => {
     return `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase();
+  };
+
+  const openDocument = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const exportCandidates = () => {
+    const escapeCsv = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const rows = [
+      ["Prénom", "Nom", "Email", "Téléphone", "Ville", "Statut", "Date de candidature"],
+      ...filteredCandidates.map((candidate) => [
+        candidate.prenom,
+        candidate.nom,
+        candidate.email,
+        candidate.telephone || "",
+        candidate.ville || "",
+        candidate.status || "submitted",
+        moment(candidate.applied_at).format("YYYY-MM-DD HH:mm"),
+      ]),
+    ];
+    const csv = rows.map((row) => row.map(escapeCsv).join(";")).join("\r\n");
+    const url = URL.createObjectURL(new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `candidatures-offre-${jobId}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -234,7 +268,7 @@ export default function JobCandidatesPage() {
     );
   }
 
-  const pendingCount = candidates.filter(c => !c.status || c.status === "pending").length;
+  const pendingCount = candidates.filter(c => !c.status || c.status === "submitted" || c.status === "viewed").length;
   const acceptedCount = candidates.filter(c => c.status === "accepted").length;
   const rejectedCount = candidates.filter(c => c.status === "rejected").length;
 
@@ -342,7 +376,8 @@ export default function JobCandidatesPage() {
                   className="border rounded-md px-3 py-2 bg-white text-sm"
                 >
                   <option value="all">Tous les statuts</option>
-                  <option value="pending">En attente</option>
+                  <option value="submitted">Soumises</option>
+                  <option value="viewed">Consultées</option>
                   <option value="accepted">Acceptés</option>
                   <option value="rejected">Rejetés</option>
                 </select>
@@ -367,7 +402,7 @@ export default function JobCandidatesPage() {
             ) : (
               <div className="space-y-4">
                 {filteredCandidates.map((candidate) => (
-                  <Card key={candidate.id} className="hover:shadow-md transition-shadow">
+                  <Card key={candidate.application_id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-4">
@@ -410,7 +445,7 @@ export default function JobCandidatesPage() {
                                   Candidature: {moment(candidate.applied_at).format("DD/MM/YYYY")}
                                 </span>
                               </div>
-                              {candidate.experience_years && (
+                              {candidate.experience_years != null && (
                                 <div className="flex items-center gap-1">
                                   <Briefcase className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-muted-foreground">
@@ -442,18 +477,18 @@ export default function JobCandidatesPage() {
                           
                           <div className="flex items-center gap-1 ml-4">
                             {candidate.cv_path && (
-                              <Button size="sm" variant="outline">
+                              <Button size="sm" variant="outline" onClick={() => openDocument(candidate.cv_path!)}>
                                 <FileText className="h-3 w-3 mr-1" />
                                 CV
                               </Button>
                             )}
                             {candidate.video_path && (
-                              <Button size="sm" variant="outline">
+                              <Button size="sm" variant="outline" onClick={() => openDocument(candidate.video_path!)}>
                                 <Eye className="h-3 w-3 mr-1" />
                                 Vidéo
                               </Button>
                             )}
-                            <Button size="sm" variant="outline">
+                            <Button size="sm" variant="outline" onClick={() => router.push(`/dashboard/candidate/${candidate.id}`)}>
                               <User className="h-3 w-3 mr-1" />
                               Profil
                             </Button>
@@ -477,7 +512,7 @@ export default function JobCandidatesPage() {
                   {filteredCandidates.length} candidat{filteredCandidates.length > 1 ? 's' : ''} affiché{filteredCandidates.length > 1 ? 's' : ''} sur {candidates.length} au total
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline">
+                  <Button variant="outline" onClick={exportCandidates} disabled={filteredCandidates.length === 0}>
                     <Download className="h-4 w-4 mr-2" />
                     Exporter la liste
                   </Button>

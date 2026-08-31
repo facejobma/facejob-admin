@@ -34,23 +34,63 @@ import skillsData from "@/data/skills.json";
 const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), { ssr: false });
 const MultiSelect = dynamic(() => import("@/components/MultiSelect"), { ssr: false });
 
+const BENEFIT_OPTIONS = ["Assurance santé", "Formation", "Télétravail", "Horaires flexibles", "Primes", "Transport", "Tickets restaurant", "Mutuelle"];
+
+interface ReferenceSector {
+  id: number;
+  name: string;
+  jobs?: Array<{ id: number; name: string }>;
+}
+
+const normalizeStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed)
+        ? parsed.filter((item): item is string => typeof item === "string")
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+};
+
+const formatValidationErrors = (errors: unknown): string => {
+  if (!errors || typeof errors !== "object") return "Les données envoyées sont invalides.";
+
+  return Object.values(errors as Record<string, unknown>)
+    .flatMap((value) => Array.isArray(value) ? value : [value])
+    .filter((value): value is string => typeof value === "string")
+    .join(" ") || "Les données envoyées sont invalides.";
+};
+
 interface JobFormData {
   id: number;
   titre: string;
   description: string;
   date_debut: string;
-  date_fin: string;
+  date_fin: string | null;
   company_name: string;
   sector_name: string;
   location: string;
   contractType: string;
   // Required IDs for validation
   sector_id: number | string;
-  job_id: number | string;
-  entreprise_id: number | string;
+  job_id: number | string | null;
   // Matching criteria fields (used in scoring)
   required_languages: string[];
   required_skills: string[];
+  experience_required: number | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  currency: string;
+  benefits: string[];
 }
 
 export default function JobEditPage() {
@@ -58,6 +98,7 @@ export default function JobEditPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sectors, setSectors] = useState<ReferenceSector[]>([]);
   const { jobId } = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -81,6 +122,32 @@ export default function JobEditPage() {
   ];
 
   useEffect(() => {
+    const fetchSectors = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        const result = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(result?.message || `Erreur ${response.status}`);
+        }
+
+        setSectors(Array.isArray(result) ? result : (result?.data || []));
+      } catch (error) {
+        console.error("Error fetching sectors and jobs:", error);
+        toast({
+          title: "Référentiel indisponible",
+          variant: "destructive",
+          description: "Impossible de charger la liste des métiers. L'offre reste consultable.",
+        });
+      }
+    };
+
+    fetchSectors();
+  }, [toast]);
+
+  useEffect(() => {
     if (jobId) {
       const fetchJobData = async () => {
         try {
@@ -102,31 +169,22 @@ export default function JobEditPage() {
             throw new Error(`Erreur ${response.status}: ${response.statusText}`);
           }
 
-          const data = await response.json();
-          console.log("Job data received:", data);
-          console.log("Required IDs:", {
-            sector_id: data.sector_id,
-            job_id: data.job_id,
-            entreprise_id: data.entreprise_id
-          });
-          
+          const result = await response.json();
+          const data = result.data;
           // Normalize data to ensure proper types
           const normalizedData = {
             ...data,
             location: data.location || '',
             contractType: data.contractType || '',
-            required_languages: Array.isArray(data.required_languages) 
-              ? data.required_languages 
-              : (data.required_languages ? JSON.parse(data.required_languages) : []),
-            required_skills: Array.isArray(data.required_skills) 
-              ? data.required_skills 
-              : (data.required_skills ? JSON.parse(data.required_skills) : []),
+            date_fin: data.date_fin || null,
+            required_languages: normalizeStringArray(data.required_languages),
+            required_skills: normalizeStringArray(data.required_skills),
+            benefits: normalizeStringArray(data.benefits),
+            experience_required: data.experience_required ?? null,
+            salary_min: data.salary_min ?? null,
+            salary_max: data.salary_max ?? null,
+            currency: data.currency || 'MAD',
           };
-          
-          console.log("Normalized data:", {
-            required_languages: normalizedData.required_languages,
-            required_skills: normalizedData.required_skills,
-          });
           
           setJobData(normalizedData);
         } catch (error) {
@@ -147,7 +205,7 @@ export default function JobEditPage() {
     }
   }, [jobId, toast]);
 
-  const handleInputChange = (field: keyof JobFormData, value: string | number | string[]) => {
+  const handleInputChange = (field: keyof JobFormData, value: string | number | string[] | null) => {
     if (jobData) {
       setJobData({
         ...jobData,
@@ -184,42 +242,50 @@ export default function JobEditPage() {
     handleInputChange('required_skills', currentSkills.filter(s => s !== skillToRemove));
   };
 
+  const selectedSector = sectors.find((sector) => String(sector.id) === String(jobData?.sector_id));
+
   const handleSave = async () => {
     if (!jobData) return;
 
     // Vérifier que les champs requis sont présents
-    if (!jobData.sector_id || !jobData.job_id || !jobData.entreprise_id) {
-      console.error("Missing required IDs:", {
-        sector_id: jobData.sector_id,
-        job_id: jobData.job_id,
-        entreprise_id: jobData.entreprise_id
-      });
+    if (!jobData.sector_id || !jobData.titre.trim() || !jobData.location.trim() || !jobData.contractType || !jobData.date_debut) {
       toast({
         title: "Erreur",
         variant: "destructive",
-        description: "Données manquantes. Veuillez recharger la page.",
+        description: "Renseignez le titre, la localisation, le contrat, le secteur et la date de début.",
       });
+      return;
+    }
+
+    if (jobData.titre.trim().length < 5 || jobData.titre.trim().length > 200) {
+      toast({ title: "Erreur", variant: "destructive", description: "Le titre doit contenir entre 5 et 200 caractères." });
+      return;
+    }
+
+    if (jobData.location.trim().length < 2 || jobData.location.trim().length > 100) {
+      toast({ title: "Erreur", variant: "destructive", description: "La localisation doit contenir entre 2 et 100 caractères." });
+      return;
+    }
+
+    const descriptionText = jobData.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    if (descriptionText.length < 50 || descriptionText.length > 10000) {
+      toast({ title: "Erreur", variant: "destructive", description: "La description doit contenir entre 50 et 10 000 caractères." });
+      return;
+    }
+
+    if (jobData.date_fin && jobData.date_fin <= jobData.date_debut) {
+      toast({ title: "Erreur", variant: "destructive", description: "La date de fin doit être postérieure à la date de début." });
+      return;
+    }
+
+    if (jobData.salary_min !== null && jobData.salary_max !== null && jobData.salary_max < jobData.salary_min) {
+      toast({ title: "Erreur", variant: "destructive", description: "Le salaire maximum doit être supérieur ou égal au salaire minimum." });
       return;
     }
 
     try {
       setSaving(true);
       const authToken = Cookies.get("authToken");
-
-      console.log("Sending job update with data:", {
-        titre: jobData.titre,
-        titre_length: jobData.titre.length,
-        description_length: jobData.description.length,
-        date_debut: jobData.date_debut,
-        date_fin: jobData.date_fin,
-        location: jobData.location,
-        contractType: jobData.contractType,
-        sector_id: Number(jobData.sector_id),
-        job_id: Number(jobData.job_id),
-        entreprise_id: Number(jobData.entreprise_id),
-        required_languages: jobData.required_languages || [],
-        required_skills: jobData.required_skills || [],
-      });
 
       // Use the correct admin endpoint
       const response = await fetch(
@@ -239,49 +305,37 @@ export default function JobEditPage() {
             contractType: jobData.contractType,
             // Include required IDs for validation - convertir en nombres
             sector_id: Number(jobData.sector_id),
-            job_id: Number(jobData.job_id),
-            entreprise_id: Number(jobData.entreprise_id),
+            job_id: jobData.job_id ? Number(jobData.job_id) : null,
             // Matching criteria (used in scoring algorithm)
             required_languages: jobData.required_languages || [],
             required_skills: jobData.required_skills || [],
+            benefits: jobData.benefits || [],
+            experience_required: jobData.experience_required,
+            salary_min: jobData.salary_min,
+            salary_max: jobData.salary_max,
+            currency: jobData.currency,
           }),
         },
       );
 
+      const responseData = await response.json().catch(() => ({}));
+
       if (response.ok) {
         toast({
           title: "Succès",
-          description: "L'offre d'emploi a été mise à jour avec succès.",
+          description: responseData.message || "L'offre d'emploi a été mise à jour avec succès.",
         });
         router.push(`/dashboard/jobs/${jobId}`);
       } else {
-        // Gestion spécifique des erreurs de validation
         if (response.status === 422) {
-          const errorData = await response.json();
-          console.error("Validation errors:", errorData);
           toast({
             title: "Erreur de validation",
             variant: "destructive",
-            description: `Erreurs de validation: ${JSON.stringify(errorData.errors)}`,
+            description: formatValidationErrors(responseData.errors),
           });
+          return;
         } else {
-          const errorText = await response.text();
-          let errorData;
-          try {
-            errorData = JSON.parse(errorText);
-          } catch {
-            errorData = { message: errorText };
-          }
-          console.error("Server error:", errorData);
-          console.error("Response status:", response.status);
-          console.error("Response headers:", Object.fromEntries(response.headers.entries()));
-          
-          toast({
-            title: "Erreur serveur",
-            variant: "destructive",
-            description: errorData.message || `Erreur ${response.status}: ${response.statusText}`,
-          });
-          throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+          throw new Error(responseData.message || `Erreur ${response.status}: ${response.statusText}`);
         }
       }
     } catch (error) {
@@ -404,6 +458,7 @@ export default function JobEditPage() {
                 <Input
                   id="titre"
                   value={jobData.titre}
+                  maxLength={200}
                   onChange={(e) => handleInputChange('titre', e.target.value)}
                   placeholder="Ex: Développeur Full Stack"
                 />
@@ -460,6 +515,25 @@ export default function JobEditPage() {
                   Le secteur d'activité est défini par l'entreprise.
                 </p>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="job_id">Métier de référence (facultatif)</Label>
+                <select
+                  id="job_id"
+                  value={jobData.job_id ?? ""}
+                  onChange={(event) => handleInputChange("job_id", event.target.value ? Number(event.target.value) : null)}
+                  disabled={sectors.length === 0}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50"
+                >
+                  <option value="">Autre métier / non répertorié</option>
+                  {(selectedSector?.jobs || []).map((job) => (
+                    <option key={job.id} value={job.id}>{job.name}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  Ce champ améliore le matching, mais son absence ne bloque pas l'offre.
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -489,6 +563,7 @@ export default function JobEditPage() {
                   <select
                     id="contractType"
                     value={jobData.contractType || ''}
+                    required
                     onChange={(e) => handleInputChange('contractType', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -516,6 +591,47 @@ export default function JobEditPage() {
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="experience_required">Expérience requise (années)</Label>
+                  <Input id="experience_required" type="number" min={0} max={50}
+                    value={jobData.experience_required ?? ''}
+                    onChange={(e) => handleInputChange('experience_required', e.target.value === '' ? null : Number(e.target.value))} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="salary_min">Salaire minimum</Label>
+                  <Input id="salary_min" type="number" min={0} value={jobData.salary_min ?? ''}
+                    onChange={(e) => handleInputChange('salary_min', e.target.value === '' ? null : Number(e.target.value))} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="salary_max">Salaire maximum</Label>
+                  <Input id="salary_max" type="number" min={0} value={jobData.salary_max ?? ''}
+                    onChange={(e) => handleInputChange('salary_max', e.target.value === '' ? null : Number(e.target.value))} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="currency">Devise</Label>
+                  <select id="currency" value={jobData.currency} onChange={(e) => handleInputChange('currency', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <option value="MAD">MAD</option><option value="EUR">EUR</option><option value="USD">USD</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Avantages</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {BENEFIT_OPTIONS.map((benefit) => (
+                    <label key={benefit} className="flex items-center gap-2 rounded-md border p-2 text-sm">
+                      <input type="checkbox" checked={jobData.benefits.includes(benefit)}
+                        onChange={() => handleInputChange('benefits', jobData.benefits.includes(benefit)
+                          ? jobData.benefits.filter((item) => item !== benefit)
+                          : [...jobData.benefits, benefit])} />
+                      {benefit}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               {/* Langues requises - MultiSelect */}
               <div className="space-y-2">
                 <Label htmlFor="required_languages" className="flex items-center gap-2">
@@ -604,7 +720,7 @@ export default function JobEditPage() {
                 </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• <strong>Secteur</strong> (30%) - Défini par l'entreprise</li>
-                  <li>• <strong>Titre du poste</strong> (20%) - Champ "Titre de l'offre"</li>
+                  <li>• <strong>Métier de référence</strong> (20% lorsqu’il est renseigné) — sinon son poids est redistribué entre les autres critères</li>
                   <li>• <strong>Expérience</strong> (20%) - Basé sur le profil candidat</li>
                   <li>• <strong>Localisation</strong> (3%) - Champ "Localisation"</li>
                   <li>• <strong>Type de contrat</strong> (2%) - Champ "Type de contrat"</li>
@@ -639,6 +755,7 @@ export default function JobEditPage() {
                     id="date_fin"
                     type="date"
                     value={jobData.date_fin ? moment(jobData.date_fin).format('YYYY-MM-DD') : ''}
+                    min={jobData.date_debut ? moment(jobData.date_debut).format('YYYY-MM-DD') : undefined}
                     onChange={(e) => handleInputChange('date_fin', e.target.value)}
                   />
                 </div>

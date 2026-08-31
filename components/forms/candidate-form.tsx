@@ -35,8 +35,11 @@ const candidateFormSchema = z.object({
   tel: z.string().optional(),
   bio: z.string().optional(),
   sector_id: z.string().optional(),
+  job_id: z.string().optional(),
   ville: z.string().optional(),
   adresse: z.string().optional(),
+  is_active: z.boolean(),
+  preferred_contract_type: z.string().optional(),
 });
 
 type CandidateFormValues = z.infer<typeof candidateFormSchema>;
@@ -62,9 +65,12 @@ export function CandidateForm({ initialData, onSubmit, loading = false }: Candid
       email: initialData?.email || "",
       tel: initialData?.tel || initialData?.phone || "",
       bio: initialData?.bio || "",
-      sector_id: typeof initialData?.sector === 'object' ? initialData?.sector?.id?.toString() : "",
+      sector_id: initialData?.job?.sector_id?.toString() || (typeof initialData?.sector === 'object' ? initialData?.sector?.id?.toString() : ""),
+      job_id: initialData?.job?.id?.toString() || "",
       ville: (initialData as any)?.ville || "",
       adresse: (initialData as any)?.adresse || "",
+      is_active: initialData?.is_active ?? true,
+      preferred_contract_type: initialData?.preferred_contract_type || "",
     },
   });
 
@@ -106,6 +112,9 @@ export function CandidateForm({ initialData, onSubmit, loading = false }: Candid
       console.error("Form submission error:", error);
     }
   };
+
+  const selectedSectorId = form.watch("sector_id");
+  const selectedSector = sectors.find((sector) => String(sector.id) === selectedSectorId);
 
   return (
     <Form {...form}>
@@ -260,7 +269,7 @@ export function CandidateForm({ initialData, onSubmit, loading = false }: Candid
               <FormItem>
                 <FormLabel>Secteur d'activité</FormLabel>
                 <Select 
-                  onValueChange={field.onChange} 
+                  onValueChange={(value) => { field.onChange(value); form.setValue("job_id", ""); }}
                   defaultValue={field.value}
                   disabled={loadingSectors}
                 >
@@ -299,6 +308,69 @@ export function CandidateForm({ initialData, onSubmit, loading = false }: Candid
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="job_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Métier ciblé (facultatif)</FormLabel>
+                <Select
+                  onValueChange={(value) => field.onChange(value === "none" ? "" : value)}
+                  value={field.value || "none"}
+                  disabled={!selectedSectorId}
+                >
+                  <FormControl><SelectTrigger><SelectValue placeholder={selectedSectorId ? "Sélectionner un métier" : "Sélectionnez d'abord un secteur"} /></SelectTrigger></FormControl>
+                  <SelectContent>
+                    <SelectItem value="none">Aucun métier de référence</SelectItem>
+                    {(selectedSector?.jobs || []).map((job) => (
+                      <SelectItem key={job.id} value={String(job.id)}>{job.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Le candidat reste utilisable sans métier normalisé.</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="preferred_contract_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Type de contrat préféré</FormLabel>
+                  <Select onValueChange={(value) => field.onChange(value === "none" ? "" : value)} value={field.value || "none"}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Aucune préférence" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">Aucune préférence</SelectItem>
+                      {['CDI', 'CDD', 'Stage', 'Freelance', 'Alternance'].map((contract) => (
+                        <SelectItem key={contract} value={contract}>{contract}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="is_active"
+              render={({ field }) => (
+                <FormItem className="rounded-md border p-4">
+                  <div className="flex items-center gap-3">
+                    <FormControl>
+                      <input type="checkbox" checked={field.value} onChange={field.onChange} className="h-4 w-4" />
+                    </FormControl>
+                    <div><FormLabel>Compte actif</FormLabel><p className="text-xs text-muted-foreground">Un candidat désactivé est exclu du matching.</p></div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Submit Button */}

@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   renderBulkActions?: (selectedRows: TData[], resetSelection: () => void) => React.ReactNode;
   disablePagination?: boolean;
   appearance?: "default" | "clean";
+  searchPlaceholder?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -42,6 +43,7 @@ export function DataTable<TData, TValue>({
   renderBulkActions,
   disablePagination = false,
   appearance = "default",
+  searchPlaceholder = "Rechercher…",
 }: DataTableProps<TData, TValue>) {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>(""); // Default to show all
@@ -133,7 +135,7 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <div className={appearance === "clean" ? "flex flex-col gap-3 rounded-lg border bg-background p-3 sm:flex-row" : "flex flex-col sm:flex-row gap-3 p-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg border border-gray-200 dark:border-gray-700"}>
         <Input
-          placeholder="Rechercher une entreprise…"
+          placeholder={searchPlaceholder}
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
           className="w-full sm:max-w-sm"

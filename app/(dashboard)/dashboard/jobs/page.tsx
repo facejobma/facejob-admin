@@ -54,6 +54,7 @@ export default function JobsPage() {
     pending: 0,
     accepted: 0,
     declined: 0,
+    expired: 0,
     total: 0,
   });
   
@@ -226,7 +227,7 @@ export default function JobsPage() {
   const fetchGlobalStats = async () => {
     try {
       // Fetch counts for each status
-      const [pendingRes, acceptedRes, declinedRes, totalRes] = await Promise.all([
+      const [pendingRes, acceptedRes, declinedRes, expiredRes, totalRes] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=Pending&per_page=1`, {
           headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
         }),
@@ -236,15 +237,19 @@ export default function JobsPage() {
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=Declined&per_page=1`, {
           headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
         }),
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=Expired&per_page=1`, {
+          headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
+        }),
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres?status=all&per_page=1`, {
           headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" },
         }),
       ]);
 
-      const [pending, accepted, declined, total] = await Promise.all([
+      const [pending, accepted, declined, expired, total] = await Promise.all([
         pendingRes.json(),
         acceptedRes.json(),
         declinedRes.json(),
+        expiredRes.json(),
         totalRes.json(),
       ]);
 
@@ -252,6 +257,7 @@ export default function JobsPage() {
         pending: pending.pagination?.total || 0,
         accepted: accepted.pagination?.total || 0,
         declined: declined.pagination?.total || 0,
+        expired: expired.pagination?.total || 0,
         total: total.pagination?.total || 0,
       });
     } catch (error) {
@@ -290,7 +296,9 @@ export default function JobsPage() {
       if (newStatus) {
         setJobs(prevJobs => 
           prevJobs.map(job => 
-            job.id === jobId ? { ...job, is_verified: newStatus } : job
+            job.id === jobId
+              ? { ...job, is_verified: newStatus, status: newStatus as Job["status"] }
+              : job
           )
         );
         
@@ -301,7 +309,7 @@ export default function JobsPage() {
       
       // Sinon, récupérer les données depuis le backend
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/offres_by_id/${jobId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/offres_by_id/${jobId}`,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -311,7 +319,8 @@ export default function JobsPage() {
       );
 
       if (response.ok) {
-        const updatedJob = await response.json();
+        const updatedJobResult = await response.json();
+        const updatedJob = updatedJobResult.data;
         
         // Mettre à jour uniquement l'offre modifiée dans le state
         setJobs(prevJobs => 
@@ -353,7 +362,7 @@ export default function JobsPage() {
 
   // Calcul du taux d'acceptation - based on global stats
   const acceptanceRate = globalStats.total > 0 
-    ? Math.round((globalStats.accepted / globalStats.total) * 100)
+    ? Math.round(((globalStats.accepted + globalStats.expired) / globalStats.total) * 100)
     : 0;
 
   // Offres récentes (dernières 7 jours)
@@ -385,6 +394,7 @@ export default function JobsPage() {
       'all': 'all',
       'pending': 'Pending',
       'accepted': 'Accepted',
+      'expired': 'Expired',
       'declined': 'Declined',
     };
     
@@ -480,7 +490,7 @@ export default function JobsPage() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Briefcase className="h-4 w-4" />
             <span>
-              {jobs.length} offre{jobs.length > 1 ? 's' : ''} • 
+              {totalItems} offre{totalItems > 1 ? 's' : ''} dans cette vue • 
               Dernière mise à jour: {new Date().toLocaleTimeString('fr-FR', { 
                 hour: '2-digit', 
                 minute: '2-digit' 
@@ -520,7 +530,7 @@ export default function JobsPage() {
       </div>
 
       {/* Statistiques principales */}
-      {showStatistics && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {showStatistics && <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card className="relative overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">En attente</CardTitle>
@@ -547,8 +557,19 @@ export default function JobsPage() {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{globalStats.accepted}</div>
             <p className="text-xs text-muted-foreground">
-              Offres publiées
+              Offres actives
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Expirées</CardTitle>
+            <Calendar className="h-4 w-4 text-slate-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-600">{globalStats.expired}</div>
+            <p className="text-xs text-muted-foreground">Anciennes offres acceptées</p>
           </CardContent>
         </Card>
 
@@ -598,14 +619,14 @@ export default function JobsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Offres traitées</span>
-                <Badge variant="outline" className="font-semibold">{globalStats.accepted + globalStats.declined}</Badge>
+                <Badge variant="outline" className="font-semibold">{globalStats.accepted + globalStats.expired + globalStats.declined}</Badge>
               </div>
               <div className="pt-2 border-t">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Taux de traitement</span>
                   <span className="font-semibold text-blue-600">
                     {globalStats.total > 0
-                      ? Math.round(((globalStats.accepted + globalStats.declined) / globalStats.total) * 100)
+                      ? Math.round(((globalStats.accepted + globalStats.expired + globalStats.declined) / globalStats.total) * 100)
                       : 0}%
                   </span>
                 </div>
@@ -739,6 +760,10 @@ export default function JobsPage() {
                 <TabsTrigger value="declined" className="flex items-center gap-2">
                   <XCircle className="h-3 w-3" />
                   Refusées ({globalStats.declined})
+                </TabsTrigger>
+                <TabsTrigger value="expired" className="flex items-center gap-2">
+                  <Calendar className="h-3 w-3" />
+                  Expirées ({globalStats.expired})
                 </TabsTrigger>
               </TabsList>
             </div>
