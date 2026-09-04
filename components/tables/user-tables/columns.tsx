@@ -8,7 +8,17 @@ import { EnterpriseData, User } from "@/types";
 import moment from "moment";
 import "moment/locale/fr";
 import { Badge } from "@/components/ui/badge";
-import { Building2, CheckCircle, Clock, XCircle, Star, Users, User as UserIcon, Mail, Phone } from "lucide-react";
+import {
+  Building2,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Star,
+  Users,
+  User as UserIcon,
+  Mail,
+  Phone,
+} from "lucide-react";
 
 // Colonnes pour les candidats
 export const columns: ColumnDef<User>[] = [
@@ -41,15 +51,22 @@ export const columns: ColumnDef<User>[] = [
     size: 250,
     cell: ({ row }) => {
       const user = row.original as any; // Type étendu pour les propriétés supplémentaires
+      const avatar = [user.image, user.avatar].find(
+        (value) =>
+          typeof value === "string" &&
+          (value.startsWith("https://") ||
+            value.startsWith("http://") ||
+            value.startsWith("/")),
+      );
       return (
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 relative rounded-full overflow-hidden bg-gray-100 border flex items-center justify-center">
-            {user.avatar ? (
-              <Image
-                src={user.avatar}
+            {avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatar}
                 alt={`${user.first_name || user.nomComplete} Avatar`}
-                fill
-                className="object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
               <UserIcon className="w-5 h-5 text-gray-400" />
@@ -57,12 +74,14 @@ export const columns: ColumnDef<User>[] = [
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-sm truncate">
-              {user.first_name && user.last_name 
+              {user.first_name && user.last_name
                 ? `${user.first_name} ${user.last_name}`
-                : user.nomComplete || 'Nom non défini'}
+                : user.nomComplete || "Nom non défini"}
             </div>
             <div className="text-xs text-muted-foreground truncate">
-              {typeof user.sector === 'object' ? user.sector?.name : user.sector || 'Secteur non défini'}
+              {typeof user.sector === "object"
+                ? user.sector?.name
+                : user.sector || "Secteur non défini"}
             </div>
           </div>
         </div>
@@ -76,10 +95,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => (
       <div className="flex items-center space-x-2">
         <Mail className="w-4 h-4 text-muted-foreground" />
-        <TruncatedCell 
-          content={row.getValue("email")} 
-          maxWidth="180px"
-        />
+        <TruncatedCell content={row.getValue("email")} maxWidth="180px" />
       </div>
     ),
   },
@@ -106,7 +122,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const user = row.original as any;
       const isActive = user.is_active !== false;
-      
+
       if (isActive) {
         return (
           <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
@@ -131,10 +147,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const bio = row.getValue("bio") as string;
       return bio ? (
-        <TruncatedCell 
-          content={bio} 
-          maxWidth="180px"
-        />
+        <TruncatedCell content={bio} maxWidth="180px" />
       ) : (
         <span className="text-xs text-muted-foreground">Aucune bio</span>
       );
@@ -154,7 +167,12 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     header: "Actions",
     size: 80,
-    cell: ({ row, table }) => <CellAction data={row.original} onRefresh={table.options.meta?.onRefresh} />,
+    cell: ({ row, table }) => (
+      <CellAction
+        data={row.original}
+        onRefresh={table.options.meta?.onRefresh}
+      />
+    ),
   },
 ];
 
@@ -196,18 +214,21 @@ export const enterpriseColumns: ColumnDef<
           {row.original?.logo && typeof row.original.logo === "string" ? (
             <Image
               src={
-                row.original.logo.startsWith("http") 
+                row.original.logo.startsWith("http")
                   ? row.original.logo
                   : row.original.logo.startsWith("/")
-                  ? row.original.logo
-                  : `/${row.original.logo}`
+                    ? row.original.logo
+                    : `/${row.original.logo}`
               }
               alt={`${row.original.company_name} Logo`}
               fill
               className="object-cover"
               onError={(e) => {
-                console.log("Enterprise logo load error for:", row.original.logo);
-                e.currentTarget.style.display = 'none';
+                console.log(
+                  "Enterprise logo load error for:",
+                  row.original.logo,
+                );
+                e.currentTarget.style.display = "none";
               }}
             />
           ) : (
@@ -221,7 +242,7 @@ export const enterpriseColumns: ColumnDef<
             {row.original.company_name}
           </div>
           <div className="text-xs text-muted-foreground truncate">
-            {row.original.sector?.name || 'Secteur non défini'}
+            {row.original.sector?.name || "Secteur non défini"}
           </div>
           <div className="flex items-center space-x-1 mt-1">
             <Users className="w-3 h-3 text-muted-foreground" />
@@ -249,7 +270,7 @@ export const enterpriseColumns: ColumnDef<
           </Badge>
         );
       }
-      
+
       return (
         <div className="flex items-center space-x-1">
           <Star className="w-3 h-3 text-yellow-500" />
@@ -266,7 +287,10 @@ export const enterpriseColumns: ColumnDef<
     size: 220,
     cell: ({ row }) => (
       <div className="space-y-1">
-        <div className="text-sm truncate max-w-[200px]" title={row.original.email}>
+        <div
+          className="text-sm truncate max-w-[200px]"
+          title={row.original.email}
+        >
           {row.original.email}
         </div>
         <div className="text-xs text-muted-foreground">
@@ -284,7 +308,10 @@ export const enterpriseColumns: ColumnDef<
         {row.original.city && (
           <div className="text-sm font-medium">{row.original.city}</div>
         )}
-        <div className="text-xs text-muted-foreground truncate max-w-[160px]" title={row.original.adresse}>
+        <div
+          className="text-xs text-muted-foreground truncate max-w-[160px]"
+          title={row.original.adresse}
+        >
           {row.original.adresse}
         </div>
       </div>
@@ -296,7 +323,7 @@ export const enterpriseColumns: ColumnDef<
     size: 120,
     cell: ({ row }) => {
       const isVerified = row.original.is_verified;
-      
+
       if (isVerified === true || isVerified === "Accepted") {
         return (
           <Badge className="bg-green-100 text-green-800 hover:bg-green-100">

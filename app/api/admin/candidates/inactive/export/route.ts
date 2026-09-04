@@ -4,7 +4,10 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL?.replace(
+    /\/$/,
+    "",
+  ).replace(/\/api$/, "");
   const authorization = request.headers.get("authorization");
 
   if (!backendUrl) {

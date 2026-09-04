@@ -22,7 +22,13 @@ interface CVCardProps {
   disablePagination?: boolean;
 }
 
-export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshing, disablePagination = false }) => {
+export const CVCard: FC<CVCardProps> = ({
+  data,
+  onRefresh,
+  isLoading,
+  isRefreshing,
+  disablePagination = false,
+}) => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectValue, setSelectValue] = useState<string>("");
   const [sectorValue, setSectorValue] = useState<string>("");
@@ -37,7 +43,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
   const authToken = Cookies.get("authToken");
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`, {
+    fetch("/api/v1/sectors", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${Cookies.get("authToken")}`,
@@ -64,7 +70,18 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
 
   const startIndex = currentPage * pageSize;
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
-  const paginatedData = disablePagination ? filteredData : filteredData.slice(startIndex, endIndex);
+  const paginatedData = disablePagination
+    ? filteredData
+    : filteredData.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchValue, selectValue, sectorValue]);
+
+  useEffect(() => {
+    const lastPage = Math.max(Math.ceil(filteredData.length / pageSize) - 1, 0);
+    setCurrentPage((page) => Math.min(page, lastPage));
+  }, [filteredData.length, pageSize]);
 
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
@@ -72,18 +89,18 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
 
   const handleNextPage = () => {
     setCurrentPage((prevPage) =>
-      Math.min(prevPage + 1, Math.ceil(filteredData.length / pageSize) - 1)
+      Math.min(prevPage + 1, Math.ceil(filteredData.length / pageSize) - 1),
     );
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Accepted":
-        return "bg-green-200 text-green-800";
+        return "border border-emerald-200 bg-emerald-50 text-emerald-700";
       case "Declined":
-        return "bg-yellow-200 text-yellow-800";
+        return "border border-red-200 bg-red-50 text-red-700";
       default:
-        return "bg-gray-200 text-gray-800";
+        return "border border-amber-200 bg-amber-50 text-amber-700";
     }
   };
 
@@ -91,14 +108,14 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
     const statusTranslations: Record<string, string> = {
       Accepted: "Accepté",
       Declined: "Décliné",
-      Pending: "En attente"
+      Pending: "En attente",
     };
     return statusTranslations[status] || status;
   };
 
   const onVerify = async (is_verified: string) => {
     if (!selectedCV) return;
-    
+
     try {
       if (is_verified === "Declined" && !comment) {
         toast({
@@ -109,32 +126,29 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
         return;
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/verify/${selectedCV.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            is_verified,
-            comment,
-          }),
+      const response = await fetch(`/api/v1/admin/verify/${selectedCV.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          is_verified,
+          comment,
+        }),
+      });
 
       if (response.ok) {
         toast({
           title: "Success!",
           description: "CV a été éditée avec succès.",
         });
-        
+
         if (onRefresh) {
           onRefresh();
         }
-        
+
         if (is_verified === "Declined") {
           setComment("");
         }
@@ -157,17 +171,17 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 sm:flex-row dark:border-slate-800 dark:bg-slate-950/50">
         <Input
           placeholder="Rechercher par candidat..."
           value={searchValue}
           onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full sm:max-w-sm"
+          className="h-11 w-full rounded-xl border-slate-200 bg-white sm:max-w-sm dark:border-slate-700 dark:bg-slate-900"
         />
         <select
           value={selectValue || ""}
           onChange={(e) => setSelectValue(e.target.value)}
-          className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+          className="h-11 min-w-[150px] rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
         >
           <option value="">Tous les statuts</option>
           <option value="Pending">En cours</option>
@@ -177,7 +191,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
         <select
           value={sectorValue || ""}
           onChange={(e) => setSectorValue(e.target.value)}
-          className="border bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-300 p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50 min-w-[120px]"
+          className="h-11 min-w-[170px] rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-600 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
         >
           <option value="">Tous les secteurs</option>
           {Array.isArray(sectors) &&
@@ -193,7 +207,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
         <div className="text-center py-10">Chargement...</div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative min-h-[400px]">
+          <div className="relative grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {isRefreshing && (
               <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10 backdrop-blur-sm">
                 <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border">
@@ -203,9 +217,12 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
               </div>
             )}
             {paginatedData.map((cv) => (
-              <Card key={cv.id} className="overflow-hidden">
+              <Card
+                key={cv.id}
+                className="overflow-hidden rounded-2xl border-slate-200 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800"
+              >
                 <CardContent className="p-4">
-                  <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden mb-3 relative group">
+                  <div className="group relative mb-4 aspect-video overflow-hidden rounded-xl bg-slate-950">
                     <video
                       src={cv.link}
                       className="w-full h-full object-contain"
@@ -230,14 +247,14 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
                         setSelectedCV(cv);
                         setShowPreview(true);
                       }}
-                      className="absolute top-2 right-2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                      className="absolute right-2 top-2 rounded-lg bg-white/90 p-2 shadow-lg transition hover:bg-white focus:opacity-100 group-hover:opacity-100 md:opacity-0"
                       title="Voir en grand"
                     >
                       <Eye className="h-4 w-4 text-gray-700" />
                     </button>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-semibold text-lg truncate">
+                    <h3 className="truncate text-base font-semibold text-slate-900 dark:text-white">
                       {cv.candidat_name}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
@@ -245,7 +262,7 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
                     </p>
                     <div className="flex items-center justify-between">
                       <span
-                        className={`${getStatusColor(cv.is_verified)} rounded-full py-1 px-3 text-xs font-medium`}
+                        className={`${getStatusColor(cv.is_verified)} rounded-full px-2.5 py-1 text-xs font-semibold`}
                       >
                         {getStatusLabel(cv.is_verified)}
                       </span>
@@ -263,38 +280,39 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
           </div>
 
           {filteredData.length === 0 && (
-            <div className="text-center py-10 text-gray-500">
-              Aucun CV vidéo trouvé
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 py-12 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950/40">
+              Aucun CV vidéo trouvé pour ces critères.
             </div>
           )}
 
-          {!disablePagination && (
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              Affichage de {startIndex + 1} à {endIndex} sur{" "}
-              {filteredData.length} CV vidéo(s)
+          {!disablePagination && filteredData.length > 0 && (
+            <div className="flex items-center justify-between space-x-2 py-4">
+              <div className="flex-1 text-sm text-muted-foreground">
+                Affichage de {startIndex + 1} à {endIndex} sur{" "}
+                {filteredData.length} CV vidéo(s)
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 0}
+                >
+                  Précédent
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNextPage}
+                  disabled={
+                    currentPage ===
+                    Math.ceil(filteredData.length / pageSize) - 1
+                  }
+                >
+                  Suivant
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePreviousPage}
-                disabled={currentPage === 0}
-              >
-                Précédent
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleNextPage}
-                disabled={
-                  currentPage === Math.ceil(filteredData.length / pageSize) - 1
-                }
-              >
-                Suivant
-              </Button>
-            </div>
-          </div>
           )}
         </>
       )}
@@ -309,7 +327,9 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
             setComment("");
           }}
           title={"Aperçu du CV Vidéo"}
-          description={"Visualisez le CV vidéo du candidat et validez ou refusez sa demande."}
+          description={
+            "Visualisez le CV vidéo du candidat et validez ou refusez sa demande."
+          }
           size="large"
         >
           <div className="space-y-6">
@@ -322,13 +342,17 @@ export const CVCard: FC<CVCardProps> = ({ data, onRefresh, isLoading, isRefreshi
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                   Candidat
                 </p>
-                <p className="text-sm font-semibold">{selectedCV.candidat_name}</p>
+                <p className="text-sm font-semibold">
+                  {selectedCV.candidat_name}
+                </p>
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
                   Secteur
                 </p>
-                <p className="text-sm font-semibold">{selectedCV.secteur_name}</p>
+                <p className="text-sm font-semibold">
+                  {selectedCV.secteur_name}
+                </p>
               </div>
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">

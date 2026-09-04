@@ -8,7 +8,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreHorizontal, Trash, CheckCircle, XCircle, Clock, Mail, Phone, User } from "lucide-react";
+import {
+  Edit,
+  Eye,
+  MoreHorizontal,
+  Trash,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Mail,
+  Phone,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { User as UserType } from "@/types";
@@ -33,7 +44,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate/delete/${data.id}`,
+        `/api/v1/admin/candidate/delete/${data.id}`,
         {
           method: "DELETE",
           headers: {
@@ -54,10 +65,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
           window.location.reload();
         }
       } else {
+        const payload = await response.json().catch(() => null);
         toast({
           title: "Erreur",
           variant: "destructive",
-          description: "Impossible de supprimer le candidat",
+          description:
+            payload?.message || "Impossible de supprimer le candidat",
         });
       }
     } catch (error) {
@@ -79,7 +92,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
       const authToken = Cookies.get("authToken");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate/${data.id}/${activate ? 'activate' : 'deactivate'}`,
+        `/api/v1/admin/candidate/${data.id}/${activate ? "activate" : "deactivate"}`,
         {
           method: "PATCH",
           headers: {
@@ -101,10 +114,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
           window.location.reload();
         }
       } else {
+        const payload = await response.json().catch(() => null);
         toast({
           title: "Erreur",
           variant: "destructive",
-          description: "Impossible de mettre à jour le statut",
+          description:
+            payload?.message || "Impossible de mettre à jour le statut",
         });
       }
     } catch (error) {
@@ -119,9 +134,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
     }
   };
 
-  const candidateName = data.first_name && data.last_name 
-    ? `${data.first_name} ${data.last_name}`
-    : data.nomComplete || 'Candidat';
+  const candidateName =
+    data.first_name && data.last_name
+      ? `${data.first_name} ${data.last_name}`
+      : data.nomComplete || "Candidat";
 
   // L'activation fonctionnelle est distincte de la vérification de l'adresse
   // email. C'est `is_active` qui pilote notamment l'éligibilité au matching.
@@ -137,20 +153,24 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
+          <Button
+            variant="ghost"
+            disabled={loading}
+            className="h-9 w-9 rounded-lg p-0 hover:bg-emerald-50 hover:text-emerald-700"
+          >
+            <span className="sr-only">Ouvrir les actions</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          
+
           <DropdownMenuItem
             onClick={() => router.push(`/dashboard/candidate/${data.id}`)}
           >
             <Eye className="mr-2 h-4 w-4" /> Voir le profil
           </DropdownMenuItem>
-          
+
           <DropdownMenuItem
             onClick={() => router.push(`/dashboard/candidate/${data.id}/edit`)}
           >
@@ -158,23 +178,23 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
-          
+
           <DropdownMenuItem
-            onClick={() => window.open(`mailto:${data.email}`, '_blank')}
+            onClick={() => window.open(`mailto:${data.email}`, "_blank")}
           >
             <Mail className="mr-2 h-4 w-4" /> Envoyer un email
           </DropdownMenuItem>
-          
+
           {data.tel && (
             <DropdownMenuItem
-              onClick={() => window.open(`tel:${data.tel}`, '_blank')}
+              onClick={() => window.open(`tel:${data.tel}`, "_blank")}
             >
               <Phone className="mr-2 h-4 w-4" /> Appeler
             </DropdownMenuItem>
           )}
 
           <DropdownMenuSeparator />
-          
+
           {!isActive && (
             <DropdownMenuItem
               onClick={() => updateActivationStatus(true)}
@@ -183,7 +203,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
               <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Activer
             </DropdownMenuItem>
           )}
-          
+
           {isActive && (
             <DropdownMenuItem
               onClick={() => updateActivationStatus(false)}
@@ -194,8 +214,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
           )}
 
           <DropdownMenuSeparator />
-          
-          <DropdownMenuItem 
+
+          <DropdownMenuItem
             onClick={() => setOpen(true)}
             className="text-red-600 focus:text-red-600"
           >

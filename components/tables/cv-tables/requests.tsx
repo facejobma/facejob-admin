@@ -1,7 +1,5 @@
 "use client";
 import { DataTable } from "@/components/ui/data-table";
-import { Heading } from "@/components/ui/heading";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { AlertModal } from "@/components/modal/alert-modal";
 import { Input } from "@/components/ui/input";
@@ -9,7 +7,15 @@ import { Modal } from "@/components/ui/modal";
 import { columns } from "./columns";
 import { FC, useState } from "react";
 import { CV } from "@/types";
-import { CheckSquare, Clock, LayoutGrid, List, Loader2, Trash2, XSquare } from "lucide-react";
+import {
+  CheckSquare,
+  Clock,
+  LayoutGrid,
+  List,
+  Loader2,
+  Trash2,
+  XSquare,
+} from "lucide-react";
 import { CVCard } from "./cv-card";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/use-toast";
@@ -25,22 +31,24 @@ interface CVProps {
   serverPagination?: boolean;
 }
 
-export const CVRequests: FC<CVProps> = ({ 
-  data, 
-  onRefresh, 
+export const CVRequests: FC<CVProps> = ({
+  data,
+  onRefresh,
   isLoading,
   isRefreshing,
   viewMode = "table",
   onViewModeChange,
   title,
-  serverPagination = false
+  serverPagination = false,
 }) => {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
   const [declineComment, setDeclineComment] = useState("");
   const [pendingSelection, setPendingSelection] = useState<CV[]>([]);
-  const [pendingResetSelection, setPendingResetSelection] = useState<(() => void) | null>(null);
+  const [pendingResetSelection, setPendingResetSelection] = useState<
+    (() => void) | null
+  >(null);
   const { toast } = useToast();
 
   const runBulkStatus = async (
@@ -64,7 +72,7 @@ export const CVRequests: FC<CVProps> = ({
       setBulkLoading(true);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate-videos/bulk/status`,
+        "/api/v1/admin/candidate-videos/bulk/status",
         {
           method: "PUT",
           headers: {
@@ -120,7 +128,7 @@ export const CVRequests: FC<CVProps> = ({
       setBulkLoading(true);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/candidate-videos/bulk/delete`,
+        "/api/v1/admin/candidate-videos/bulk/delete",
         {
           method: "DELETE",
           headers: {
@@ -178,7 +186,11 @@ export const CVRequests: FC<CVProps> = ({
             onChange={(event) => setDeclineComment(event.target.value)}
           />
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDeclineOpen(false)} disabled={bulkLoading}>
+            <Button
+              variant="outline"
+              onClick={() => setDeclineOpen(false)}
+              disabled={bulkLoading}
+            >
               Annuler
             </Button>
             <Button
@@ -186,7 +198,12 @@ export const CVRequests: FC<CVProps> = ({
               disabled={bulkLoading}
               onClick={() => {
                 if (pendingResetSelection) {
-                  runBulkStatus(pendingSelection, pendingResetSelection, "Declined", declineComment);
+                  runBulkStatus(
+                    pendingSelection,
+                    pendingResetSelection,
+                    "Declined",
+                    declineComment,
+                  );
                 }
               }}
             >
@@ -195,15 +212,20 @@ export const CVRequests: FC<CVProps> = ({
           </div>
         </div>
       </Modal>
-      <div className="flex items-start justify-between">
-        <Heading
-          title={title ?? `Demandes (${data.length})`}
-          description="Valider les CV Vidéos"
-        />
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-slate-950 dark:text-white">
+            {title ?? `Demandes (${data.length})`}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Consultez et modérez les CV vidéo reçus.
+          </p>
+        </div>
+        <div className="flex w-fit gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-slate-800 dark:bg-slate-950">
           <Button
             variant={viewMode === "table" ? "default" : "outline"}
             size="sm"
+            className="rounded-lg"
             onClick={() => onViewModeChange?.("table")}
           >
             <List className="h-4 w-4 mr-2" />
@@ -212,6 +234,7 @@ export const CVRequests: FC<CVProps> = ({
           <Button
             variant={viewMode === "cards" ? "default" : "outline"}
             size="sm"
+            className="rounded-lg"
             onClick={() => onViewModeChange?.("cards")}
           >
             <LayoutGrid className="h-4 w-4 mr-2" />
@@ -219,13 +242,11 @@ export const CVRequests: FC<CVProps> = ({
           </Button>
         </div>
       </div>
-      <Separator />
-      
       {viewMode === "table" ? (
-        <DataTable 
-          searchKey="candidat_name" 
-          columns={columns} 
-          data={data} 
+        <DataTable
+          searchKey="candidat_name"
+          columns={columns}
+          data={data}
           onRefresh={onRefresh}
           isLoading={isLoading}
           isRefreshing={isRefreshing}
@@ -240,16 +261,24 @@ export const CVRequests: FC<CVProps> = ({
                   variant="outline"
                   size="sm"
                   disabled={bulkLoading || isRefreshing}
-                  onClick={() => runBulkStatus(selectedRows, resetSelection, "Accepted")}
+                  onClick={() =>
+                    runBulkStatus(selectedRows, resetSelection, "Accepted")
+                  }
                 >
-                  {bulkLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckSquare className="mr-2 h-4 w-4 text-green-600" />}
+                  {bulkLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckSquare className="mr-2 h-4 w-4 text-green-600" />
+                  )}
                   Accepter
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   disabled={bulkLoading || isRefreshing}
-                  onClick={() => runBulkStatus(selectedRows, resetSelection, "Pending")}
+                  onClick={() =>
+                    runBulkStatus(selectedRows, resetSelection, "Pending")
+                  }
                 >
                   <Clock className="mr-2 h-4 w-4" />
                   En attente
@@ -285,8 +314,8 @@ export const CVRequests: FC<CVProps> = ({
           )}
         />
       ) : (
-        <CVCard 
-          data={data} 
+        <CVCard
+          data={data}
           onRefresh={onRefresh}
           isLoading={isLoading}
           isRefreshing={isRefreshing}

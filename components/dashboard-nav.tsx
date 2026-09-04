@@ -15,7 +15,11 @@ interface DashboardNavProps {
   closeOnClick?: boolean;
 }
 
-export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardNavProps) {
+export function DashboardNav({
+  items,
+  setOpen,
+  closeOnClick = true,
+}: DashboardNavProps) {
   const path = usePathname();
 
   const handleItemClick = (item: NavItem) => {
@@ -23,7 +27,7 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
       performLogout();
       return;
     }
-    
+
     if (setOpen && closeOnClick) {
       setOpen(false);
     }
@@ -34,8 +38,8 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
   }
 
   // Séparer les éléments de navigation et le logout
-  const navigationItems = items.filter(item => item.label !== "logout");
-  const logoutItem = items.find(item => item.label === "logout");
+  const navigationItems = items.filter((item) => item.label !== "logout");
+  const logoutItem = items.find((item) => item.label === "logout");
 
   return (
     <div className="space-y-2">
@@ -44,7 +48,7 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
         {navigationItems.map((item, index) => {
           const Icon = Icons[item.icon || "arrowRight"];
           const isActive = path === item.href;
-          
+
           return (
             item.href && (
               <Link
@@ -55,31 +59,33 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
               >
                 <div
                   className={cn(
-                    "group flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ease-in-out relative",
+                    "group relative flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 shadow-sm border border-green-100 dark:border-green-800"
-                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
+                      ? "bg-emerald-50 text-emerald-800 shadow-sm ring-1 ring-inset ring-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-900"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white",
                     item.disabled && "cursor-not-allowed opacity-50",
                   )}
                 >
                   {/* Active indicator */}
                   {isActive && (
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-green-500 dark:bg-green-400 rounded-r-full"></div>
+                    <div className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-emerald-600 dark:bg-emerald-400" />
                   )}
-                  
-                  <div className={cn(
-                    "flex items-center justify-center w-8 h-8 rounded-lg mr-3 transition-colors",
-                    isActive 
-                      ? "bg-green-100 dark:bg-green-800 text-green-600 dark:text-green-400" 
-                      : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 group-hover:text-gray-600 dark:group-hover:text-gray-300"
-                  )}>
+
+                  <div
+                    className={cn(
+                      "mr-3 flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                      isActive
+                        ? "bg-white text-emerald-700 shadow-sm dark:bg-emerald-900 dark:text-emerald-300"
+                        : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700",
+                    )}
+                  >
                     <Icon className="h-4 w-4" />
                   </div>
-                  
+
                   <span className="flex-1 truncate">{item.title}</span>
-                  
+
                   {isActive && (
-                    <div className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full ml-2"></div>
+                    <div className="ml-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   )}
                 </div>
               </Link>
@@ -99,7 +105,9 @@ export function DashboardNav({ items, setOpen, closeOnClick = true }: DashboardN
               <div className="flex items-center justify-center w-8 h-8 rounded-lg mr-3 transition-colors bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-800 group-hover:text-red-600 dark:group-hover:text-red-400">
                 <Icons.logout className="h-4 w-4" />
               </div>
-              <span className="flex-1 truncate text-left">{logoutItem.title}</span>
+              <span className="flex-1 truncate text-left">
+                {logoutItem.title}
+              </span>
             </div>
           </button>
         </div>

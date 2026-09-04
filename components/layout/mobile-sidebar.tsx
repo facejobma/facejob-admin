@@ -1,49 +1,62 @@
 "use client";
+
 import { DashboardNav } from "@/components/dashboard-nav";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { navItems } from "@/constants/data";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-export function MobileSidebar({ className }: SidebarProps) {
+export function MobileSidebar() {
   const [open, setOpen] = useState(false);
   return (
-    <>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <MenuIcon className="h-6 w-6 cursor-pointer text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" />
-        </SheetTrigger>
-        <SheetContent side="left" className="!px-0 w-72 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-          <div className="sr-only">
-            <SheetTitle>Navigation Menu</SheetTitle>
-          </div>
-          <div className="flex flex-col h-full">
-            {/* Navigation Section */}
-            <div className="flex-1 px-4 py-6 space-y-6">
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          aria-label="Ouvrir la navigation"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-900"
+        >
+          <MenuIcon className="h-5 w-5" />
+        </button>
+      </SheetTrigger>
+      <SheetContent
+        side="left"
+        className="w-72 !px-0 border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950"
+      >
+        <SheetTitle className="sr-only">Navigation d’administration</SheetTitle>
+        <div className="flex h-full flex-col">
+          <div className="border-b border-slate-100 px-5 py-5 dark:border-slate-800">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+                <ShieldCheck className="h-5 w-5" />
+              </span>
               <div>
-                <h2 className="mb-4 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Navigation
-                </h2>
-                <DashboardNav items={navItems} setOpen={setOpen} closeOnClick={true} />
-              </div>
-            </div>
-
-            {/* Footer Section */}
-            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-              <div className="text-center">
-                <p className="text-xs text-gray-400 dark:text-gray-500">
-                  © 2026 FaceJob
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
+                  FaceJob Admin
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Interface Admin
+                <p className="text-[11px] text-slate-500">
+                  Navigation sécurisée
                 </p>
               </div>
             </div>
           </div>
-        </SheetContent>
-      </Sheet>
-    </>
+          <div className="flex-1 overflow-y-auto px-3 py-5">
+            <h2 className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Gestion de la plateforme
+            </h2>
+            <DashboardNav items={navItems} setOpen={setOpen} closeOnClick />
+          </div>
+          <div className="border-t border-slate-100 bg-slate-50/70 px-5 py-4 text-center dark:border-slate-800 dark:bg-slate-900/60">
+            <p className="text-xs text-slate-400">© 2026 FaceJob</p>
+            <p className="mt-1 text-[10px] text-slate-400">Interface interne</p>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

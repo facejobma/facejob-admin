@@ -2,58 +2,58 @@ import { NavItem } from "@/types";
 
 export const navItems: NavItem[] = [
   {
-    title: "Tableau de Bord",
+    title: "Tableau de bord",
     href: "/dashboard",
     icon: "dashboard",
-    label: "Dashboard"
+    label: "Dashboard",
   },
   {
     title: "Candidats",
     href: "/dashboard/candidate",
     icon: "user",
-    label: "user"
+    label: "user",
   },
   {
     title: "Entreprises",
     href: "/dashboard/entreprise",
     icon: "employee",
-    label: "employee"
+    label: "employee",
   },
   {
-    title: "Revue des Entreprises",
+    title: "Validation des entreprises",
     href: "/dashboard/requests",
     icon: "request",
-    label: "request"
+    label: "request",
   },
   {
-    title: "Revue des annonces",
+    title: "Validation des offres",
     href: "/dashboard/jobs",
     icon: "jobReview",
-    label: "jobReview"
+    label: "jobReview",
   },
   {
-    title: "Vidéos Candidats",
+    title: "CV vidéo",
     href: "/dashboard/candidate-videos",
     icon: "candidateVideos",
-    label: "candidateVideos"
+    label: "candidateVideos",
   },
   {
-    title: "Relances Email",
+    title: "Campagnes e-mail",
     href: "/dashboard/email-campaigns",
     icon: "mail",
-    label: "emailCampaigns"
+    label: "emailCampaigns",
   },
   {
     title: "Ventes",
     href: "/dashboard/sales",
     icon: "sales",
-    label: "sales"
+    label: "sales",
   },
   {
     title: "Fonctionnalités IA",
     href: "/dashboard/ai-features",
     icon: "settings",
-    label: "aiFeatures"
+    label: "aiFeatures",
   },
   // {
   //   title: "Service de Payment",
@@ -65,6 +65,6 @@ export const navItems: NavItem[] = [
     title: "Déconnexion",
     href: "/",
     icon: "logout",
-    label: "logout"
-  }
+    label: "logout",
+  },
 ];

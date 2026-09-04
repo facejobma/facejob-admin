@@ -23,7 +23,18 @@ import * as React from "react";
 import { DateRange } from "react-day-picker";
 import { addDays, addMonths, addYears } from "date-fns";
 import Cookies from "js-cookie";
-import { Building2, Users, Briefcase, FileText, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import {
+  Activity,
+  ArrowRight,
+  Building2,
+  Users,
+  Briefcase,
+  FileText,
+  TrendingUp,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
 
 type DurationPreset = "7d" | "30d" | "3m" | "6m" | "1y" | "custom";
 type CandidateAccountStatus = "all" | "active" | "inactive";
@@ -37,7 +48,10 @@ const durationOptions: { label: string; value: DurationPreset }[] = [
   { label: "Période personnalisée", value: "custom" },
 ];
 
-const candidateStatusOptions: { label: string; value: CandidateAccountStatus }[] = [
+const candidateStatusOptions: {
+  label: string;
+  value: CandidateAccountStatus;
+}[] = [
   { label: "Tous les statuts", value: "all" },
   { label: "Actifs", value: "active" },
   { label: "Inactifs", value: "inactive" },
@@ -74,28 +88,41 @@ function OverViewTab() {
     video_cvs: [],
     candidate_sectors: [],
     entreprises: [],
-    last_n_sales: []
+    last_n_sales: [],
   });
   const [loading, setLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: addYears(new Date(), -1),
     to: new Date(),
   });
   const [durationPreset, setDurationPreset] = useState<DurationPreset>("1y");
-  const [candidateChartDate, setCandidateChartDate] = React.useState<DateRange | undefined>({
+  const [candidateChartDate, setCandidateChartDate] = React.useState<
+    DateRange | undefined
+  >({
     from: addYears(new Date(), -1),
     to: new Date(),
   });
-  const [candidateChartPreset, setCandidateChartPreset] = useState<DurationPreset>("1y");
-  const [candidateChartStatus, setCandidateChartStatus] = useState<CandidateAccountStatus>("all");
-  const [candidateChartStats, setCandidateChartStats] = useState<Statistiques["candidates"]>([]);
+  const [candidateChartPreset, setCandidateChartPreset] =
+    useState<DurationPreset>("1y");
+  const [candidateChartStatus, setCandidateChartStatus] =
+    useState<CandidateAccountStatus>("all");
+  const [candidateChartStats, setCandidateChartStats] = useState<
+    Statistiques["candidates"]
+  >([]);
   const [candidateChartLoading, setCandidateChartLoading] = useState(true);
-  const [videoCvChartDate, setVideoCvChartDate] = React.useState<DateRange | undefined>({
+  const [videoCvChartDate, setVideoCvChartDate] = React.useState<
+    DateRange | undefined
+  >({
     from: addYears(new Date(), -1),
     to: new Date(),
   });
-  const [videoCvChartPreset, setVideoCvChartPreset] = useState<DurationPreset>("1y");
-  const [videoCvChartStats, setVideoCvChartStats] = useState<Statistiques["video_cvs"]>([]);
+  const [videoCvChartPreset, setVideoCvChartPreset] =
+    useState<DurationPreset>("1y");
+  const [videoCvChartStats, setVideoCvChartStats] = useState<
+    Statistiques["video_cvs"]
+  >([]);
   const [videoCvChartLoading, setVideoCvChartLoading] = useState(true);
   const { toast } = useToast();
 
@@ -109,7 +136,9 @@ function OverViewTab() {
     }
   };
 
-  const handleDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
+  const handleDateChange: React.Dispatch<
+    React.SetStateAction<DateRange | undefined>
+  > = (value) => {
     setDurationPreset("custom");
     setDate(value);
   };
@@ -122,7 +151,9 @@ function OverViewTab() {
     }
   };
 
-  const handleCandidateChartDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
+  const handleCandidateChartDateChange: React.Dispatch<
+    React.SetStateAction<DateRange | undefined>
+  > = (value) => {
     setCandidateChartPreset("custom");
     setCandidateChartDate(value);
   };
@@ -135,7 +166,9 @@ function OverViewTab() {
     }
   };
 
-  const handleVideoCvChartDateChange: React.Dispatch<React.SetStateAction<DateRange | undefined>> = (value) => {
+  const handleVideoCvChartDateChange: React.Dispatch<
+    React.SetStateAction<DateRange | undefined>
+  > = (value) => {
     setVideoCvChartPreset("custom");
     setVideoCvChartDate(value);
   };
@@ -146,7 +179,8 @@ function OverViewTab() {
         toast({
           title: "Erreur d'authentification",
           variant: "destructive",
-          description: "Token d'authentification manquant. Veuillez vous reconnecter.",
+          description:
+            "Token d'authentification manquant. Veuillez vous reconnecter.",
         });
         setLoading(false);
         return;
@@ -154,11 +188,11 @@ function OverViewTab() {
 
       try {
         setLoading(true);
-        
-        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-        const apiBase = rawBackend.replace(/\/api\/?$/, '');
+        setDashboardError(null);
+
+        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const apiBase = rawBackend.replace(/\/api\/?$/, "");
         const apiUrl = `${apiBase}/api/v1/admin/statics?from=${date?.from?.toISOString()}&to=${date?.to?.toISOString()}`;
-        console.log("Fetching stats from:", apiUrl);
 
         const response = await fetch(apiUrl, {
           method: "GET",
@@ -171,12 +205,13 @@ function OverViewTab() {
         if (!response.ok) {
           const errorText = await response.text();
           console.error("API Error:", response.status, errorText);
-          throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+          throw new Error(
+            `Erreur API: ${response.status} - ${response.statusText}`,
+          );
         }
 
         const result = await response.json();
-        console.log("Stats API Response:", result);
-        
+
         // Vérifier la structure de la réponse et fournir des valeurs par défaut
         const statsData = {
           sectors_count: result.sectors_count || 0,
@@ -187,19 +222,26 @@ function OverViewTab() {
           sales: Array.isArray(result.sales) ? result.sales : [],
           candidates: Array.isArray(result.candidates) ? result.candidates : [],
           video_cvs: Array.isArray(result.video_cvs) ? result.video_cvs : [],
-          candidate_sectors: Array.isArray(result.candidate_sectors) ? result.candidate_sectors : [],
-          entreprises: Array.isArray(result.entreprises) ? result.entreprises : [],
-          last_n_sales: Array.isArray(result.last_n_sales) ? result.last_n_sales : []
+          candidate_sectors: Array.isArray(result.candidate_sectors)
+            ? result.candidate_sectors
+            : [],
+          entreprises: Array.isArray(result.entreprises)
+            ? result.entreprises
+            : [],
+          last_n_sales: Array.isArray(result.last_n_sales)
+            ? result.last_n_sales
+            : [],
         };
-        
+
         setStats(statsData);
       } catch (error) {
         console.error("Error fetching stats:", error);
-        
+
         let errorMessage = "Erreur lors du chargement des statistiques.";
-        
+
         if (error instanceof TypeError && error.message.includes("fetch")) {
-          errorMessage = "Impossible de se connecter au serveur. Vérifiez votre connexion internet.";
+          errorMessage =
+            "Impossible de se connecter au serveur. Vérifiez votre connexion internet.";
         } else if (error instanceof Error) {
           errorMessage = error.message;
         }
@@ -209,7 +251,8 @@ function OverViewTab() {
           variant: "destructive",
           description: errorMessage,
         });
-        
+        setDashboardError(errorMessage);
+
         // En cas d'erreur, on garde des valeurs par défaut pour éviter les crashes
         setStats({
           sectors_count: 0,
@@ -222,7 +265,7 @@ function OverViewTab() {
           video_cvs: [],
           candidate_sectors: [],
           entreprises: [],
-          last_n_sales: []
+          last_n_sales: [],
         });
       } finally {
         setLoading(false);
@@ -230,7 +273,7 @@ function OverViewTab() {
     }
 
     getStats();
-  }, [date?.from, date?.to, toast, authToken]);
+  }, [date?.from, date?.to, toast, authToken, reloadKey]);
 
   useEffect(() => {
     async function getCandidateChartStats() {
@@ -256,8 +299,8 @@ function OverViewTab() {
           params.set("candidate_status", candidateChartStatus);
         }
 
-        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-        const apiBase = rawBackend.replace(/\/api\/?$/, '');
+        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const apiBase = rawBackend.replace(/\/api\/?$/, "");
 
         const response = await fetch(
           `${apiBase}/api/v1/admin/statics?${params.toString()}`,
@@ -271,11 +314,15 @@ function OverViewTab() {
         );
 
         if (!response.ok) {
-          throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+          throw new Error(
+            `Erreur API: ${response.status} - ${response.statusText}`,
+          );
         }
 
         const result = await response.json();
-        setCandidateChartStats(Array.isArray(result.candidates) ? result.candidates : []);
+        setCandidateChartStats(
+          Array.isArray(result.candidates) ? result.candidates : [],
+        );
       } catch (error) {
         console.error("Error fetching candidate chart stats:", error);
         setCandidateChartStats([]);
@@ -291,7 +338,13 @@ function OverViewTab() {
     }
 
     getCandidateChartStats();
-  }, [candidateChartDate?.from, candidateChartDate?.to, candidateChartStatus, authToken, toast]);
+  }, [
+    candidateChartDate?.from,
+    candidateChartDate?.to,
+    candidateChartStatus,
+    authToken,
+    toast,
+  ]);
 
   useEffect(() => {
     async function getVideoCvChartStats() {
@@ -313,8 +366,8 @@ function OverViewTab() {
           params.set("to", videoCvChartDate.to.toISOString());
         }
 
-        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-        const apiBase = rawBackend.replace(/\/api\/?$/, '');
+        const rawBackend = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+        const apiBase = rawBackend.replace(/\/api\/?$/, "");
 
         const response = await fetch(
           `${apiBase}/api/v1/admin/statics?${params.toString()}`,
@@ -328,11 +381,15 @@ function OverViewTab() {
         );
 
         if (!response.ok) {
-          throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
+          throw new Error(
+            `Erreur API: ${response.status} - ${response.statusText}`,
+          );
         }
 
         const result = await response.json();
-        setVideoCvChartStats(Array.isArray(result.video_cvs) ? result.video_cvs : []);
+        setVideoCvChartStats(
+          Array.isArray(result.video_cvs) ? result.video_cvs : [],
+        );
       } catch (error) {
         console.error("Error fetching video CV chart stats:", error);
         setVideoCvChartStats([]);
@@ -390,20 +447,60 @@ function OverViewTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="flex-1 space-y-6 p-6 md:p-8">
+      <div className="mx-auto max-w-[1600px] flex-1 space-y-6 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-              Tableau de bord
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Bienvenue dans votre interface d&apos;administration FaceJob
-            </p>
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-800 to-teal-700 p-6 text-white shadow-xl shadow-emerald-950/10 sm:p-8">
+          <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+          <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-4 flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-emerald-50">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Pilotage de la plateforme
+              </div>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Tableau de bord administrateur
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-emerald-50 sm:text-base">
+                Supervisez les utilisateurs, les offres, les CV vidéo et
+                l’activité commerciale depuis un espace centralisé.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Link
+                href="/dashboard/requests"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/15"
+              >
+                Entreprises à valider
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/dashboard/jobs"
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+              >
+                Offres à vérifier
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+              <Activity className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                Période d’analyse
+              </p>
+              <p className="text-xs text-slate-500">
+                Les indicateurs et graphiques suivent la période sélectionnée.
+              </p>
+            </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Select value={durationPreset} onValueChange={handleDurationChange}>
-              <SelectTrigger className="w-full sm:w-[210px]">
+              <SelectTrigger className="h-10 w-full rounded-xl border-slate-200 bg-slate-50 sm:w-[210px] dark:border-slate-700 dark:bg-slate-950">
                 <SelectValue placeholder="Choisir une durée" />
               </SelectTrigger>
               <SelectContent>
@@ -416,32 +513,53 @@ function OverViewTab() {
             </Select>
             <CalendarDateRangePicker date={date} setDate={handleDateChange} />
           </div>
-        </div>
+        </section>
+
+        {dashboardError && (
+          <div className="flex flex-col gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 sm:flex-row sm:items-center sm:justify-between dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+            <span>{dashboardError}</span>
+            <button
+              type="button"
+              onClick={() => setReloadKey((key) => key + 1)}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-red-700 shadow-sm ring-1 ring-red-200 hover:bg-red-50 dark:bg-red-950 dark:text-red-200 dark:ring-red-900"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Réessayer
+            </button>
+          </div>
+        )}
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+          <TabsList className="grid h-11 w-full grid-cols-2 rounded-xl bg-slate-200/70 p-1 dark:bg-slate-800 lg:w-[420px]">
             <TabsTrigger value="overview">Aperçu général</TabsTrigger>
             <TabsTrigger value="analytics">Analyses détaillées</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-              {statsCards.map((card, index) => {
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              {statsCards.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <Card key={index} className="hover:shadow-md transition-shadow border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  <Card
+                    key={card.title}
+                    className="overflow-hidden rounded-2xl border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                  >
+                    <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+                      <CardTitle className="max-w-[150px] text-sm font-medium leading-5 text-slate-500 dark:text-slate-400">
                         {card.title}
                       </CardTitle>
-                      <div className={`p-2 rounded-lg ${card.bgColor}`}>
-                        <Icon className={`h-4 w-4 ${card.color}`} />
+                      <div className={`rounded-xl p-2.5 ${card.bgColor}`}>
+                        <Icon className={`h-5 w-5 ${card.color}`} />
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {card.value.toLocaleString()}
+                      <div className="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                        {loading ? (
+                          <span className="block h-9 w-20 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+                        ) : (
+                          card.value.toLocaleString("fr-FR")
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -449,15 +567,15 @@ function OverViewTab() {
               })}
             </div>
 
-            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <Card className="rounded-2xl border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <CardHeader className="gap-4">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      Evolution des CV video uploades
+                      Évolution des CV vidéo téléversés
                     </CardTitle>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Nombre de CV video ajoutes sur la periode selectionnee
+                      Nombre de CV vidéo ajoutés sur la période sélectionnée
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -466,7 +584,7 @@ function OverViewTab() {
                       onValueChange={handleVideoCvChartDurationChange}
                     >
                       <SelectTrigger className="w-full sm:w-[210px]">
-                        <SelectValue placeholder="Choisir une durÃ©e" />
+                        <SelectValue placeholder="Choisir une durée" />
                       </SelectTrigger>
                       <SelectContent>
                         {durationOptions.map((option) => (
@@ -488,7 +606,9 @@ function OverViewTab() {
                   <div className="flex h-[320px] items-center justify-center">
                     <div className="text-center space-y-2">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <div className="text-gray-500 dark:text-gray-400">Chargement des donnÃ©es...</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Chargement des données...
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -497,13 +617,13 @@ function OverViewTab() {
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <Card className="rounded-2xl border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   Top secteurs par nombre de candidats
                 </CardTitle>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Les secteurs les plus representes dans les profils candidats
+                  Les secteurs les plus représentés dans les profils candidats
                 </p>
               </CardHeader>
               <CardContent>
@@ -511,7 +631,9 @@ function OverViewTab() {
                   <div className="flex h-[360px] items-center justify-center">
                     <div className="text-center space-y-2">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <div className="text-gray-500 dark:text-gray-400">Chargement des donnees...</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Chargement des donnees...
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -520,7 +642,7 @@ function OverViewTab() {
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <Card className="rounded-2xl border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <CardHeader className="gap-4">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
@@ -528,13 +650,16 @@ function OverViewTab() {
                       Évolution des créations de comptes candidats
                     </CardTitle>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Nombre de nouveaux comptes candidats sur la période sélectionnée
+                      Nombre de nouveaux comptes candidats sur la période
+                      sélectionnée
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Select
                       value={candidateChartStatus}
-                      onValueChange={(value) => setCandidateChartStatus(value as CandidateAccountStatus)}
+                      onValueChange={(value) =>
+                        setCandidateChartStatus(value as CandidateAccountStatus)
+                      }
                     >
                       <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder="Statut du compte" />
@@ -574,7 +699,9 @@ function OverViewTab() {
                   <div className="flex h-[320px] items-center justify-center">
                     <div className="text-center space-y-2">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <div className="text-gray-500 dark:text-gray-400">Chargement des données...</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        Chargement des données...
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -599,13 +726,15 @@ function OverViewTab() {
                     <div className="flex items-center justify-center h-[350px]">
                       <div className="text-center space-y-2">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                        <div className="text-gray-500 dark:text-gray-400">Chargement des données...</div>
+                        <div className="text-gray-500 dark:text-gray-400">
+                          Chargement des données...
+                        </div>
                       </div>
                     </div>
                   ) : stats.sales && stats.sales.length > 0 ? (
-                    <SimpleBarChart 
-                      unit={"DH "} 
-                      stats={stats.sales} 
+                    <SimpleBarChart
+                      unit={"DH "}
+                      stats={stats.sales}
                       title="Graphique des Ventes"
                       color="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500"
                     />
@@ -614,7 +743,9 @@ function OverViewTab() {
                       <div className="text-center space-y-2">
                         <div className="text-lg">📊</div>
                         <div>Aucune donnée de vente disponible</div>
-                        <div className="text-sm">Les données apparaîtront ici une fois disponibles</div>
+                        <div className="text-sm">
+                          Les données apparaîtront ici une fois disponibles
+                        </div>
                       </div>
                     </div>
                   )}
@@ -638,7 +769,9 @@ function OverViewTab() {
                       <div className="text-center space-y-2">
                         <div className="text-lg">💰</div>
                         <div>Aucune vente récente</div>
-                        <div className="text-sm">Les ventes récentes apparaîtront ici</div>
+                        <div className="text-sm">
+                          Les ventes récentes apparaîtront ici
+                        </div>
                       </div>
                     </div>
                   )}
@@ -660,8 +793,8 @@ function OverViewTab() {
                 </CardHeader>
                 <CardContent className="pl-2">
                   {stats.entreprises && stats.entreprises.length > 0 ? (
-                    <SimpleBarChart 
-                      stats={stats.entreprises} 
+                    <SimpleBarChart
+                      stats={stats.entreprises}
                       title="Nouvelles Entreprises"
                       color="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500"
                     />
@@ -670,7 +803,9 @@ function OverViewTab() {
                       <div className="text-center space-y-2">
                         <div className="text-lg">🏢</div>
                         <div>Aucune donnée d&apos;entreprise disponible</div>
-                        <div className="text-sm">Les statistiques apparaîtront ici</div>
+                        <div className="text-sm">
+                          Les statistiques apparaîtront ici
+                        </div>
                       </div>
                     </div>
                   )}
@@ -688,8 +823,8 @@ function OverViewTab() {
                 </CardHeader>
                 <CardContent className="pl-2">
                   {stats.candidates && stats.candidates.length > 0 ? (
-                    <SimpleBarChart 
-                      stats={stats.candidates} 
+                    <SimpleBarChart
+                      stats={stats.candidates}
                       title="Nouveaux Candidats"
                       color="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500"
                     />
@@ -698,7 +833,9 @@ function OverViewTab() {
                       <div className="text-center space-y-2">
                         <div className="text-lg">👥</div>
                         <div>Aucune donnée de candidat disponible</div>
-                        <div className="text-sm">Les statistiques apparaîtront ici</div>
+                        <div className="text-sm">
+                          Les statistiques apparaîtront ici
+                        </div>
                       </div>
                     </div>
                   )}
