@@ -5,18 +5,23 @@ import { UserClient } from "@/components/tables/user-tables/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Activity,
+  CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   ChevronsLeft,
   ChevronsRight,
+  Clock3,
   Download,
+  LayoutDashboard,
   RefreshCw,
-  ShieldCheck,
-  TrendingUp,
-  UserCheck,
   Users,
-  UserX,
+  XCircle,
 } from "lucide-react";
 
 import Cookies from "js-cookie";
@@ -53,6 +58,8 @@ export default function CandidatesPage() {
   const [sectorFilter, setSectorFilter] = useState("");
   const [sectorOptions, setSectorOptions] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
   const hasLoadedRef = useRef(false);
   const [pagination, setPagination] = useState<PaginationMeta>({
     current_page: 1,
@@ -199,6 +206,28 @@ export default function CandidatesPage() {
     void fetchData(false, controller.signal);
     return () => controller.abort();
   }, [currentPage, pageSize, searchQuery, statusFilter, sectorFilter]);
+
+  useEffect(() => {
+    setShowStatistics(
+      localStorage.getItem("candidates:show-statistics") === "true",
+    );
+    setShowActivity(
+      localStorage.getItem("candidates:show-activity") === "true",
+    );
+  }, []);
+
+  const togglePanel = (panel: "statistics" | "activity") => {
+    const setter = panel === "statistics" ? setShowStatistics : setShowActivity;
+    const key =
+      panel === "statistics"
+        ? "candidates:show-statistics"
+        : "candidates:show-activity";
+
+    setter((current) => {
+      localStorage.setItem(key, String(!current));
+      return !current;
+    });
+  };
 
   // Calculer les statistiques
   const totalCandidates = stats.total;
@@ -358,21 +387,21 @@ export default function CandidatesPage() {
     {
       title: "Candidats actifs",
       value: activeCandidates,
-      icon: UserCheck,
+      icon: CheckCircle2,
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-900/20",
     },
     {
       title: "Candidats inactifs",
       value: inactiveCandidates,
-      icon: UserX,
+      icon: XCircle,
       color: "text-red-600 dark:text-red-400",
       bgColor: "bg-red-50 dark:bg-red-900/20",
     },
     {
       title: "Nouveaux (30j)",
       value: recentCandidates,
-      icon: TrendingUp,
+      icon: Clock3,
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-50 dark:bg-purple-900/20",
     },
@@ -380,16 +409,10 @@ export default function CandidatesPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <BreadCrumb items={breadcrumbItems} />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <span className="text-muted-foreground">
-              Chargement des candidats...
-            </span>
-          </div>
-        </div>
+      <div className="mx-auto max-w-[1600px] space-y-5 p-6">
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-[460px] w-full" />
       </div>
     );
   }
@@ -411,22 +434,21 @@ export default function CandidatesPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] space-y-6 overflow-x-hidden p-4 sm:p-6 lg:p-8">
+    <div className="mx-auto w-full max-w-[1600px] space-y-5 overflow-x-hidden p-4 md:p-6">
       <BreadCrumb items={breadcrumbItems} />
 
       {/* Header */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-800 to-teal-700 p-6 text-white shadow-xl shadow-emerald-950/10 sm:p-8">
-        <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+      <section className="rounded-xl border bg-card p-5 shadow-sm">
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <div className="mb-4 flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-emerald-50">
-              <ShieldCheck className="h-3.5 w-3.5" />
+            <div className="mb-3 flex w-fit items-center gap-2 text-xs font-medium text-muted-foreground">
+              <Users className="h-3.5 w-3.5" />
               Gestion des utilisateurs
             </div>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Candidats
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Gestion des candidats
             </h1>
-            <p className="mt-2 text-sm leading-6 text-emerald-50 sm:text-base">
+            <p className="mt-1 text-sm text-muted-foreground">
               Recherchez, contrôlez et administrez les comptes candidats de la
               plateforme.
             </p>
@@ -437,7 +459,8 @@ export default function CandidatesPage() {
               variant="outline"
               onClick={exportActiveCandidates}
               disabled={exportingActive || activeCandidates === 0}
-              className="h-11 gap-2 rounded-xl border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              size="sm"
+              className="gap-2"
             >
               <Download className="h-4 w-4" />
               {exportingActive ? "Export..." : "Exporter actifs"}
@@ -447,7 +470,8 @@ export default function CandidatesPage() {
               variant="outline"
               onClick={exportInactiveCandidates}
               disabled={exportingInactive || inactiveCandidates === 0}
-              className="h-11 gap-2 rounded-xl border-white/20 bg-white text-emerald-800 hover:bg-emerald-50 hover:text-emerald-900"
+              size="sm"
+              className="gap-2"
             >
               <Download className="h-4 w-4" />
               {exportingInactive ? "Export..." : "Exporter non actifs"}
@@ -455,6 +479,44 @@ export default function CandidatesPage() {
           </div>
         </div>
       </section>
+
+      <div className="flex flex-wrap gap-2 rounded-xl border bg-card p-2 shadow-sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => togglePanel("statistics")}
+          aria-expanded={showStatistics}
+          className="gap-2"
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          Statistiques
+          {showStatistics ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => togglePanel("activity")}
+          aria-expanded={showActivity}
+          className="gap-2"
+        >
+          <Activity className="h-4 w-4" />
+          Activité et répartition
+          {showActivity ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </Button>
+        {!showStatistics && !showActivity && (
+          <span className="self-center px-2 text-xs text-muted-foreground">
+            Panneaux masqués pour libérer l’espace de travail
+          </span>
+        )}
+      </div>
 
       {error && (
         <div className="flex flex-col gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 sm:flex-row sm:items-center sm:justify-between dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
@@ -476,31 +538,89 @@ export default function CandidatesPage() {
       )}
 
       {/* Stats Cards */}
-      <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {statsCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Card
-              key={card.title}
-              className="min-w-0 rounded-2xl border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
-            >
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
-                <CardTitle className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
-                  {card.title}
-                </CardTitle>
-                <div className={`shrink-0 rounded-xl p-2.5 ${card.bgColor}`}>
-                  <Icon className={`h-5 w-5 ${card.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
-                  {card.value.toLocaleString("fr-FR")}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      {showStatistics && (
+        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {statsCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Card
+                key={card.title}
+                className="min-w-0 rounded-2xl border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+              >
+                <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+                  <CardTitle className="truncate text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {card.title}
+                  </CardTitle>
+                  <div className={`shrink-0 rounded-xl p-2.5 ${card.bgColor}`}>
+                    <Icon className={`h-5 w-5 ${card.color}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
+                    {card.value.toLocaleString("fr-FR")}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {showActivity && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Activity className="h-4 w-4" />
+                Activité récente
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Nouveaux candidats sur 30 jours
+                </span>
+                <strong>{recentCandidates.toLocaleString("fr-FR")}</strong>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Comptes actifs</span>
+                <strong>{activeCandidates.toLocaleString("fr-FR")}</strong>
+              </div>
+              <div className="flex justify-between border-t pt-3 text-sm">
+                <span className="text-muted-foreground">Taux d’activation</span>
+                <strong>
+                  {totalCandidates
+                    ? Math.round((activeCandidates / totalCandidates) * 100)
+                    : 0}
+                  %
+                </strong>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Users className="h-4 w-4" />
+                Répartition des comptes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Actifs</span>
+                <strong>{activeCandidates.toLocaleString("fr-FR")}</strong>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Inactifs</span>
+                <strong>{inactiveCandidates.toLocaleString("fr-FR")}</strong>
+              </div>
+              <div className="flex justify-between border-t pt-3 text-sm">
+                <span className="text-muted-foreground">Total</span>
+                <strong>{totalCandidates.toLocaleString("fr-FR")}</strong>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Candidates Table */}
       <div className="w-full">
@@ -524,128 +644,150 @@ export default function CandidatesPage() {
               )}
             </div>
           </CardHeader>
-          <CardContent className="p-4 sm:p-5">
-            {users.length === 0 &&
-            !searchQuery &&
-            !statusFilter &&
-            !sectorFilter ? (
-              <div className="text-center py-12">
-                <div className="space-y-4">
-                  <div className="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-gray-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      Aucun candidat trouvé
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">
-                      Il n&apos;y a actuellement aucun candidat dans la base de
-                      données.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full overflow-x-hidden">
-                <UserClient
-                  data={users}
-                  onRefresh={() => fetchData(true)}
-                  isRefreshing={refreshing}
-                  onSearchChange={handleSearchChange}
-                  onSectorChange={handleSectorChange}
-                  onStatusChange={handleStatusChange}
-                  sectorOptions={sectorOptions}
-                />
-              </div>
-            )}
-            {pagination.total > 0 && (
-              <div className="mt-6 flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {pagination.from ?? 0}-{pagination.to ?? 0}
-                  </span>{" "}
-                  sur{" "}
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {pagination.total.toLocaleString()}
-                  </span>{" "}
-                  candidats
-                </div>
-
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <label className="flex items-center gap-2 text-sm text-muted-foreground">
-                    Par page
-                    <select
-                      value={pageSize}
-                      onChange={handlePageSizeChange}
-                      disabled={refreshing}
-                      className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-                    >
-                      <option value={15}>15</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                  </label>
-
-                  <div className="flex items-center gap-2">
-                    <div className="min-w-[112px] text-center text-sm text-muted-foreground">
-                      Page{" "}
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {pagination.current_page}
-                      </span>{" "}
-                      / {pagination.last_page || 1}
+          <Tabs
+            value={statusFilter || "all"}
+            onValueChange={(value) =>
+              handleStatusChange(value === "all" ? "" : value)
+            }
+          >
+            <div className="overflow-x-auto px-5 pt-4">
+              <TabsList className="inline-flex h-auto min-w-full justify-start gap-1 p-1 sm:min-w-0">
+                <TabsTrigger value="all">
+                  Tous ({totalCandidates.toLocaleString("fr-FR")})
+                </TabsTrigger>
+                <TabsTrigger value="active">
+                  Actifs ({activeCandidates.toLocaleString("fr-FR")})
+                </TabsTrigger>
+                <TabsTrigger value="inactive">
+                  Inactifs ({inactiveCandidates.toLocaleString("fr-FR")})
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            <TabsContent value={statusFilter || "all"} className="m-0">
+              <CardContent className="p-5">
+                {users.length === 0 &&
+                !searchQuery &&
+                !statusFilter &&
+                !sectorFilter ? (
+                  <div className="text-center py-12">
+                    <div className="space-y-4">
+                      <div className="mx-auto w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                        <Users className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                          Aucun candidat trouvé
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 mt-1">
+                          Il n&apos;y a actuellement aucun candidat dans la base
+                          de données.
+                        </p>
+                      </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setCurrentPage(1)}
-                      disabled={!canGoPrevious || refreshing}
-                      title="Première page"
-                      className="h-9 w-9"
-                    >
-                      <ChevronsLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        setCurrentPage((page) => Math.max(page - 1, 1))
-                      }
-                      disabled={!canGoPrevious || refreshing}
-                      title="Page précédente"
-                      className="h-9 w-9"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        setCurrentPage((page) =>
-                          Math.min(page + 1, pagination.last_page),
-                        )
-                      }
-                      disabled={!canGoNext || refreshing}
-                      title="Page suivante"
-                      className="h-9 w-9"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setCurrentPage(pagination.last_page)}
-                      disabled={!canGoNext || refreshing}
-                      title="Dernière page"
-                      className="h-9 w-9"
-                    >
-                      <ChevronsRight className="h-4 w-4" />
-                    </Button>
                   </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
+                ) : (
+                  <div className="w-full overflow-x-hidden">
+                    <UserClient
+                      data={users}
+                      onRefresh={() => fetchData(true)}
+                      isRefreshing={refreshing}
+                      onSearchChange={handleSearchChange}
+                      onSectorChange={handleSectorChange}
+                      onStatusChange={handleStatusChange}
+                      sectorOptions={sectorOptions}
+                    />
+                  </div>
+                )}
+                {pagination.total > 0 && (
+                  <div className="mt-6 flex flex-col gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="text-sm text-muted-foreground">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {pagination.from ?? 0}-{pagination.to ?? 0}
+                      </span>{" "}
+                      sur{" "}
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {pagination.total.toLocaleString()}
+                      </span>{" "}
+                      candidats
+                    </div>
+
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                        Par page
+                        <select
+                          value={pageSize}
+                          onChange={handlePageSizeChange}
+                          disabled={refreshing}
+                          className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+                        >
+                          <option value={15}>15</option>
+                          <option value={25}>25</option>
+                          <option value={50}>50</option>
+                          <option value={100}>100</option>
+                        </select>
+                      </label>
+
+                      <div className="flex items-center gap-2">
+                        <div className="min-w-[112px] text-center text-sm text-muted-foreground">
+                          Page{" "}
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                            {pagination.current_page}
+                          </span>{" "}
+                          / {pagination.last_page || 1}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setCurrentPage(1)}
+                          disabled={!canGoPrevious || refreshing}
+                          title="Première page"
+                          className="h-9 w-9"
+                        >
+                          <ChevronsLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            setCurrentPage((page) => Math.max(page - 1, 1))
+                          }
+                          disabled={!canGoPrevious || refreshing}
+                          title="Page précédente"
+                          className="h-9 w-9"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() =>
+                            setCurrentPage((page) =>
+                              Math.min(page + 1, pagination.last_page),
+                            )
+                          }
+                          disabled={!canGoNext || refreshing}
+                          title="Page suivante"
+                          className="h-9 w-9"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setCurrentPage(pagination.last_page)}
+                          disabled={!canGoNext || refreshing}
+                          title="Dernière page"
+                          className="h-9 w-9"
+                        >
+                          <ChevronsRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </TabsContent>
+          </Tabs>
         </Card>
       </div>
     </div>

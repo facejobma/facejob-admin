@@ -10,14 +10,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BreadCrumb from "@/components/breadcrumb";
 import { useToast } from "@/components/ui/use-toast";
 import { SafeLogo } from "@/components/ui/safe-logo";
+import { Skeleton } from "@/components/ui/skeleton";
 import Cookies from "js-cookie";
-import { 
-  Building2, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Globe, 
-  Users, 
+import {
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Users,
   Edit,
   ArrowLeft,
   CheckCircle,
@@ -31,7 +32,7 @@ import {
   Eye,
   Star,
   Award,
-  Shield
+  Shield,
 } from "lucide-react";
 import { EnterpriseData, Job, PaymentDetail } from "@/types";
 
@@ -64,7 +65,7 @@ export default function EntrepriseProfilePage() {
               Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         if (enterpriseResponse.ok) {
@@ -80,14 +81,24 @@ export default function EntrepriseProfilePage() {
             "Content-Type": "application/json",
           };
           const [jobsResponse, activeJobsResponse] = await Promise.all([
-            fetch(`${jobsBaseUrl}?entreprise_id=${params.id}&per_page=100`, { headers }),
-            fetch(`${jobsBaseUrl}?entreprise_id=${params.id}&status=Accepted&per_page=1`, { headers }),
+            fetch(`${jobsBaseUrl}?entreprise_id=${params.id}&per_page=100`, {
+              headers,
+            }),
+            fetch(
+              `${jobsBaseUrl}?entreprise_id=${params.id}&status=Accepted&per_page=1`,
+              { headers },
+            ),
           ]);
 
           if (!jobsResponse.ok || !activeJobsResponse.ok) {
-            const failedResponse = !jobsResponse.ok ? jobsResponse : activeJobsResponse;
+            const failedResponse = !jobsResponse.ok
+              ? jobsResponse
+              : activeJobsResponse;
             const errorData = await failedResponse.json().catch(() => null);
-            throw new Error(errorData?.message || `Erreur ${failedResponse.status} lors du chargement des offres`);
+            throw new Error(
+              errorData?.message ||
+                `Erreur ${failedResponse.status} lors du chargement des offres`,
+            );
           }
 
           const [jobsResult, activeJobsResult] = await Promise.all([
@@ -110,7 +121,7 @@ export default function EntrepriseProfilePage() {
                 Authorization: `Bearer ${authToken}`,
                 "Content-Type": "application/json",
               },
-            }
+            },
           );
           if (paymentsResponse.ok) {
             const paymentsResult = await paymentsResponse.json();
@@ -119,7 +130,6 @@ export default function EntrepriseProfilePage() {
         } catch (error) {
           console.error("Error fetching payments:", error);
         }
-
       } catch (error) {
         console.error("Error fetching data:", error);
         toast({
@@ -164,9 +174,17 @@ export default function EntrepriseProfilePage() {
 
   const getJobStatusBadge = (job: Job) => {
     if (job.status === "Expired") {
-      return <Badge variant="secondary" className="bg-slate-100 text-slate-800">Expirée</Badge>;
+      return (
+        <Badge variant="secondary" className="bg-slate-100 text-slate-800">
+          Expirée
+        </Badge>
+      );
     } else if (job.status === "Accepted") {
-      return <Badge variant="default" className="bg-green-100 text-green-800">Actif</Badge>;
+      return (
+        <Badge variant="default" className="bg-green-100 text-green-800">
+          Actif
+        </Badge>
+      );
     } else if (job.status === "Declined") {
       return <Badge variant="destructive">Refusé</Badge>;
     } else {
@@ -177,26 +195,48 @@ export default function EntrepriseProfilePage() {
   const calculateStats = () => {
     const totalJobs = jobsTotal;
     const activeJobs = activeJobsTotal;
-    const totalPayments = payments.reduce((sum, payment) => sum + parseFloat(payment.amount || "0"), 0);
-    const lastPayment = [...payments].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
-    
+    const totalPayments = payments.reduce(
+      (sum, payment) => sum + parseFloat(payment.amount || "0"),
+      0,
+    );
+    const lastPayment = [...payments].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    )[0];
+
     return {
       totalJobs,
       activeJobs,
       totalPayments,
-      lastPayment
+      lastPayment,
     };
   };
 
-  const stats = entreprise ? calculateStats() : { totalJobs: 0, activeJobs: 0, totalPayments: 0, lastPayment: null };
+  const stats = entreprise
+    ? calculateStats()
+    : { totalJobs: 0, activeJobs: 0, totalPayments: 0, lastPayment: null };
+
+  const showJobs = () => {
+    setActiveTab("jobs");
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("enterprise-tabs")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   if (loading) {
     return (
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <main className="mx-auto w-full max-w-[1500px] space-y-6 p-4 sm:p-6 lg:p-8">
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-48 w-full rounded-3xl" />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-28 rounded-2xl" />
+          ))}
         </div>
-      </div>
+        <Skeleton className="h-[360px] w-full rounded-2xl" />
+      </main>
     );
   }
 
@@ -214,31 +254,37 @@ export default function EntrepriseProfilePage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-x-hidden">
+    <main className="mx-auto w-full max-w-[1500px] space-y-6 overflow-x-hidden p-4 sm:p-6 lg:p-8">
       <BreadCrumb items={breadcrumbItems} />
-      
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => router.back()}
+            onClick={() => router.push("/dashboard/entreprise")}
+            className="rounded-xl"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour
           </Button>
           <h1 className="text-2xl font-bold">Profil de l'Entreprise</h1>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/entreprise/${params.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/entreprise/${params.id}/edit`)
+            }
           >
             <Edit className="w-4 h-4 mr-2" />
             Modifier
           </Button>
-          <Button>
+          <Button
+            onClick={showJobs}
+            className="bg-emerald-600 hover:bg-emerald-700"
+          >
             <Eye className="w-4 h-4 mr-2" />
             Voir les offres
           </Button>
@@ -246,33 +292,40 @@ export default function EntrepriseProfilePage() {
       </div>
 
       {/* Enterprise Header Card */}
-      <Card className="border-l-4 border-l-blue-500 enterprise-card-hover">
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 relative rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 shadow-sm">
+      <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-br from-emerald-950 via-emerald-800 to-teal-700 text-white shadow-xl shadow-emerald-950/10">
+        <CardContent className="p-6 sm:p-8">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/25 bg-white shadow-sm">
                 <SafeLogo
                   src={entreprise?.logo}
                   alt={`Logo de ${entreprise?.company_name || "l'entreprise"}`}
-                  fallbackClassName="h-10 w-10 text-gray-400"
+                  className="h-full w-full object-contain p-2"
+                  fallbackClassName="h-9 w-9 text-slate-400"
                 />
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{entreprise?.company_name}</h2>
-                <p className="text-gray-600 text-lg">{entreprise?.sector?.name || "Secteur non défini"}</p>
-                <div className="flex items-center space-x-4 mt-2">
+              <div className="min-w-0">
+                <h2 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">
+                  {entreprise?.company_name}
+                </h2>
+                <p className="mt-1 text-emerald-50">
+                  {entreprise?.sector?.name || "Secteur non défini"}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
                   {getStatusBadge(entreprise?.is_verified || false)}
-                  <Badge variant="outline" className="flex items-center">
+                  <Badge className="border-white/20 bg-white/10 text-white hover:bg-white/15">
                     <Users className="w-3 h-3 mr-1" />
                     {entreprise?.effectif} employés
                   </Badge>
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Membre depuis</p>
-              <p className="font-semibold">
-                {entreprise?.created_at ? new Date(entreprise.created_at).toLocaleDateString("fr-FR") : "N/A"}
+            <div className="shrink-0 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 md:text-right">
+              <p className="text-xs text-emerald-100">Membre depuis</p>
+              <p className="mt-1 font-semibold text-white">
+                {entreprise?.created_at
+                  ? new Date(entreprise.created_at).toLocaleDateString("fr-FR")
+                  : "N/A"}
               </p>
             </div>
           </div>
@@ -281,9 +334,11 @@ export default function EntrepriseProfilePage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="stats-card">
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Offres d'emploi</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Offres d'emploi
+            </CardTitle>
             <Briefcase className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -293,57 +348,78 @@ export default function EntrepriseProfilePage() {
             </p>
           </CardContent>
         </Card>
-        
-        <Card className="stats-card">
+
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Chiffre d'affaires</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Chiffre d'affaires
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalPayments.toFixed(2)} €</div>
-            <p className="text-xs text-muted-foreground">
-              Total des paiements
-            </p>
+            <div className="text-2xl font-bold">
+              {stats.totalPayments.toFixed(2)} €
+            </div>
+            <p className="text-xs text-muted-foreground">Total des paiements</p>
           </CardContent>
         </Card>
-        
-        <Card className="stats-card">
+
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Plan actuel</CardTitle>
             <Award className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{entreprise?.plan?.name || "Aucun"}</div>
-            <p className="text-xs text-muted-foreground">
-              Plan d'abonnement
-            </p>
+            <div className="text-2xl font-bold">
+              {entreprise?.plan?.name || "Aucun"}
+            </div>
+            <p className="text-xs text-muted-foreground">Plan d'abonnement</p>
           </CardContent>
         </Card>
-        
-        <Card className="stats-card">
+
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Dernier paiement</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Dernier paiement
+            </CardTitle>
             <CreditCard className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats.lastPayment ? `${parseFloat(stats.lastPayment.amount).toFixed(2)} €` : "N/A"}
+              {stats.lastPayment
+                ? `${parseFloat(stats.lastPayment.amount).toFixed(2)} €`
+                : "N/A"}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats.lastPayment ? new Date(stats.lastPayment.created_at).toLocaleDateString("fr-FR") : "Aucun paiement"}
+              {stats.lastPayment
+                ? new Date(stats.lastPayment.created_at).toLocaleDateString(
+                    "fr-FR",
+                  )
+                : "Aucun paiement"}
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="jobs">Offres d'emploi ({stats.totalJobs})</TabsTrigger>
-          <TabsTrigger value="payments">Paiements ({payments.length})</TabsTrigger>
-          <TabsTrigger value="details">Détails</TabsTrigger>
-        </TabsList>
+      <Tabs
+        id="enterprise-tabs"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="min-w-0 scroll-mt-6 space-y-4"
+      >
+        <div className="overflow-x-auto rounded-xl border bg-card p-1 shadow-sm">
+          <TabsList className="flex h-auto w-max min-w-full justify-start bg-transparent">
+            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="jobs">
+              Offres d'emploi ({stats.totalJobs})
+            </TabsTrigger>
+            <TabsTrigger value="payments">
+              Paiements ({payments.length})
+            </TabsTrigger>
+            <TabsTrigger value="details">Détails</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="space-y-4 tab-content-fade">
           <div className="grid gap-6 md:grid-cols-2">
@@ -362,31 +438,35 @@ export default function EntrepriseProfilePage() {
                     {entreprise?.description || "Aucune description disponible"}
                   </p>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm break-all">{entreprise?.email}</span>
+                    <span className="text-sm break-all">
+                      {entreprise?.email}
+                    </span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Phone className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm">{entreprise?.phone}</span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm break-words">{entreprise?.adresse}</span>
+                    <span className="text-sm break-words">
+                      {entreprise?.adresse}
+                    </span>
                   </div>
-                  
+
                   {entreprise?.site_web && (
                     <div className="flex items-center space-x-2">
                       <Globe className="w-4 h-4 text-muted-foreground" />
-                      <a 
-                        href={entreprise.site_web} 
-                        target="_blank" 
+                      <a
+                        href={entreprise.site_web}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:underline break-all"
                       >
@@ -421,7 +501,9 @@ export default function EntrepriseProfilePage() {
                 </CardContent>
               </Card>
 
-              {(entreprise?.city || entreprise?.linkedin || entreprise?.founded_year) && (
+              {(entreprise?.city ||
+                entreprise?.linkedin ||
+                entreprise?.founded_year) && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
@@ -433,23 +515,29 @@ export default function EntrepriseProfilePage() {
                     {entreprise?.city && (
                       <div>
                         <span className="text-sm font-medium">Ville:</span>
-                        <p className="text-sm text-muted-foreground">{entreprise.city}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {entreprise.city}
+                        </p>
                       </div>
                     )}
-                    
+
                     {entreprise?.founded_year && (
                       <div>
-                        <span className="text-sm font-medium">Année de création:</span>
-                        <p className="text-sm text-muted-foreground">{entreprise.founded_year}</p>
+                        <span className="text-sm font-medium">
+                          Année de création:
+                        </span>
+                        <p className="text-sm text-muted-foreground">
+                          {entreprise.founded_year}
+                        </p>
                       </div>
                     )}
-                    
+
                     {entreprise?.linkedin && (
                       <div>
                         <span className="text-sm font-medium">LinkedIn:</span>
-                        <a 
-                          href={entreprise.linkedin} 
-                          target="_blank" 
+                        <a
+                          href={entreprise.linkedin}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm text-blue-600 hover:underline break-all block"
                         >
@@ -476,30 +564,46 @@ export default function EntrepriseProfilePage() {
               {jobs.length > 0 ? (
                 <div className="space-y-4">
                   {jobs.map((job) => (
-                    <div key={job.id} className="job-card rounded-lg p-4 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
+                    <div
+                      key={job.id}
+                      className="rounded-xl border border-slate-200 bg-card p-4 transition-colors hover:bg-muted/30 dark:border-slate-800"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0 flex-1">
                           <h4 className="font-semibold text-lg">{job.titre}</h4>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {job.sector_name} • {job.location || "Localisation non spécifiée"}
+                            {job.sector_name} •{" "}
+                            {job.location || "Localisation non spécifiée"}
                           </p>
                           <p className="text-sm text-gray-600 mt-2 line-clamp-2">
                             {job.description}
                           </p>
-                          <div className="flex items-center space-x-4 mt-3">
+                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
                             <span className="text-xs text-muted-foreground">
-                              Publié le {new Date(job.created_at).toLocaleDateString("fr-FR")}
+                              Publié le{" "}
+                              {new Date(job.created_at).toLocaleDateString(
+                                "fr-FR",
+                              )}
                             </span>
                             {job.date_fin && (
                               <span className="text-xs text-muted-foreground">
-                                Expire le {new Date(job.date_fin).toLocaleDateString("fr-FR")}
+                                Expire le{" "}
+                                {new Date(job.date_fin).toLocaleDateString(
+                                  "fr-FR",
+                                )}
                               </span>
                             )}
                           </div>
                         </div>
-                        <div className="ml-4 flex flex-col items-end space-y-2">
+                        <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-end">
                           {getJobStatusBadge(job)}
-                          <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/jobs/${job.id}`)}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              router.push(`/dashboard/jobs/${job.id}`)
+                            }
+                          >
                             <Eye className="w-3 h-3 mr-1" />
                             Voir
                           </Button>
@@ -511,7 +615,9 @@ export default function EntrepriseProfilePage() {
               ) : (
                 <div className="text-center py-8">
                   <Briefcase className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-muted-foreground">Aucune offre d'emploi trouvée</p>
+                  <p className="text-muted-foreground">
+                    Aucune offre d'emploi trouvée
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -530,33 +636,55 @@ export default function EntrepriseProfilePage() {
               {payments.length > 0 ? (
                 <div className="space-y-4">
                   {payments.map((payment) => (
-                    <div key={payment.id} className="payment-card rounded-lg p-4 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
+                    <div
+                      key={payment.id}
+                      className="rounded-xl border border-slate-200 bg-card p-4 transition-colors hover:bg-muted/30 dark:border-slate-800"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                               <DollarSign className="w-5 h-5 text-green-600" />
                             </div>
                             <div>
-                              <h4 className="font-semibold">{parseFloat(payment.amount).toFixed(2)} €</h4>
+                              <h4 className="font-semibold">
+                                {parseFloat(payment.amount).toFixed(2)} €
+                              </h4>
                               <p className="text-sm text-muted-foreground">
                                 {payment.plan?.name} • {payment.payment_method}
                               </p>
                             </div>
                           </div>
                           <div className="mt-2 text-xs text-muted-foreground">
-                            Période: {new Date(payment.start_date).toLocaleDateString("fr-FR")} - {new Date(payment.end_date).toLocaleDateString("fr-FR")}
+                            Période:{" "}
+                            {new Date(payment.start_date).toLocaleDateString(
+                              "fr-FR",
+                            )}{" "}
+                            -{" "}
+                            {new Date(payment.end_date).toLocaleDateString(
+                              "fr-FR",
+                            )}
                           </div>
                         </div>
                         <div className="text-right">
-                          <Badge 
-                            variant={payment.status === "completed" ? "default" : "secondary"}
-                            className={payment.status === "completed" ? "bg-green-100 text-green-800" : ""}
+                          <Badge
+                            variant={
+                              payment.status === "completed"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={
+                              payment.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : ""
+                            }
                           >
                             {payment.status}
                           </Badge>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {new Date(payment.created_at).toLocaleDateString("fr-FR")}
+                            {new Date(payment.created_at).toLocaleDateString(
+                              "fr-FR",
+                            )}
                           </p>
                         </div>
                       </div>
@@ -585,27 +713,37 @@ export default function EntrepriseProfilePage() {
               <CardContent className="space-y-3">
                 {entreprise?.legal_form && (
                   <div>
-                    <span className="text-sm font-medium">Forme juridique:</span>
-                    <p className="text-sm text-muted-foreground">{entreprise.legal_form}</p>
+                    <span className="text-sm font-medium">
+                      Forme juridique:
+                    </span>
+                    <p className="text-sm text-muted-foreground">
+                      {entreprise.legal_form}
+                    </p>
                   </div>
                 )}
-                
+
                 {entreprise?.ice_number && (
                   <div>
                     <span className="text-sm font-medium">Numéro ICE:</span>
-                    <p className="text-sm text-muted-foreground">{entreprise.ice_number}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {entreprise.ice_number}
+                    </p>
                   </div>
                 )}
-                
+
                 {entreprise?.rc_number && (
                   <div>
                     <span className="text-sm font-medium">Numéro RC:</span>
-                    <p className="text-sm text-muted-foreground">{entreprise.rc_number}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {entreprise.rc_number}
+                    </p>
                   </div>
                 )}
-                
+
                 <div>
-                  <span className="text-sm font-medium">Statut de vérification:</span>
+                  <span className="text-sm font-medium">
+                    Statut de vérification:
+                  </span>
                   <div className="mt-1">
                     {getStatusBadge(entreprise?.is_verified || false)}
                   </div>
@@ -627,30 +765,40 @@ export default function EntrepriseProfilePage() {
                     <div className="text-sm">
                       <span className="font-medium">Inscription</span>
                       <p className="text-muted-foreground">
-                        {entreprise?.created_at ? new Date(entreprise.created_at).toLocaleDateString("fr-FR") : "N/A"}
+                        {entreprise?.created_at
+                          ? new Date(entreprise.created_at).toLocaleDateString(
+                              "fr-FR",
+                            )
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
-                  
+
                   {stats.lastPayment && (
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       <div className="text-sm">
                         <span className="font-medium">Dernier paiement</span>
                         <p className="text-muted-foreground">
-                          {new Date(stats.lastPayment.created_at).toLocaleDateString("fr-FR")}
+                          {new Date(
+                            stats.lastPayment.created_at,
+                          ).toLocaleDateString("fr-FR")}
                         </p>
                       </div>
                     </div>
                   )}
-                  
+
                   {jobs.length > 0 && (
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                       <div className="text-sm">
-                        <span className="font-medium">Dernière offre publiée</span>
+                        <span className="font-medium">
+                          Dernière offre publiée
+                        </span>
                         <p className="text-muted-foreground">
-                          {new Date(jobs[0].created_at).toLocaleDateString("fr-FR")}
+                          {new Date(jobs[0].created_at).toLocaleDateString(
+                            "fr-FR",
+                          )}
                         </p>
                       </div>
                     </div>
@@ -661,6 +809,6 @@ export default function EntrepriseProfilePage() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </main>
   );
 }

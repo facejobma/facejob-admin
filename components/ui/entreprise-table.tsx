@@ -117,14 +117,13 @@ export function EntrepriseDataTable({
         );
       } else if (selectStatusValue === "Declined") {
         filtered = filtered.filter(
-          (entreprise) => entreprise.is_verified === false || entreprise.is_verified === "Declined"
+          (entreprise) => entreprise.is_verified === "Declined"
         );
       } else if (selectStatusValue === "Pending") {
         filtered = filtered.filter(
           (entreprise) => 
             entreprise.is_verified !== true && 
             entreprise.is_verified !== "Accepted" && 
-            entreprise.is_verified !== false && 
             entreprise.is_verified !== "Declined"
         );
       }

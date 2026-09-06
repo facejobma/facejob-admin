@@ -350,7 +350,7 @@ export function CandidateDataTable<TData, TValue>({
       )}
 
       {/* Table */}
-      <div className="relative min-h-[400px] w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+      <div className="relative min-h-[360px] w-full overflow-hidden rounded-lg border bg-background">
         {isRefreshing && (
           <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 flex items-center justify-center z-10 backdrop-blur-sm">
             <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border">
@@ -360,29 +360,29 @@ export function CandidateDataTable<TData, TValue>({
           </div>
         )}
         <div className="w-full overflow-x-auto">
-          <Table className="min-w-[1100px]">
-            <TableHeader>
+          <Table className="relative w-full min-w-[820px] table-fixed">
+            <TableHeader className="bg-muted/50">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className="border-b">
                   {headerGroup.headers.map((header, index) => (
                     <TableHead
                       key={header.id}
-                      className={`font-semibold text-xs whitespace-nowrap ${
+                      className={`whitespace-nowrap px-3 text-xs font-semibold ${
                         index === 0
-                          ? "w-12 text-center"
+                          ? "w-10 text-center"
                           : index === 1
-                            ? "w-1/4"
+                            ? "w-[22%]"
                             : index === 2
-                              ? "w-1/8"
+                              ? "w-[18%]"
                               : index === 3
-                                ? "w-1/8"
+                                ? "w-[12%]"
                                 : index === 4
-                                  ? "w-1/12"
+                                  ? "w-[11%]"
                                   : index === 5
-                                    ? "w-1/4"
+                                    ? "w-[17%]"
                                     : index === 6
-                                      ? "w-1/8"
-                                      : "w-16 text-center"
+                                      ? "w-[13%]"
+                                      : "w-14 text-center"
                       }`}
                     >
                       {header.isPlaceholder
@@ -411,26 +411,27 @@ export function CandidateDataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() ? "selected" : undefined}
+                    className="border-b transition-colors hover:bg-muted/40"
                   >
                     {row.getVisibleCells().map((cell, index) => (
                       <TableCell
                         key={cell.id}
-                        className={`text-xs ${
+                        className={`overflow-hidden px-3 py-3 text-xs ${
                           index === 0
-                            ? "w-12 text-center"
+                            ? "w-10 text-center"
                             : index === 1
-                              ? "w-1/4 truncate"
+                              ? "w-[22%]"
                               : index === 2
-                                ? "w-1/8 truncate"
+                                ? "w-[18%] truncate"
                                 : index === 3
-                                  ? "w-1/8 truncate"
+                                  ? "w-[12%] truncate"
                                   : index === 4
-                                    ? "w-1/12 truncate"
+                                    ? "w-[11%] truncate"
                                     : index === 5
-                                      ? "w-1/4 truncate"
+                                      ? "w-[17%] truncate"
                                       : index === 6
-                                        ? "w-1/8 truncate"
-                                        : "w-16 text-center"
+                                        ? "w-[13%] truncate"
+                                        : "w-14 text-center"
                         }`}
                         title={
                           typeof cell.getValue() === "string"

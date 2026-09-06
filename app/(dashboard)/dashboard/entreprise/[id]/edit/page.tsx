@@ -7,11 +7,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import BreadCrumb from "@/components/breadcrumb";
 import { useToast } from "@/components/ui/use-toast";
+import { SafeLogo } from "@/components/ui/safe-logo";
+import { Skeleton } from "@/components/ui/skeleton";
 import Cookies from "js-cookie";
-import { ArrowLeft, Save } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  FileText,
+  Loader2,
+  MapPin,
+  Save,
+  ShieldCheck,
+  UserRoundCog,
+} from "lucide-react";
 import { EnterpriseData, Sector, Plan } from "@/types";
 
 export default function EditEntreprisePage() {
@@ -42,7 +59,7 @@ export default function EditEntreprisePage() {
               Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         // Fetch sectors
@@ -53,7 +70,7 @@ export default function EditEntreprisePage() {
               Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         // Fetch plans
@@ -64,33 +81,41 @@ export default function EditEntreprisePage() {
               Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         if (entrepriseResponse.ok) {
           const entrepriseResult = await entrepriseResponse.json();
           const enterpriseData = entrepriseResult.data;
-          
+
           // Ensure numeric fields are properly typed
           setEntreprise({
             ...enterpriseData,
-            effectif: typeof enterpriseData.effectif === 'string' 
-              ? parseInt(enterpriseData.effectif) || 0 
-              : enterpriseData.effectif || 0,
-            founded_year: typeof enterpriseData.founded_year === 'string'
-              ? parseInt(enterpriseData.founded_year) || null
-              : enterpriseData.founded_year || null,
+            effectif:
+              typeof enterpriseData.effectif === "string"
+                ? parseInt(enterpriseData.effectif) || 0
+                : enterpriseData.effectif || 0,
+            founded_year:
+              typeof enterpriseData.founded_year === "string"
+                ? parseInt(enterpriseData.founded_year) || null
+                : enterpriseData.founded_year || null,
           });
         }
 
         if (sectorsResponse.ok) {
           const sectorsResult = await sectorsResponse.json();
-          setSectors(Array.isArray(sectorsResult) ? sectorsResult : sectorsResult.data || []);
+          setSectors(
+            Array.isArray(sectorsResult)
+              ? sectorsResult
+              : sectorsResult.data || [],
+          );
         }
 
         if (plansResponse.ok) {
           const plansResult = await plansResponse.json();
-          setPlans(Array.isArray(plansResult) ? plansResult : plansResult.data || []);
+          setPlans(
+            Array.isArray(plansResult) ? plansResult : plansResult.data || [],
+          );
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -127,7 +152,9 @@ export default function EditEntreprisePage() {
         is_verified: entreprise.is_verified,
         city: entreprise.city,
         linkedin: entreprise.linkedin,
-        founded_year: entreprise.founded_year ? Number(entreprise.founded_year) : null,
+        founded_year: entreprise.founded_year
+          ? Number(entreprise.founded_year)
+          : null,
         legal_form: entreprise.legal_form,
         ice_number: entreprise.ice_number,
         rc_number: entreprise.rc_number,
@@ -143,7 +170,7 @@ export default function EditEntreprisePage() {
         return;
       }
 
-      console.log('Sending data:', requestData);
+      console.log("Sending data:", requestData);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/entreprise/update/${params.id}`,
@@ -154,7 +181,7 @@ export default function EditEntreprisePage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(requestData),
-        }
+        },
       );
 
       if (response.ok) {
@@ -185,10 +212,10 @@ export default function EditEntreprisePage() {
 
   const handleInputChange = (field: keyof EnterpriseData, value: any) => {
     if (!entreprise) return;
-    
+
     // Handle numeric fields properly
-    if (field === 'effectif' || field === 'founded_year') {
-      const numValue = value === '' ? null : Number(value);
+    if (field === "effectif" || field === "founded_year") {
+      const numValue = value === "" ? null : Number(value);
       setEntreprise({ ...entreprise, [field]: numValue });
     } else {
       setEntreprise({ ...entreprise, [field]: value });
@@ -196,7 +223,7 @@ export default function EditEntreprisePage() {
   };
 
   const handleSectorChange = (sectorId: string) => {
-    const selectedSector = sectors.find(s => s.id.toString() === sectorId);
+    const selectedSector = sectors.find((s) => s.id.toString() === sectorId);
     if (selectedSector && entreprise) {
       setEntreprise({ ...entreprise, sector: selectedSector });
     }
@@ -204,11 +231,14 @@ export default function EditEntreprisePage() {
 
   if (loading) {
     return (
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <main className="mx-auto w-full max-w-[1400px] space-y-6 p-4 sm:p-6 lg:p-8">
+        <Skeleton className="h-8 w-56" />
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Skeleton className="h-[520px] rounded-2xl" />
+          <Skeleton className="h-[520px] rounded-2xl" />
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -226,30 +256,69 @@ export default function EditEntreprisePage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-x-hidden">
+    <main className="mx-auto w-full max-w-[1400px] space-y-6 overflow-x-hidden p-4 sm:p-6 lg:p-8">
       <BreadCrumb items={breadcrumbItems} />
-      
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => router.back()}
+            onClick={() => router.push(`/dashboard/entreprise/${params.id}`)}
+            className="rounded-xl"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour
           </Button>
-          <h1 className="text-2xl font-bold">Modifier l'Entreprise</h1>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Modifier l’entreprise
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Mettez à jour les informations du compte entreprise.
+            </p>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
+      <Card className="overflow-hidden rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border bg-slate-50 dark:bg-slate-900">
+            <SafeLogo
+              src={entreprise.logo}
+              alt={`Logo de ${entreprise.company_name}`}
+              className="h-full w-full object-contain p-2"
+              fallbackClassName="h-7 w-7 text-slate-400"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-lg font-semibold">
+              {entreprise.company_name}
+            </p>
+            <p className="truncate text-sm text-muted-foreground">
+              {entreprise.email}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+            <UserRoundCog className="h-4 w-4" />
+            ID #{String(params.id)}
+          </div>
+        </CardContent>
+      </Card>
+
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 [&_input]:h-11 [&_label]:mb-2 [&_label]:block"
+      >
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* Basic Information */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
-              <CardTitle>Informations de Base</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Building2 className="h-5 w-5 text-emerald-600" />
+                Informations générales
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -257,7 +326,9 @@ export default function EditEntreprisePage() {
                 <Input
                   id="company_name"
                   value={entreprise.company_name}
-                  onChange={(e) => handleInputChange("company_name", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("company_name", e.target.value)
+                  }
                   required
                 />
               </div>
@@ -306,8 +377,10 @@ export default function EditEntreprisePage() {
                 <Input
                   id="effectif"
                   type="number"
-                  value={entreprise.effectif || ''}
-                  onChange={(e) => handleInputChange("effectif", e.target.value)}
+                  value={entreprise.effectif || ""}
+                  onChange={(e) =>
+                    handleInputChange("effectif", e.target.value)
+                  }
                 />
               </div>
 
@@ -315,19 +388,15 @@ export default function EditEntreprisePage() {
                 <Label htmlFor="is_verified">Statut de Vérification</Label>
                 <Select
                   value={entreprise.is_verified?.toString() || ""}
-                  onValueChange={(value) => {
-                    if (value === "true") handleInputChange("is_verified", true);
-                    else if (value === "false") handleInputChange("is_verified", false);
-                    else handleInputChange("is_verified", value);
-                  }}
+                  onValueChange={(value) => handleInputChange("is_verified", value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner le statut" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">Acceptée</SelectItem>
-                    <SelectItem value="false">Refusée</SelectItem>
-                    <SelectItem value="pending">En attente</SelectItem>
+                    <SelectItem value="Accepted">Acceptée</SelectItem>
+                    <SelectItem value="Declined">Refusée</SelectItem>
+                    <SelectItem value="Pending">En attente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -335,9 +404,12 @@ export default function EditEntreprisePage() {
           </Card>
 
           {/* Contact & Location */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
-              <CardTitle>Contact & Localisation</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <MapPin className="h-5 w-5 text-emerald-600" />
+                Contact et localisation
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -365,7 +437,9 @@ export default function EditEntreprisePage() {
                   id="site_web"
                   type="url"
                   value={entreprise.site_web}
-                  onChange={(e) => handleInputChange("site_web", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("site_web", e.target.value)
+                  }
                 />
               </div>
 
@@ -374,7 +448,9 @@ export default function EditEntreprisePage() {
                 <Input
                   id="linkedin"
                   value={entreprise.linkedin || ""}
-                  onChange={(e) => handleInputChange("linkedin", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("linkedin", e.target.value)
+                  }
                 />
               </div>
 
@@ -384,7 +460,9 @@ export default function EditEntreprisePage() {
                   id="founded_year"
                   type="number"
                   value={entreprise.founded_year || ""}
-                  onChange={(e) => handleInputChange("founded_year", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("founded_year", e.target.value)
+                  }
                 />
               </div>
             </CardContent>
@@ -392,9 +470,11 @@ export default function EditEntreprisePage() {
         </div>
 
         {/* Description */}
-        <Card>
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader>
-            <CardTitle>Description</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <FileText className="h-5 w-5 text-emerald-600" /> Description
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
@@ -407,9 +487,12 @@ export default function EditEntreprisePage() {
         </Card>
 
         {/* Legal Information */}
-        <Card>
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader>
-            <CardTitle>Informations Légales</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              Informations légales
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
@@ -418,7 +501,9 @@ export default function EditEntreprisePage() {
                 <Input
                   id="legal_form"
                   value={entreprise.legal_form || ""}
-                  onChange={(e) => handleInputChange("legal_form", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("legal_form", e.target.value)
+                  }
                 />
               </div>
 
@@ -427,7 +512,9 @@ export default function EditEntreprisePage() {
                 <Input
                   id="ice_number"
                   value={entreprise.ice_number || ""}
-                  onChange={(e) => handleInputChange("ice_number", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("ice_number", e.target.value)
+                  }
                 />
               </div>
 
@@ -436,7 +523,9 @@ export default function EditEntreprisePage() {
                 <Input
                   id="rc_number"
                   value={entreprise.rc_number || ""}
-                  onChange={(e) => handleInputChange("rc_number", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("rc_number", e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -444,18 +533,23 @@ export default function EditEntreprisePage() {
         </Card>
 
         {/* Submit Button */}
-        <div className="flex justify-end space-x-4">
+        <div className="sticky bottom-4 z-10 flex flex-col-reverse justify-end gap-3 rounded-2xl border bg-background/95 p-4 shadow-lg backdrop-blur sm:flex-row">
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => router.push(`/dashboard/entreprise/${params.id}`)}
+            className="rounded-xl"
           >
             Annuler
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button
+            type="submit"
+            disabled={saving}
+            className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+          >
             {saving ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Enregistrement...
               </>
             ) : (
@@ -467,6 +561,6 @@ export default function EditEntreprisePage() {
           </Button>
         </div>
       </form>
-    </div>
+    </main>
   );
 }

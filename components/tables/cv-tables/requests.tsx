@@ -251,6 +251,8 @@ export const CVRequests: FC<CVProps> = ({
           isLoading={isLoading}
           isRefreshing={isRefreshing}
           disablePagination={serverPagination}
+          appearance="clean"
+          searchPlaceholder="Rechercher un candidat…"
           renderBulkActions={(selectedRows, resetSelection) => (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm font-medium">

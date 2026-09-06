@@ -13,12 +13,14 @@ interface DashboardNavProps {
   items: NavItem[];
   setOpen?: Dispatch<SetStateAction<boolean>>;
   closeOnClick?: boolean;
+  compact?: boolean;
 }
 
 export function DashboardNav({
   items,
   setOpen,
   closeOnClick = true,
+  compact = false,
 }: DashboardNavProps) {
   const path = usePathname();
 
@@ -56,10 +58,12 @@ export function DashboardNav({
                 href={item.disabled ? "/" : item.href}
                 onClick={() => handleItemClick(item)}
                 className="block"
+                title={compact ? item.title : undefined}
               >
                 <div
                   className={cn(
                     "group relative flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    compact && "justify-center px-2",
                     isActive
                       ? "bg-emerald-50 text-emerald-800 shadow-sm ring-1 ring-inset ring-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-900"
                       : "text-slate-600 hover:bg-slate-50 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white",
@@ -73,7 +77,8 @@ export function DashboardNav({
 
                   <div
                     className={cn(
-                      "mr-3 flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                      "flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                      !compact && "mr-3",
                       isActive
                         ? "bg-white text-emerald-700 shadow-sm dark:bg-emerald-900 dark:text-emerald-300"
                         : "bg-slate-100 text-slate-500 group-hover:bg-white group-hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:group-hover:bg-slate-700",
@@ -82,9 +87,11 @@ export function DashboardNav({
                     <Icon className="h-4 w-4" />
                   </div>
 
-                  <span className="flex-1 truncate">{item.title}</span>
+                  {!compact && (
+                    <span className="flex-1 truncate">{item.title}</span>
+                  )}
 
-                  {isActive && (
+                  {isActive && !compact && (
                     <div className="ml-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   )}
                 </div>
@@ -100,14 +107,27 @@ export function DashboardNav({
           <button
             onClick={() => handleItemClick(logoutItem)}
             className="w-full text-left"
+            title={compact ? logoutItem.title : undefined}
           >
-            <div className="group flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg mr-3 transition-colors bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-800 group-hover:text-red-600 dark:group-hover:text-red-400">
+            <div
+              className={cn(
+                "group flex items-center rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 ease-in-out text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400",
+                compact && "justify-center px-2",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex items-center justify-center w-8 h-8 rounded-lg transition-colors bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-red-100 dark:group-hover:bg-red-800 group-hover:text-red-600 dark:hover:text-red-400",
+                  !compact && "mr-3",
+                )}
+              >
                 <Icons.logout className="h-4 w-4" />
               </div>
-              <span className="flex-1 truncate text-left">
-                {logoutItem.title}
-              </span>
+              {!compact && (
+                <span className="flex-1 truncate text-left">
+                  {logoutItem.title}
+                </span>
+              )}
             </div>
           </button>
         </div>

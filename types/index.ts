@@ -79,6 +79,7 @@ export type PaymentDetail = {
 export interface Statistiques {
   sectors_count: number;
   postules_count: number;
+  video_profiles_count: number;
   offres_count: number;
   candidates: StatsItem[];
   video_cvs: StatsItem[];

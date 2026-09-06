@@ -65,7 +65,7 @@ export default function RequestsPage() {
       setLastFetchTime(now);
       
       const response = await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/entreprises",
+        process.env.NEXT_PUBLIC_BACKEND_URL + "/api/v1/admin/entreprises?per_page=100&page=1",
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -115,7 +115,18 @@ export default function RequestsPage() {
       }
 
       const result = await response.json();
-      setEntrepriseRequests(result.data || []);
+      const allRequests: EnterpriseData[] = Array.isArray(result.data) ? result.data : [];
+      const lastPage = Number(result.pagination?.last_page || 1);
+      for (let page = 2; page <= lastPage; page += 1) {
+        const pageResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/entreprises?per_page=100&page=${page}`,
+          { headers: { Authorization: `Bearer ${authToken}`, "Content-Type": "application/json" } },
+        );
+        if (!pageResponse.ok) throw new Error(`Erreur ${pageResponse.status}: ${pageResponse.statusText}`);
+        const pageResult = await pageResponse.json();
+        allRequests.push(...(Array.isArray(pageResult.data) ? pageResult.data : []));
+      }
+      setEntrepriseRequests(allRequests);
       
       if (showRefreshToast) {
         toast({
@@ -185,7 +196,7 @@ export default function RequestsPage() {
   const pendingRequests = entrepriseRequests.filter(
     (entreprise) => {
       const isAccepted = entreprise?.is_verified === true || entreprise?.is_verified === "Accepted";
-      const isDeclined = entreprise?.is_verified === "Declined" || Boolean(entreprise?.comment);
+      const isDeclined = entreprise?.is_verified === "Declined";
       return !isAccepted && !isDeclined;
     }
   );
@@ -195,7 +206,7 @@ export default function RequestsPage() {
   );
 
   const declinedRequests = entrepriseRequests.filter(
-    (entreprise) => entreprise?.is_verified === "Declined" || Boolean(entreprise?.comment)
+    (entreprise) => entreprise?.is_verified === "Declined"
   );
 
   // Données filtrées selon l'onglet actif

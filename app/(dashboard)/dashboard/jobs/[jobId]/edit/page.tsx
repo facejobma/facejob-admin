@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
+import {
   ArrowLeft,
   Save,
   AlertCircle,
@@ -23,6 +23,7 @@ import {
   Languages,
   Wrench,
   Info,
+  Loader2,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/use-toast";
@@ -31,10 +32,23 @@ import languagesData from "@/data/languages.json";
 import skillsData from "@/data/skills.json";
 
 // Import RichTextEditor and MultiSelect dynamically
-const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), { ssr: false });
-const MultiSelect = dynamic(() => import("@/components/MultiSelect"), { ssr: false });
+const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), {
+  ssr: false,
+});
+const MultiSelect = dynamic(() => import("@/components/MultiSelect"), {
+  ssr: false,
+});
 
-const BENEFIT_OPTIONS = ["Assurance santé", "Formation", "Télétravail", "Horaires flexibles", "Primes", "Transport", "Tickets restaurant", "Mutuelle"];
+const BENEFIT_OPTIONS = [
+  "Assurance santé",
+  "Formation",
+  "Télétravail",
+  "Horaires flexibles",
+  "Primes",
+  "Transport",
+  "Tickets restaurant",
+  "Mutuelle",
+];
 
 interface ReferenceSector {
   id: number;
@@ -43,16 +57,24 @@ interface ReferenceSector {
 }
 
 const normalizeStringArray = (value: unknown): string[] => {
+  const normalize = (items: unknown[]) =>
+    Array.from(
+      new Set(
+        items
+          .filter((item): item is string => typeof item === "string")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      ),
+    );
+
   if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === "string");
+    return normalize(value);
   }
 
   if (typeof value === "string" && value.trim()) {
     try {
       const parsed = JSON.parse(value);
-      return Array.isArray(parsed)
-        ? parsed.filter((item): item is string => typeof item === "string")
-        : [];
+      return Array.isArray(parsed) ? normalize(parsed) : [];
     } catch {
       return [];
     }
@@ -62,12 +84,15 @@ const normalizeStringArray = (value: unknown): string[] => {
 };
 
 const formatValidationErrors = (errors: unknown): string => {
-  if (!errors || typeof errors !== "object") return "Les données envoyées sont invalides.";
+  if (!errors || typeof errors !== "object")
+    return "Les données envoyées sont invalides.";
 
-  return Object.values(errors as Record<string, unknown>)
-    .flatMap((value) => Array.isArray(value) ? value : [value])
-    .filter((value): value is string => typeof value === "string")
-    .join(" ") || "Les données envoyées sont invalides.";
+  return (
+    Object.values(errors as Record<string, unknown>)
+      .flatMap((value) => (Array.isArray(value) ? value : [value]))
+      .filter((value): value is string => typeof value === "string")
+      .join(" ") || "Les données envoyées sont invalides."
+  );
 };
 
 interface JobFormData {
@@ -91,6 +116,7 @@ interface JobFormData {
   salary_max: number | null;
   currency: string;
   benefits: string[];
+  company_logo?: string | null;
 }
 
 export default function JobEditPage() {
@@ -107,13 +133,15 @@ export default function JobEditPage() {
   const availableLanguages = languagesData.languages;
 
   // Liste des compétences disponibles depuis le fichier JSON local
-  const availableSkills = Array.from(new Set([
-    ...(skillsData.technical_skills || []),
-    ...(skillsData.soft_skills || []),
-    ...(skillsData.business_skills || []),
-    ...(skillsData.language_skills || []),
-    ...(skillsData.industry_specific || []),
-  ]));
+  const availableSkills = Array.from(
+    new Set([
+      ...(skillsData.technical_skills || []),
+      ...(skillsData.soft_skills || []),
+      ...(skillsData.business_skills || []),
+      ...(skillsData.language_skills || []),
+      ...(skillsData.industry_specific || []),
+    ]),
+  );
 
   const breadcrumbItems = [
     { title: "Offres d'emploi", link: "/dashboard/jobs" },
@@ -124,22 +152,26 @@ export default function JobEditPage() {
   useEffect(() => {
     const fetchSectors = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`, {
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`,
+          {
+            headers: { "Content-Type": "application/json" },
+          },
+        );
         const result = await response.json().catch(() => null);
 
         if (!response.ok) {
           throw new Error(result?.message || `Erreur ${response.status}`);
         }
 
-        setSectors(Array.isArray(result) ? result : (result?.data || []));
+        setSectors(Array.isArray(result) ? result : result?.data || []);
       } catch (error) {
         console.error("Error fetching sectors and jobs:", error);
         toast({
           title: "Référentiel indisponible",
           variant: "destructive",
-          description: "Impossible de charger la liste des métiers. L'offre reste consultable.",
+          description:
+            "Impossible de charger la liste des métiers. L'offre reste consultable.",
         });
       }
     };
@@ -166,7 +198,9 @@ export default function JobEditPage() {
           );
 
           if (!response.ok) {
-            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+            throw new Error(
+              `Erreur ${response.status}: ${response.statusText}`,
+            );
           }
 
           const result = await response.json();
@@ -174,8 +208,8 @@ export default function JobEditPage() {
           // Normalize data to ensure proper types
           const normalizedData = {
             ...data,
-            location: data.location || '',
-            contractType: data.contractType || '',
+            location: data.location || "",
+            contractType: data.contractType || "",
             date_fin: data.date_fin || null,
             required_languages: normalizeStringArray(data.required_languages),
             required_skills: normalizeStringArray(data.required_skills),
@@ -183,13 +217,16 @@ export default function JobEditPage() {
             experience_required: data.experience_required ?? null,
             salary_min: data.salary_min ?? null,
             salary_max: data.salary_max ?? null,
-            currency: data.currency || 'MAD',
+            currency: data.currency || "MAD",
           };
-          
+
           setJobData(normalizedData);
         } catch (error) {
           console.error("Error fetching job data:", error);
-          const errorMessage = error instanceof Error ? error.message : "Erreur lors de la récupération des données.";
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Erreur lors de la récupération des données.";
           setError(errorMessage);
           toast({
             title: "Erreur",
@@ -205,81 +242,172 @@ export default function JobEditPage() {
     }
   }, [jobId, toast]);
 
-  const handleInputChange = (field: keyof JobFormData, value: string | number | string[] | null) => {
+  const handleInputChange = (
+    field: keyof JobFormData,
+    value: string | number | string[] | null,
+  ) => {
     if (jobData) {
       setJobData({
         ...jobData,
-        [field]: value
+        [field]: value,
       });
     }
   };
 
   // Fonction pour gérer les langues
   const handleLanguagesChange = (selectedLanguages: string[]) => {
-    handleInputChange('required_languages', selectedLanguages);
+    handleInputChange("required_languages", selectedLanguages);
   };
 
   // Fonction pour gérer les compétences - permettre les virgules dans le texte
   const handleSkillsInputChange = (value: string) => {
     // Ne pas split automatiquement, juste stocker la valeur
-    handleInputChange('required_skills', [value]);
+    handleInputChange("required_skills", [value]);
   };
 
   // Fonction pour ajouter une compétence
   const addSkill = (skillText: string) => {
     if (!skillText.trim()) return;
-    
+
     const currentSkills = jobData?.required_skills || [];
-    const newSkills = skillText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const newSkills = skillText
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
     const uniqueSkills = Array.from(new Set([...currentSkills, ...newSkills]));
-    
-    handleInputChange('required_skills', uniqueSkills);
+
+    handleInputChange("required_skills", uniqueSkills);
   };
 
   // Fonction pour supprimer une compétence
   const removeSkill = (skillToRemove: string) => {
     const currentSkills = jobData?.required_skills || [];
-    handleInputChange('required_skills', currentSkills.filter(s => s !== skillToRemove));
+    handleInputChange(
+      "required_skills",
+      currentSkills.filter((s) => s !== skillToRemove),
+    );
   };
 
-  const selectedSector = sectors.find((sector) => String(sector.id) === String(jobData?.sector_id));
+  const selectedSector = sectors.find(
+    (sector) => String(sector.id) === String(jobData?.sector_id),
+  );
 
   const handleSave = async () => {
     if (!jobData) return;
 
     // Vérifier que les champs requis sont présents
-    if (!jobData.sector_id || !jobData.titre.trim() || !jobData.location.trim() || !jobData.contractType || !jobData.date_debut) {
+    if (
+      !jobData.sector_id ||
+      !jobData.titre.trim() ||
+      !jobData.location.trim() ||
+      !jobData.contractType ||
+      !jobData.date_debut
+    ) {
       toast({
         title: "Erreur",
         variant: "destructive",
-        description: "Renseignez le titre, la localisation, le contrat, le secteur et la date de début.",
+        description:
+          "Renseignez le titre, la localisation, le contrat, le secteur et la date de début.",
       });
       return;
     }
 
     if (jobData.titre.trim().length < 5 || jobData.titre.trim().length > 200) {
-      toast({ title: "Erreur", variant: "destructive", description: "Le titre doit contenir entre 5 et 200 caractères." });
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Le titre doit contenir entre 5 et 200 caractères.",
+      });
       return;
     }
 
-    if (jobData.location.trim().length < 2 || jobData.location.trim().length > 100) {
-      toast({ title: "Erreur", variant: "destructive", description: "La localisation doit contenir entre 2 et 100 caractères." });
+    if (
+      jobData.location.trim().length < 2 ||
+      jobData.location.trim().length > 100
+    ) {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "La localisation doit contenir entre 2 et 100 caractères.",
+      });
       return;
     }
 
-    const descriptionText = jobData.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    const descriptionText = jobData.description
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
     if (descriptionText.length < 50 || descriptionText.length > 10000) {
-      toast({ title: "Erreur", variant: "destructive", description: "La description doit contenir entre 50 et 10 000 caractères." });
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description:
+          "La description doit contenir entre 50 et 10 000 caractères.",
+      });
       return;
     }
 
     if (jobData.date_fin && jobData.date_fin <= jobData.date_debut) {
-      toast({ title: "Erreur", variant: "destructive", description: "La date de fin doit être postérieure à la date de début." });
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "La date de fin doit être postérieure à la date de début.",
+      });
       return;
     }
 
-    if (jobData.salary_min !== null && jobData.salary_max !== null && jobData.salary_max < jobData.salary_min) {
-      toast({ title: "Erreur", variant: "destructive", description: "Le salaire maximum doit être supérieur ou égal au salaire minimum." });
+    if (
+      jobData.salary_min !== null &&
+      jobData.salary_max !== null &&
+      jobData.salary_max < jobData.salary_min
+    ) {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description:
+          "Le salaire maximum doit être supérieur ou égal au salaire minimum.",
+      });
+      return;
+    }
+
+    if (
+      (jobData.salary_min !== null && jobData.salary_min < 0) ||
+      (jobData.salary_max !== null && jobData.salary_max < 0)
+    ) {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description: "Les salaires ne peuvent pas être négatifs.",
+      });
+      return;
+    }
+
+    if (
+      jobData.experience_required !== null &&
+      (!Number.isInteger(jobData.experience_required) ||
+        jobData.experience_required < 0 ||
+        jobData.experience_required > 50)
+    ) {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description:
+          "L’expérience requise doit être un entier entre 0 et 50 ans.",
+      });
+      return;
+    }
+
+    if (
+      jobData.required_languages.length > 20 ||
+      jobData.required_skills.length > 30 ||
+      jobData.benefits.length > 8
+    ) {
+      toast({
+        title: "Erreur",
+        variant: "destructive",
+        description:
+          "Maximum autorisé : 20 langues, 30 compétences et 8 avantages.",
+      });
       return;
     }
 
@@ -323,7 +451,9 @@ export default function JobEditPage() {
       if (response.ok) {
         toast({
           title: "Succès",
-          description: responseData.message || "L'offre d'emploi a été mise à jour avec succès.",
+          description:
+            responseData.message ||
+            "L'offre d'emploi a été mise à jour avec succès.",
         });
         router.push(`/dashboard/jobs/${jobId}`);
       } else {
@@ -335,7 +465,10 @@ export default function JobEditPage() {
           });
           return;
         } else {
-          throw new Error(responseData.message || `Erreur ${response.status}: ${response.statusText}`);
+          throw new Error(
+            responseData.message ||
+              `Erreur ${response.status}: ${response.statusText}`,
+          );
         }
       }
     } catch (error) {
@@ -343,7 +476,10 @@ export default function JobEditPage() {
       toast({
         title: "Erreur",
         variant: "destructive",
-        description: error instanceof Error ? error.message : "Une erreur est survenue lors de la mise à jour.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Une erreur est survenue lors de la mise à jour.",
       });
     } finally {
       setSaving(false);
@@ -353,9 +489,9 @@ export default function JobEditPage() {
   if (loading) {
     return (
       <ScrollArea className="h-full">
-        <div className="flex-1 space-y-6 p-6 max-w-4xl mx-auto">
+        <div className="mx-auto w-full max-w-[1400px] space-y-6 p-4 sm:p-6 lg:p-8">
           <BreadCrumb items={breadcrumbItems} />
-          
+
           <div className="flex items-center justify-between">
             <Skeleton className="h-8 w-64" />
             <div className="flex gap-2">
@@ -363,7 +499,7 @@ export default function JobEditPage() {
               <Skeleton className="h-10 w-32" />
             </div>
           </div>
-          
+
           <div className="grid gap-6">
             <Card>
               <CardHeader>
@@ -387,15 +523,19 @@ export default function JobEditPage() {
   if (error || !jobData) {
     return (
       <ScrollArea className="h-full">
-        <div className="flex-1 space-y-6 p-6 max-w-4xl mx-auto">
+        <div className="mx-auto w-full max-w-[1400px] space-y-6 p-4 sm:p-6 lg:p-8">
           <BreadCrumb items={breadcrumbItems} />
           <Card className="border-red-200">
             <CardContent className="flex items-center justify-center py-12">
               <div className="text-center space-y-4">
                 <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
                 <div>
-                  <h3 className="text-lg font-semibold text-red-900">Erreur de chargement</h3>
-                  <p className="text-red-600">{error || "Offre d'emploi introuvable"}</p>
+                  <h3 className="text-lg font-semibold text-red-900">
+                    Erreur de chargement
+                  </h3>
+                  <p className="text-red-600">
+                    {error || "Offre d'emploi introuvable"}
+                  </p>
                 </div>
                 <Button onClick={() => router.back()} variant="outline">
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -411,32 +551,46 @@ export default function JobEditPage() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="flex-1 space-y-6 p-6 max-w-4xl mx-auto">
+      <div className="mx-auto w-full max-w-[1400px] space-y-6 p-4 sm:p-6 lg:p-8">
         {/* En-tête */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <BreadCrumb items={breadcrumbItems} />
           <div className="flex items-center gap-2">
-            <Button onClick={() => router.back()} variant="outline" size="sm">
+            <Button
+              onClick={() => router.push(`/dashboard/jobs/${jobId}`)}
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Annuler
             </Button>
-            <Button onClick={handleSave} size="sm" disabled={saving}>
-              <Save className="h-4 w-4 mr-2" />
+            <Button
+              onClick={handleSave}
+              size="sm"
+              disabled={saving}
+              className="rounded-xl bg-emerald-600 hover:bg-emerald-700"
+            >
+              {saving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
               {saving ? "Enregistrement..." : "Enregistrer"}
             </Button>
           </div>
         </div>
 
         {/* Titre */}
-        <Card>
+        <Card className="overflow-hidden rounded-3xl border-0 bg-gradient-to-br from-emerald-950 via-emerald-800 to-teal-700 text-white shadow-xl shadow-emerald-950/10">
           <CardHeader>
             <CardTitle className="text-2xl font-bold flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-center">
-                <Briefcase className="w-6 h-6 text-blue-600" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/10">
+                <Briefcase className="h-6 w-6 text-emerald-50" />
               </div>
               Modifier l'offre d'emploi
             </CardTitle>
-            <p className="text-muted-foreground">
+            <p className="text-emerald-50">
               Modifiez les informations de l'offre d'emploi "{jobData.titre}"
             </p>
           </CardHeader>
@@ -445,7 +599,7 @@ export default function JobEditPage() {
         {/* Formulaire */}
         <div className="grid gap-6">
           {/* Informations principales */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
@@ -459,7 +613,7 @@ export default function JobEditPage() {
                   id="titre"
                   value={jobData.titre}
                   maxLength={200}
-                  onChange={(e) => handleInputChange('titre', e.target.value)}
+                  onChange={(e) => handleInputChange("titre", e.target.value)}
                   placeholder="Ex: Développeur Full Stack"
                 />
               </div>
@@ -468,19 +622,20 @@ export default function JobEditPage() {
                 <Label htmlFor="description">Description du poste *</Label>
                 <RichTextEditor
                   content={jobData.description}
-                  onChange={(value) => handleInputChange('description', value)}
+                  onChange={(value) => handleInputChange("description", value)}
                   placeholder="Décrivez le poste, les missions, les compétences requises..."
                   minHeight="300px"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Utilisez la barre d'outils pour formater le texte (gras, listes, titres, liens, etc.)
+                  Utilisez la barre d'outils pour formater le texte (gras,
+                  listes, titres, liens, etc.)
                 </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Informations de l'entreprise */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5" />
@@ -493,12 +648,15 @@ export default function JobEditPage() {
                 <Input
                   id="company_name"
                   value={jobData.company_name}
-                  onChange={(e) => handleInputChange('company_name', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("company_name", e.target.value)
+                  }
                   disabled
                   className="bg-gray-50"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Le nom de l'entreprise ne peut pas être modifié depuis cette interface.
+                  Le nom de l'entreprise ne peut pas être modifié depuis cette
+                  interface.
                 </p>
               </div>
 
@@ -507,7 +665,9 @@ export default function JobEditPage() {
                 <Input
                   id="sector_name"
                   value={jobData.sector_name}
-                  onChange={(e) => handleInputChange('sector_name', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("sector_name", e.target.value)
+                  }
                   disabled
                   className="bg-gray-50"
                 />
@@ -521,24 +681,32 @@ export default function JobEditPage() {
                 <select
                   id="job_id"
                   value={jobData.job_id ?? ""}
-                  onChange={(event) => handleInputChange("job_id", event.target.value ? Number(event.target.value) : null)}
+                  onChange={(event) =>
+                    handleInputChange(
+                      "job_id",
+                      event.target.value ? Number(event.target.value) : null,
+                    )
+                  }
                   disabled={sectors.length === 0}
                   className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-50"
                 >
                   <option value="">Autre métier / non répertorié</option>
                   {(selectedSector?.jobs || []).map((job) => (
-                    <option key={job.id} value={job.id}>{job.name}</option>
+                    <option key={job.id} value={job.id}>
+                      {job.name}
+                    </option>
                   ))}
                 </select>
                 <p className="text-xs text-muted-foreground">
-                  Ce champ améliore le matching, mais son absence ne bloque pas l'offre.
+                  Ce champ améliore le matching, mais son absence ne bloque pas
+                  l'offre.
                 </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Localisation et contrat */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
@@ -551,8 +719,10 @@ export default function JobEditPage() {
                   <Label htmlFor="location">Localisation *</Label>
                   <Input
                     id="location"
-                    value={jobData.location || ''}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    value={jobData.location || ""}
+                    onChange={(e) =>
+                      handleInputChange("location", e.target.value)
+                    }
                     placeholder="Ex: Casablanca, Maroc"
                     required
                   />
@@ -562,9 +732,11 @@ export default function JobEditPage() {
                   <Label htmlFor="contractType">Type de contrat</Label>
                   <select
                     id="contractType"
-                    value={jobData.contractType || ''}
+                    value={jobData.contractType || ""}
                     required
-                    onChange={(e) => handleInputChange('contractType', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("contractType", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Sélectionner un type</option>
@@ -580,39 +752,80 @@ export default function JobEditPage() {
           </Card>
 
           {/* Critères de matching */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wrench className="h-5 w-5" />
                 Critères de matching
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Ces critères sont utilisés pour le score de matching candidat-offre
+                Ces critères sont utilisés pour le score de matching
+                candidat-offre
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="experience_required">Expérience requise (années)</Label>
-                  <Input id="experience_required" type="number" min={0} max={50}
-                    value={jobData.experience_required ?? ''}
-                    onChange={(e) => handleInputChange('experience_required', e.target.value === '' ? null : Number(e.target.value))} />
+                  <Label htmlFor="experience_required">
+                    Expérience requise (années)
+                  </Label>
+                  <Input
+                    id="experience_required"
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={jobData.experience_required ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "experience_required",
+                        e.target.value === "" ? null : Number(e.target.value),
+                      )
+                    }
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="salary_min">Salaire minimum</Label>
-                  <Input id="salary_min" type="number" min={0} value={jobData.salary_min ?? ''}
-                    onChange={(e) => handleInputChange('salary_min', e.target.value === '' ? null : Number(e.target.value))} />
+                  <Input
+                    id="salary_min"
+                    type="number"
+                    min={0}
+                    value={jobData.salary_min ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "salary_min",
+                        e.target.value === "" ? null : Number(e.target.value),
+                      )
+                    }
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="salary_max">Salaire maximum</Label>
-                  <Input id="salary_max" type="number" min={0} value={jobData.salary_max ?? ''}
-                    onChange={(e) => handleInputChange('salary_max', e.target.value === '' ? null : Number(e.target.value))} />
+                  <Input
+                    id="salary_max"
+                    type="number"
+                    min={0}
+                    value={jobData.salary_max ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "salary_max",
+                        e.target.value === "" ? null : Number(e.target.value),
+                      )
+                    }
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="currency">Devise</Label>
-                  <select id="currency" value={jobData.currency} onChange={(e) => handleInputChange('currency', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                    <option value="MAD">MAD</option><option value="EUR">EUR</option><option value="USD">USD</option>
+                  <select
+                    id="currency"
+                    value={jobData.currency}
+                    onChange={(e) =>
+                      handleInputChange("currency", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  >
+                    <option value="MAD">MAD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
                   </select>
                 </div>
               </div>
@@ -621,11 +834,24 @@ export default function JobEditPage() {
                 <Label>Avantages</Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {BENEFIT_OPTIONS.map((benefit) => (
-                    <label key={benefit} className="flex items-center gap-2 rounded-md border p-2 text-sm">
-                      <input type="checkbox" checked={jobData.benefits.includes(benefit)}
-                        onChange={() => handleInputChange('benefits', jobData.benefits.includes(benefit)
-                          ? jobData.benefits.filter((item) => item !== benefit)
-                          : [...jobData.benefits, benefit])} />
+                    <label
+                      key={benefit}
+                      className="flex items-center gap-2 rounded-md border p-2 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={jobData.benefits.includes(benefit)}
+                        onChange={() =>
+                          handleInputChange(
+                            "benefits",
+                            jobData.benefits.includes(benefit)
+                              ? jobData.benefits.filter(
+                                  (item) => item !== benefit,
+                                )
+                              : [...jobData.benefits, benefit],
+                          )
+                        }
+                      />
                       {benefit}
                     </label>
                   ))}
@@ -634,7 +860,10 @@ export default function JobEditPage() {
 
               {/* Langues requises - MultiSelect */}
               <div className="space-y-2">
-                <Label htmlFor="required_languages" className="flex items-center gap-2">
+                <Label
+                  htmlFor="required_languages"
+                  className="flex items-center gap-2"
+                >
                   <Languages className="h-4 w-4" />
                   Langues requises (Poids: 10%)
                 </Label>
@@ -646,13 +875,19 @@ export default function JobEditPage() {
                 />
                 <p className="text-xs text-muted-foreground flex items-start gap-1">
                   <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                  <span>Cliquez pour ouvrir la liste et sélectionner plusieurs langues</span>
+                  <span>
+                    Cliquez pour ouvrir la liste et sélectionner plusieurs
+                    langues
+                  </span>
                 </p>
               </div>
 
               {/* Compétences requises - Input avec bouton Ajouter */}
               <div className="space-y-2">
-                <Label htmlFor="required_skills" className="flex items-center gap-2">
+                <Label
+                  htmlFor="required_skills"
+                  className="flex items-center gap-2"
+                >
                   <Wrench className="h-4 w-4" />
                   Compétences requises (Poids: 15%)
                 </Label>
@@ -662,11 +897,11 @@ export default function JobEditPage() {
                     list="skills-list"
                     placeholder="Ex: React.js, Python, SQL (séparez par des virgules)"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         const input = e.currentTarget;
                         addSkill(input.value);
-                        input.value = '';
+                        input.value = "";
                       }
                     }}
                     className="flex-1"
@@ -679,10 +914,12 @@ export default function JobEditPage() {
                   <Button
                     type="button"
                     onClick={(e) => {
-                      const input = document.getElementById('required_skills') as HTMLInputElement;
+                      const input = document.getElementById(
+                        "required_skills",
+                      ) as HTMLInputElement;
                       if (input) {
                         addSkill(input.value);
-                        input.value = '';
+                        input.value = "";
                       }
                     }}
                     variant="outline"
@@ -692,24 +929,32 @@ export default function JobEditPage() {
                 </div>
                 <p className="text-xs text-muted-foreground flex items-start gap-1">
                   <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                  <span>Tapez les compétences séparées par des virgules, puis cliquez sur "Ajouter" ou appuyez sur Entrée</span>
+                  <span>
+                    Tapez les compétences séparées par des virgules, puis
+                    cliquez sur "Ajouter" ou appuyez sur Entrée
+                  </span>
                 </p>
-                {jobData.required_skills && Array.isArray(jobData.required_skills) && jobData.required_skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {jobData.required_skills.map((skill, index) => (
-                      <div key={index} className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-md border border-green-200">
-                        <span className="text-sm">{skill}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeSkill(skill)}
-                          className="ml-1 text-green-600 hover:text-red-600 transition-colors"
+                {jobData.required_skills &&
+                  Array.isArray(jobData.required_skills) &&
+                  jobData.required_skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {jobData.required_skills.map((skill, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1 rounded-md border border-green-200"
                         >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                          <span className="text-sm">{skill}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeSkill(skill)}
+                            className="ml-1 text-green-600 hover:text-red-600 transition-colors"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
 
               {/* Info sur les autres critères */}
@@ -719,18 +964,32 @@ export default function JobEditPage() {
                   Autres critères de matching automatiques
                 </h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• <strong>Secteur</strong> (30%) - Défini par l'entreprise</li>
-                  <li>• <strong>Métier de référence</strong> (20% lorsqu’il est renseigné) — sinon son poids est redistribué entre les autres critères</li>
-                  <li>• <strong>Expérience</strong> (20%) - Basé sur le profil candidat</li>
-                  <li>• <strong>Localisation</strong> (3%) - Champ "Localisation"</li>
-                  <li>• <strong>Type de contrat</strong> (2%) - Champ "Type de contrat"</li>
+                  <li>
+                    • <strong>Secteur</strong> (30%) - Défini par l'entreprise
+                  </li>
+                  <li>
+                    • <strong>Métier de référence</strong> (20% lorsqu’il est
+                    renseigné) — sinon son poids est redistribué entre les
+                    autres critères
+                  </li>
+                  <li>
+                    • <strong>Expérience</strong> (20%) - Basé sur le profil
+                    candidat
+                  </li>
+                  <li>
+                    • <strong>Localisation</strong> (3%) - Champ "Localisation"
+                  </li>
+                  <li>
+                    • <strong>Type de contrat</strong> (2%) - Champ "Type de
+                    contrat"
+                  </li>
                 </ul>
               </div>
             </CardContent>
           </Card>
 
           {/* Dates */}
-          <Card>
+          <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
@@ -744,8 +1003,14 @@ export default function JobEditPage() {
                   <Input
                     id="date_debut"
                     type="date"
-                    value={jobData.date_debut ? moment(jobData.date_debut).format('YYYY-MM-DD') : ''}
-                    onChange={(e) => handleInputChange('date_debut', e.target.value)}
+                    value={
+                      jobData.date_debut
+                        ? moment(jobData.date_debut).format("YYYY-MM-DD")
+                        : ""
+                    }
+                    onChange={(e) =>
+                      handleInputChange("date_debut", e.target.value)
+                    }
                   />
                 </div>
 
@@ -754,9 +1019,19 @@ export default function JobEditPage() {
                   <Input
                     id="date_fin"
                     type="date"
-                    value={jobData.date_fin ? moment(jobData.date_fin).format('YYYY-MM-DD') : ''}
-                    min={jobData.date_debut ? moment(jobData.date_debut).format('YYYY-MM-DD') : undefined}
-                    onChange={(e) => handleInputChange('date_fin', e.target.value)}
+                    value={
+                      jobData.date_fin
+                        ? moment(jobData.date_fin).format("YYYY-MM-DD")
+                        : ""
+                    }
+                    min={
+                      jobData.date_debut
+                        ? moment(jobData.date_debut).format("YYYY-MM-DD")
+                        : undefined
+                    }
+                    onChange={(e) =>
+                      handleInputChange("date_fin", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -765,11 +1040,12 @@ export default function JobEditPage() {
         </div>
 
         {/* Actions finales */}
-        <Card>
+        <Card className="sticky bottom-4 z-10 rounded-2xl border-slate-200 bg-background/95 shadow-lg backdrop-blur dark:border-slate-800">
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">
-                Les modifications seront sauvegardées et l'offre restera dans son état actuel.
+                Les modifications seront sauvegardées et l'offre restera dans
+                son état actuel.
               </p>
               <div className="flex gap-2">
                 <Button onClick={() => router.back()} variant="outline">
@@ -777,7 +1053,9 @@ export default function JobEditPage() {
                 </Button>
                 <Button onClick={handleSave} disabled={saving}>
                   <Save className="h-4 w-4 mr-2" />
-                  {saving ? "Enregistrement..." : "Enregistrer les modifications"}
+                  {saving
+                    ? "Enregistrement..."
+                    : "Enregistrer les modifications"}
                 </Button>
               </div>
             </div>

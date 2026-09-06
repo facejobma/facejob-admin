@@ -1,35 +1,80 @@
-import Image from "next/image";
-import { CheckCircle, XCircle, Mail, Phone, Globe, Users, MapPin, Building2, Calendar, ExternalLink, Award, Clock } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Mail,
+  Phone,
+  Globe,
+  Users,
+  MapPin,
+  Building2,
+  Calendar,
+  ExternalLink,
+  Award,
+  Clock,
+} from "lucide-react";
 import { EnterpriseData } from "@/types";
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/use-toast";
+import { SafeLogo } from "@/components/ui/safe-logo";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
-export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
-  initialData
-}) => {
+export const EntrepriseProfile: React.FC<{
+  initialData: EnterpriseData;
+  onStatusChange?: (status: "Accepted" | "Declined") => void;
+}> = ({ initialData, onStatusChange }) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const isPending = initialData.is_verified === "Pending";
-  const isAccepted = initialData.is_verified === "Accepted";
-  const isDeclined = initialData.is_verified === "Declined";
+  const [status, setStatus] = useState(String(initialData.is_verified));
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [comment, setComment] = useState(initialData.comment || "");
+  const isPending = status === "Pending";
+  const isAccepted = status === "Accepted";
+  const isDeclined = status === "Declined";
 
-  const handleStatusChange = async (action: 'accept' | 'decline') => {
+  const handleStatusChange = async (action: "accept" | "decline") => {
+    const nextStatus = action === "accept" ? "Accepted" : "Declined";
+    if (nextStatus === "Declined" && !comment.trim()) {
+      toast({ title: "Motif requis", description: "Ajoutez un motif avant de refuser la demande.", variant: "destructive" });
+      return;
+    }
     setIsProcessing(true);
     try {
-      // Ici vous pouvez ajouter l'appel API pour changer le statut
-      // await updateEnterpriseStatus(initialData.id, action);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/enterprise/accept/${initialData.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("authToken")}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            is_verified: nextStatus,
+            comment: nextStatus === "Declined" ? comment.trim() : null,
+          }),
+        },
+      );
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || "La mise à jour a échoué.");
+
+      setStatus(nextStatus);
+      setRejectOpen(false);
+      onStatusChange?.(nextStatus);
+      window.dispatchEvent(new Event("requests:refresh"));
       toast({
-        title: action === 'accept' ? "Entreprise acceptée" : "Entreprise refusée",
+        title:
+          action === "accept" ? "Entreprise acceptée" : "Entreprise refusée",
         description: `Le statut de ${initialData.company_name} a été mis à jour.`,
       });
     } catch (error) {
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la mise à jour du statut.",
+        description:
+          "Une erreur est survenue lors de la mise à jour du statut.",
         variant: "destructive",
       });
     } finally {
@@ -50,51 +95,58 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
   };
 
   return (
-    <div className="grid gap-6 max-w-6xl mx-auto">
+    <div className="mx-auto grid w-full max-w-[1400px] gap-6">
       {/* En-tête avec logo et informations principales */}
-      <Card>
+      <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-col gap-6 md:flex-row">
             {/* Logo et nom */}
-            <div className="flex flex-col items-center md:items-start space-y-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage 
-                  src={initialData.logo} 
+            <div className="flex flex-col items-center space-y-4 md:items-start">
+              <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border bg-slate-50 dark:bg-slate-900">
+                <SafeLogo
+                  src={initialData.logo}
                   alt={`${initialData.company_name} Logo`}
+                  className="h-full w-full object-contain p-2"
+                  fallbackClassName="h-10 w-10 text-slate-400"
                 />
-                <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                  {initialData.company_name?.charAt(0) || 'E'}
-                </AvatarFallback>
-              </Avatar>
-              
+              </div>
+
               <div className="text-center md:text-left">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h2 className="break-words text-2xl font-bold text-slate-950 dark:text-white">
                   {initialData.company_name}
-                </h1>
+                </h2>
                 {initialData.sector && (
                   <Badge variant="outline" className="mt-2">
                     <Building2 className="h-3 w-3 mr-1" />
-                    {typeof initialData.sector === 'object' ? initialData.sector.name : initialData.sector}
+                    {typeof initialData.sector === "object"
+                      ? initialData.sector.name
+                      : initialData.sector}
                   </Badge>
                 )}
               </div>
             </div>
 
             {/* Statut et actions */}
-            <div className="flex-1 flex flex-col justify-between">
-              <div className="flex justify-end">
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${getStatusColor()}`}>
+            <div className="flex flex-1 flex-col justify-between gap-4">
+              <div className="flex justify-center md:justify-end">
+                <div
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${getStatusColor()}`}
+                >
                   {getStatusIcon()}
                   <span className="font-medium">
-                    {isAccepted ? "Acceptée" : isPending ? "En attente" : "Refusée"}
+                    {isAccepted
+                      ? "Acceptée"
+                      : isPending
+                        ? "En attente"
+                        : "Refusée"}
                   </span>
                 </div>
               </div>
 
               {isPending && (
-                <div className="flex gap-3 justify-end mt-4">
+                <div className="mt-4 flex flex-wrap justify-center gap-3 md:justify-end">
                   <Button
-                    onClick={() => handleStatusChange('decline')}
+                    onClick={() => setRejectOpen(true)}
                     variant="outline"
                     className="border-red-200 text-red-600 hover:bg-red-50"
                     disabled={isProcessing}
@@ -103,7 +155,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
                     Refuser
                   </Button>
                   <Button
-                    onClick={() => handleStatusChange('accept')}
+                    onClick={() => handleStatusChange("accept")}
                     className="bg-green-600 hover:bg-green-700"
                     disabled={isProcessing}
                   >
@@ -126,9 +178,9 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
       </Card>
 
       {/* Informations détaillées */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Informations de contact */}
-        <Card>
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
@@ -143,7 +195,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
                 <p className="font-medium">{initialData.email}</p>
               </div>
             </div>
-            
+
             {initialData.phone && (
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-gray-500" />
@@ -169,9 +221,9 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
                 <Globe className="h-4 w-4 text-gray-500" />
                 <div>
                   <p className="text-sm text-gray-500">Site web</p>
-                  <a 
-                    href={initialData.site_web} 
-                    target="_blank" 
+                  <a
+                    href={initialData.site_web}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1"
                   >
@@ -185,7 +237,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
         </Card>
 
         {/* Informations sur l'entreprise */}
-        <Card>
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
@@ -229,11 +281,14 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
                 <div>
                   <p className="text-sm text-gray-500">Date d'inscription</p>
                   <p className="font-medium">
-                    {new Date(initialData.created_at).toLocaleDateString('fr-FR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {new Date(initialData.created_at).toLocaleDateString(
+                      "fr-FR",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      },
+                    )}
                   </p>
                 </div>
               </div>
@@ -244,7 +299,7 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
 
       {/* Plan actuel */}
       {initialData.plan && (
-        <Card>
+        <Card className="rounded-2xl border-slate-200 shadow-sm dark:border-slate-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="h-5 w-5" />
@@ -252,11 +307,15 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="font-semibold text-lg">{initialData.plan.name}</h3>
+                <h3 className="font-semibold text-lg">
+                  {initialData.plan.name}
+                </h3>
                 {initialData.plan.description && (
-                  <p className="text-gray-600 mt-1">{initialData.plan.description}</p>
+                  <p className="text-gray-600 mt-1">
+                    {initialData.plan.description}
+                  </p>
                 )}
               </div>
               <Badge variant="outline" className="text-sm">
@@ -266,6 +325,24 @@ export const EntrepriseProfile: React.FC<{ initialData: EnterpriseData }> = ({
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Refuser la demande</DialogTitle>
+            <DialogDescription>
+              Le motif sera enregistré avec le statut refusé.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Motif du refus…" rows={4} />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectOpen(false)} disabled={isProcessing}>Annuler</Button>
+            <Button variant="destructive" onClick={() => handleStatusChange("decline")} disabled={isProcessing || !comment.trim()}>
+              Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

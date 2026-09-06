@@ -28,12 +28,20 @@ export default function EntreprisePage() {
     try {
       silent ? setRefreshing(true) : setLoading(true);
       setError(null);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/entreprises`, {
-        headers: { Authorization: `Bearer ${Cookies.get("authToken")}`, "Content-Type": "application/json" },
-      });
-      if (!response.ok) throw new Error("Impossible de charger les entreprises.");
-      const result = await response.json();
-      setEnterprises(result.data || []);
+      const allEnterprises: EnterpriseData[] = [];
+      let page = 1;
+      let lastPage = 1;
+      do {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/admin/entreprises?per_page=100&page=${page}`, {
+          headers: { Authorization: `Bearer ${Cookies.get("authToken")}`, "Content-Type": "application/json" },
+        });
+        if (!response.ok) throw new Error("Impossible de charger les entreprises.");
+        const result = await response.json();
+        allEnterprises.push(...(Array.isArray(result.data) ? result.data : []));
+        lastPage = Number(result.pagination?.last_page || 1);
+        page += 1;
+      } while (page <= lastPage);
+      setEnterprises(allEnterprises);
       if (silent) toast({ title: "Liste actualisée", description: "Les données des entreprises sont à jour." });
     } catch (fetchError) {
       const message = fetchError instanceof Error ? fetchError.message : "Une erreur est survenue.";
@@ -61,7 +69,7 @@ export default function EntreprisePage() {
   };
 
   const accepted = useMemo(() => enterprises.filter((item) => item.is_verified === true || item.is_verified === "Accepted"), [enterprises]);
-  const declined = useMemo(() => enterprises.filter((item) => item.is_verified === "Declined" || Boolean(item.comment)), [enterprises]);
+  const declined = useMemo(() => enterprises.filter((item) => item.is_verified === "Declined"), [enterprises]);
   const pending = useMemo(() => enterprises.filter((item) => !accepted.includes(item) && !declined.includes(item)), [enterprises, accepted, declined]);
   const recent = useMemo(() => enterprises.filter((item) => Date.now() - new Date(item.created_at).getTime() <= 7 * 24 * 60 * 60 * 1000), [enterprises]);
   const topSectors = useMemo(() => {

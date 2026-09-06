@@ -11,7 +11,7 @@ const getStatus = (enterprise: EnterpriseData) => {
   if (enterprise.is_verified === true || enterprise.is_verified === "Accepted") {
     return { label: "Active", icon: CheckCircle2, className: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" };
   }
-  if (enterprise.is_verified === "Declined" || enterprise.comment) {
+  if (enterprise.is_verified === "Declined") {
     return { label: "Refusée", icon: XCircle, className: "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300" };
   }
   return { label: "À examiner", icon: Clock3, className: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300" };

@@ -80,6 +80,7 @@ function OverViewTab() {
   const [stats, setStats] = useState<Statistiques>({
     sectors_count: 0,
     postules_count: 0,
+    video_profiles_count: 0,
     offres_count: 0,
     candidates_count: 0,
     entreprises_count: 0,
@@ -216,6 +217,7 @@ function OverViewTab() {
         const statsData = {
           sectors_count: result.sectors_count || 0,
           postules_count: result.postules_count || 0,
+          video_profiles_count: result.video_profiles_count || 0,
           offres_count: result.offres_count || 0,
           candidates_count: result.candidates_count || 0,
           entreprises_count: result.entreprises_count || 0,
@@ -257,6 +259,7 @@ function OverViewTab() {
         setStats({
           sectors_count: 0,
           postules_count: 0,
+          video_profiles_count: 0,
           offres_count: 0,
           candidates_count: 0,
           entreprises_count: 0,
@@ -421,6 +424,13 @@ function OverViewTab() {
       icon: Users,
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-900/20",
+    },
+    {
+      title: "Profils CV vidéo",
+      value: stats.video_profiles_count,
+      icon: FileText,
+      color: "text-cyan-600 dark:text-cyan-400",
+      bgColor: "bg-cyan-50 dark:bg-cyan-900/20",
     },
     {
       title: "Total d'offres",
