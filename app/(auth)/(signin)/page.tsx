@@ -1,163 +1,138 @@
 import { Metadata } from "next";
 import UserAuthForm from "@/components/forms/user-auth-form";
 import { Logo } from "@/components/ui/logo";
-import { Shield, Settings, Database, Users } from "lucide-react";
+import {
+  Database,
+  LockKeyhole,
+  Settings2,
+  ShieldCheck,
+  UsersRound,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Administration FaceJob - Connexion",
-  description: "Interface d'administration FaceJob - Accès réservé aux super administrateurs.",
+  description:
+    "Interface d'administration FaceJob - Accès réservé aux super administrateurs.",
 };
+
+const adminFeatures = [
+  {
+    icon: UsersRound,
+    title: "Utilisateurs",
+    description: "Gérez les comptes et les accès",
+  },
+  {
+    icon: Settings2,
+    title: "Configuration",
+    description: "Pilotez les paramètres globaux",
+  },
+  {
+    icon: Database,
+    title: "Données",
+    description: "Contrôlez les ressources système",
+  },
+];
 
 export default function AuthenticationPage() {
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden relative">
-      {/* Subtle background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-green-400/5 rounded-full blur-2xl"></div>
-      </div>
-
-      <div className="flex h-screen relative z-10">
-        {/* Left Panel - Clean Admin Branding */}
-        <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-transparent"></div>
-          
-          <div className="relative z-10 flex flex-col justify-between p-6 text-white w-full h-full">
-            {/* Header with logo in top-left position */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-green-500/20 rounded-2xl blur-lg"></div>
-                <div className="relative bg-gradient-to-br from-slate-800/80 to-slate-700/80 backdrop-blur-sm rounded-2xl p-4 border border-green-500/30 shadow-2xl">
-                  <Logo />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-green-300 bg-clip-text text-transparent">
-                  FaceJob
-                </h1>
-                <p className="text-green-300 text-base font-medium">Administration</p>
-                <p className="text-gray-400 text-xs">Interface Super Administrateur</p>
-              </div>
-            </div>
-
-            {/* Main Content - Compact */}
-            <div className="space-y-4 flex-1 flex flex-col justify-center max-w-md mx-auto">
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold leading-tight">
-                  Tableau de bord<br />
-                  <span className="bg-gradient-to-r from-green-400 to-green-300 bg-clip-text text-transparent">
-                    Administrateur
-                  </span>
-                </h2>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  Accédez aux outils de gestion et de supervision de la plateforme FaceJob.
-                </p>
-              </div>
-
-              {/* Simple admin features grid - Very compact */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="glass-dark rounded-xl p-3 border border-green-500/20 text-center">
-                  <Users className="h-6 w-6 text-green-400 mb-2 mx-auto" />
-                  <h3 className="font-semibold text-xs mb-1">Utilisateurs</h3>
-                  <p className="text-xs text-gray-400">Gestion complète</p>
-                </div>
-                
-                <div className="glass-dark rounded-xl p-3 border border-green-500/20 text-center">
-                  <Database className="h-6 w-6 text-green-400 mb-2 mx-auto" />
-                  <h3 className="font-semibold text-xs mb-1">Base de données</h3>
-                  <p className="text-xs text-gray-400">Supervision système</p>
-                </div>
-                
-                <div className="glass-dark rounded-xl p-3 border border-green-500/20 text-center">
-                  <Settings className="h-6 w-6 text-green-400 mb-2 mx-auto" />
-                  <h3 className="font-semibold text-xs mb-1">Configuration</h3>
-                  <p className="text-xs text-gray-400">Paramètres globaux</p>
-                </div>
-                
-                <div className="glass-dark rounded-xl p-3 border border-green-500/20 text-center">
-                  <Shield className="h-6 w-6 text-green-400 mb-2 mx-auto" />
-                  <h3 className="font-semibold text-xs mb-1">Sécurité</h3>
-                  <p className="text-xs text-gray-400">Contrôle d'accès</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Simple footer - Minimal */}
-            <div className="text-center">
-              <p className="text-gray-400 text-xs">
-                Interface réservée aux super administrateurs
-              </p>
-              <p className="text-gray-500 text-xs">
-                Accès sécurisé et contrôlé
-              </p>
-            </div>
+    <main className="h-screen overflow-y-auto bg-slate-50 text-slate-950 lg:grid lg:grid-cols-2">
+      <section className="hidden min-h-screen bg-slate-900 lg:flex lg:flex-col lg:justify-between lg:p-10 xl:p-14">
+        <header className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-slate-700 bg-slate-800 [&_img]:h-10 [&_img]:w-10 [&_img]:object-contain">
+            <Logo />
           </div>
-        </div>
-
-        {/* Right Panel - Clean Login Form */}
-        <div className="flex-1 lg:w-1/2 xl:w-2/5 flex items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 relative">
-          {/* Minimal background pattern */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-1/3 right-1/3 w-32 h-32 bg-green-100 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-1/3 left-1/3 w-24 h-24 bg-green-50 rounded-full blur-xl"></div>
+          <div>
+            <p className="text-xl font-bold tracking-tight text-white">
+              Face<span className="text-emerald-400">Job</span>
+            </p>
+            <p className="mt-0.5 text-xs font-medium tracking-wide text-slate-400">
+              ESPACE ADMINISTRATION
+            </p>
           </div>
-          
-          <div className="w-full max-w-sm space-y-6 relative z-10">
-            {/* Mobile Logo - Compact but prominent */}
-            <div className="lg:hidden text-center">
-              <div className="inline-flex flex-col items-center space-y-2 mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-green-200 rounded-2xl blur-md"></div>
-                  <div className="relative bg-white rounded-2xl p-3 border-2 border-green-300 shadow-xl">
-                    <Logo />
+        </header>
+
+        <div className="mx-auto w-full max-w-xl py-10">
+          <h1 className="text-3xl font-bold leading-tight text-white xl:text-4xl">
+            Tableau de bord
+            <span className="block text-emerald-400">Administrateur</span>
+          </h1>
+          <p className="mt-4 max-w-lg text-base leading-7 text-slate-300">
+            Accédez aux outils de gestion et de supervision de la plateforme
+            FaceJob.
+          </p>
+
+          <div className="mt-8 grid max-w-xl grid-cols-3 gap-3">
+            {adminFeatures.map(({ icon: Icon, title, description }) => (
+              <div
+                key={title}
+                className="rounded-xl border border-slate-700 bg-slate-800/70 p-4"
+              >
+                <div className="flex items-start gap-3.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-700 text-emerald-400">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-semibold text-white">
+                      {title}
+                    </h2>
+                    <p className="mt-1 text-xs leading-5 text-slate-400">
+                      {description}
+                    </p>
                   </div>
                 </div>
-                <div className="text-center">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-green-700 bg-clip-text text-transparent">
-                    FaceJob
-                  </h1>
-                  <p className="text-gray-600 text-sm font-medium">Administration</p>
-                  <p className="text-gray-500 text-xs">Super Administrateur</p>
-                </div>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            {/* Clean Welcome Section - Compact */}
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center space-x-2 bg-green-100 px-3 py-1 rounded-full mb-2">
-                <Shield className="h-3 w-3 text-green-600" />
-                <span className="text-green-700 text-xs font-medium">Accès Administrateur</span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Connexion
-              </h2>
-              <p className="text-gray-600 text-sm">
-                Identifiez-vous pour accéder au panneau d'administration
+        <footer className="flex items-center justify-between border-t border-slate-800 pt-5 text-xs text-slate-500">
+          <span>© {new Date().getFullYear()} FaceJob</span>
+          <span className="flex items-center gap-2">
+            <LockKeyhole
+              className="h-3.5 w-3.5 text-emerald-500"
+              aria-hidden="true"
+            />
+            Accès réservé aux administrateurs
+          </span>
+        </footer>
+      </section>
+
+      <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
+        <div className="w-full max-w-md">
+          <div className="mb-9 flex items-center gap-3 lg:hidden">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-100 bg-white shadow-sm [&_img]:h-8 [&_img]:w-8 [&_img]:object-contain">
+              <Logo />
+            </div>
+            <div>
+              <p className="text-lg font-bold tracking-tight text-slate-900">
+                Face<span className="text-emerald-600">Job</span>
               </p>
-            </div>
-
-            {/* Clean Login Form - Compact */}
-            <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-6 relative overflow-hidden">
-              {/* Minimal background accent */}
-              <div className="absolute top-0 right-0 w-16 h-16 bg-green-50 rounded-full -translate-y-8 translate-x-8 opacity-50"></div>
-              
-              <div className="relative z-10">
-                <UserAuthForm />
-              </div>
-            </div>
-
-            {/* Clean Footer - Minimal */}
-            <div className="text-center space-y-1">
-              <p className="text-xs text-gray-500">
-                © 2026 FaceJob. Interface d'administration.
-              </p>
-              <p className="text-xs text-gray-400">
-                Système sécurisé - Accès contrôlé
+              <p className="text-xs font-medium text-slate-500">
+                Administration
               </p>
             </div>
           </div>
+
+          <div className="mb-6">
+            <div className="mb-4 inline-flex items-center gap-2 text-xs font-semibold text-emerald-700">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              Accès administrateur
+            </div>
+            <h2 className="text-3xl font-bold text-slate-950">Connexion</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
+              Connectez-vous pour accéder au panneau d’administration FaceJob.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+            <UserAuthForm />
+          </div>
+
+          <p className="mt-7 text-center text-xs leading-5 text-slate-500">
+            En vous connectant, vous accédez à un espace réservé et sécurisé.
+          </p>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
