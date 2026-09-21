@@ -63,12 +63,20 @@ const nextConfig = {
     ],
     domains: ["utfs.io", "picsum.photos", "d1csarkz8obe9u.cloudfront.net", "via.placeholder.com", "placeholder.com", "images.unsplash.com", "source.unsplash.com", "cdn.vectorstock.com", "static.vecteezy.com", "lh3.googleusercontent.com"],
   },
-  // Proxy API requests to backend ALB to avoid Mixed Content (HTTPS -> HTTP) and double /api
+  // Proxy API requests to the backend to avoid Mixed Content (HTTPS -> HTTP) and double /api.
+  // 2026-09-21: the production fallback below still pointed at
+  // facejobalb-... — the ALB from the pre-Lambda ECS setup, destroyed in
+  // facejobBackend's API Gateway + Lambda migration (see facejob_infra's
+  // DEPLOYMENT_CHECKLIST.md). Same bug as facejob's next.config.js (PR #278
+  // there): whenever NEXT_PUBLIC_BACKEND_URL wasn't set on this Amplify app
+  // at runtime, every /api/* request rewritten here 500'd. Falls back to
+  // the real API Gateway domain now; NEXT_PUBLIC_BACKEND_URL should still
+  // be set explicitly in Amplify so this fallback is never load-bearing.
   async rewrites() {
     const rawBackendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ||
       (process.env.NODE_ENV === 'development'
         ? 'http://127.0.0.1:8000'
-        : 'http://facejobalb-1619101788.eu-west-3.elb.amazonaws.com');
+        : 'https://api.facejob.ma');
     const backendUrl = rawBackendUrl.replace(/\/$/, '').replace(/\/api$/, '');
 
     return [
