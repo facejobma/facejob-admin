@@ -385,14 +385,14 @@ export default function CandidatesPage() {
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
     },
     {
-      title: "Candidats actifs",
+      title: "Comptes actifs",
       value: activeCandidates,
       icon: CheckCircle2,
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-900/20",
     },
     {
-      title: "Candidats inactifs",
+      title: "Comptes désactivés",
       value: inactiveCandidates,
       icon: XCircle,
       color: "text-red-600 dark:text-red-400",
@@ -656,10 +656,10 @@ export default function CandidatesPage() {
                   Tous ({totalCandidates.toLocaleString("fr-FR")})
                 </TabsTrigger>
                 <TabsTrigger value="active">
-                  Actifs ({activeCandidates.toLocaleString("fr-FR")})
+                  Comptes actifs ({activeCandidates.toLocaleString("fr-FR")})
                 </TabsTrigger>
                 <TabsTrigger value="inactive">
-                  Inactifs ({inactiveCandidates.toLocaleString("fr-FR")})
+                  Désactivés ({inactiveCandidates.toLocaleString("fr-FR")})
                 </TabsTrigger>
               </TabsList>
             </div>

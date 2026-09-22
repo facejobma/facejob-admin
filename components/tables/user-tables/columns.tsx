@@ -117,27 +117,40 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "status",
-    header: "Statut",
-    size: 120,
+    header: "Compte / e-mail",
+    size: 170,
     cell: ({ row }) => {
-      const user = row.original as any;
+      const user = row.original;
       const isActive = user.is_active !== false;
+      const isEmailVerified = Boolean(user.email_verified_at);
 
-      if (isActive) {
-        return (
-          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Actif
-          </Badge>
-        );
-      } else {
-        return (
-          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-            <Clock className="w-3 h-3 mr-1" />
-            Désactivé
-          </Badge>
-        );
-      }
+      return (
+        <div className="flex flex-col items-start gap-1.5">
+          {isActive ? (
+            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+              <CheckCircle className="mr-1 h-3 w-3" />
+              Compte actif
+            </Badge>
+          ) : (
+            <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+              <XCircle className="mr-1 h-3 w-3" />
+              Compte désactivé
+            </Badge>
+          )}
+
+          {isEmailVerified ? (
+            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+              <Mail className="mr-1 h-3 w-3" />
+              E-mail vérifié
+            </Badge>
+          ) : (
+            <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">
+              <Clock className="mr-1 h-3 w-3" />
+              E-mail non vérifié
+            </Badge>
+          )}
+        </div>
+      );
     },
   },
   {

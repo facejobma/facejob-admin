@@ -15,10 +15,8 @@ import {
   Trash,
   CheckCircle,
   XCircle,
-  Clock,
   Mail,
   Phone,
-  User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -105,7 +103,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
       if (response.ok) {
         toast({
           title: "Succès",
-          description: `Candidat ${activate ? "activé" : "désactivé"} avec succès`,
+          description: activate
+            ? "Candidat activé et adresse e-mail vérifiée avec succès"
+            : "Candidat désactivé avec succès",
         });
         // Use onRefresh if available, otherwise reload
         if (onRefresh) {
@@ -134,14 +134,8 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
     }
   };
 
-  const candidateName =
-    data.first_name && data.last_name
-      ? `${data.first_name} ${data.last_name}`
-      : data.nomComplete || "Candidat";
-
-  // L'activation fonctionnelle est distincte de la vérification de l'adresse
-  // email. C'est `is_active` qui pilote notamment l'éligibilité au matching.
   const isActive = data.is_active !== false;
+  const isEmailVerified = Boolean(data.email_verified_at);
 
   return (
     <>
@@ -195,12 +189,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onRefresh }) => {
 
           <DropdownMenuSeparator />
 
-          {!isActive && (
+          {(!isActive || !isEmailVerified) && (
             <DropdownMenuItem
               onClick={() => updateActivationStatus(true)}
               disabled={loading}
             >
-              <CheckCircle className="mr-2 h-4 w-4 text-green-600" /> Activer
+              <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+              {isActive ? "Vérifier l’e-mail" : "Activer et vérifier"}
             </DropdownMenuItem>
           )}
 

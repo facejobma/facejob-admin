@@ -298,8 +298,8 @@ export function CandidateDataTable<TData, TValue>({
             disabled={isRefreshing}
           >
             <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="inactive">Inactif</option>
+            <option value="active">Compte actif</option>
+            <option value="inactive">Compte désactivé</option>
           </select>
         </div>
       </div>
@@ -321,7 +321,7 @@ export function CandidateDataTable<TData, TValue>({
               ) : (
                 <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
               )}
-              Activer
+              Activer et vérifier
             </Button>
             <Button
               variant="outline"
@@ -360,7 +360,7 @@ export function CandidateDataTable<TData, TValue>({
           </div>
         )}
         <div className="w-full overflow-x-auto">
-          <Table className="relative w-full min-w-[820px] table-fixed">
+          <Table className="relative w-full min-w-[1000px] table-fixed">
             <TableHeader className="bg-muted/50">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-b">
@@ -371,15 +371,15 @@ export function CandidateDataTable<TData, TValue>({
                         index === 0
                           ? "w-10 text-center"
                           : index === 1
-                            ? "w-[22%]"
+                            ? "w-[20%]"
                             : index === 2
                               ? "w-[18%]"
                               : index === 3
                                 ? "w-[12%]"
                                 : index === 4
-                                  ? "w-[11%]"
+                                  ? "w-[17%]"
                                   : index === 5
-                                    ? "w-[17%]"
+                                    ? "w-[14%]"
                                     : index === 6
                                       ? "w-[13%]"
                                       : "w-14 text-center"
@@ -420,15 +420,15 @@ export function CandidateDataTable<TData, TValue>({
                           index === 0
                             ? "w-10 text-center"
                             : index === 1
-                              ? "w-[22%]"
+                              ? "w-[20%]"
                               : index === 2
                                 ? "w-[18%] truncate"
                                 : index === 3
                                   ? "w-[12%] truncate"
                                   : index === 4
-                                    ? "w-[11%] truncate"
+                                    ? "w-[17%]"
                                     : index === 5
-                                      ? "w-[17%] truncate"
+                                      ? "w-[14%] truncate"
                                       : index === 6
                                         ? "w-[13%] truncate"
                                         : "w-14 text-center"
