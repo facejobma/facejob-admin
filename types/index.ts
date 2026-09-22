@@ -1,6 +1,5 @@
 import { Icons } from "@/components/icons";
 
-
 export interface NavItem {
   title: string;
   href?: string;
@@ -11,38 +10,38 @@ export interface NavItem {
   description?: string;
 }
 
-
 export type Sales = {
   id: number;
+  entreprise_id: number;
+  plan_id: number;
   price: string;
   start_date: string;
   end_date: string;
-  payment_method: string;
-  reference: string;
+  payment_method?: string | null;
+  reference?: string | null;
   payment_period: string;
-  status: string;
+  status: "Pending" | "Accepted" | "Rejected" | "Declined";
   contact_access_consumed: number;
+  job_posted: number;
   created_at?: string;
   updated_at?: string;
-}
+  plan?: Plan | null;
+  entreprise?: EnterpriseData | null;
+};
 
 export type StatsItem = {
   sum: number;
   month: number;
   year: number;
-}
+};
 
 export type SectorCountItem = {
   id: number;
   name: string;
   total: number;
-}
+};
 
-
-
-
-
-export type Sale ={
+export type Sale = {
   id: number;
   entreprise_id: number;
   amount: string; // ou number si tu convertis
@@ -54,7 +53,7 @@ export type Sale ={
   plan: Plan;
   entreprise: Entreprise;
   sector: Sector | null;
-}
+};
 
 export type PaymentDetail = {
   id: number;
@@ -74,7 +73,7 @@ export type PaymentDetail = {
   updated_at: string;
   plan: Plan;
   entreprise: EnterpriseData;
-}
+};
 
 export interface Statistiques {
   sectors_count: number;
@@ -90,7 +89,6 @@ export interface Statistiques {
   sales: StatsItem[];
   last_n_sales: Sale[];
 }
-
 
 export interface EnterpriseData {
   id: number;
@@ -124,7 +122,6 @@ export interface Sector {
   updated_at: string;
 }
 
-
 export type PlanDetails = {
   id: number;
   name: string;
@@ -144,7 +141,7 @@ export type PlanDetails = {
   isMonthly: boolean;
   isYearly: boolean;
   isQuarterly: boolean;
-}
+};
 
 export type Plan = {
   id: number;
@@ -153,9 +150,11 @@ export type Plan = {
   monthly_price: number;
   quarterly_price: number;
   annual_price: number;
-    company_name: string;
+  cv_video_consultations?: number;
+  job_postings?: number;
+  company_name: string;
   entreprise_logo: string;
-}
+};
 
 export type User = {
   id: number;
@@ -169,13 +168,18 @@ export type User = {
   bio?: string;
   is_active?: boolean;
   preferred_contract_type?: string | null;
-  job?: { id: number; name: string; sector_id: number; sector?: Sector | null } | null;
+  job?: {
+    id: number;
+    name: string;
+    sector_id: number;
+    sector?: Sector | null;
+  } | null;
   avatar?: string;
   email_verified_at?: string | null;
   created_at: string;
   updated_at?: string;
 };
-export type EntrepriseStatus = "Pending" | "Accepted" | "Declined"
+export type EntrepriseStatus = "Pending" | "Accepted" | "Declined";
 
 export type Entreprise = {
   logo: string;
@@ -224,7 +228,6 @@ export type Job = {
   applications_count?: number; // Nombre de candidatures
   views_count?: number; // Nombre de vues
 };
-
 
 export type CV = {
   id: number;

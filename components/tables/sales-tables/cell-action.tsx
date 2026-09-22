@@ -27,8 +27,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const { toast } = useToast();
   const authToken = Cookies.get("authToken");
   const router = useRouter();
+  const isPending = data.status === "Pending";
 
-  const onVerify = async (is_verified: string) => {
+  const onVerify = async (is_verified: Sales["status"]) => {
     try {
       if (is_verified === "Declined" && !comment) {
         toast({
@@ -60,9 +61,9 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           title: "Success!",
           description: "Entreprise a été vérifiée avec succès.",
         });
-        data.status = is_verified;
+        data.status = is_verified === "Declined" ? "Rejected" : is_verified;
       } else {
-        data.status = "pending";
+        data.status = "Pending";
       }
     } catch (error) {
       toast({
@@ -88,25 +89,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
           <DropdownMenuItem
             onClick={() => {
-              onVerify("Accepted" as string);
-            }}
-          >
-            <CheckSquare className="mr-2 h-4 w-4" /> Accept
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              setOpen(true);
-            }}
-          >
-            <XSquare className="mr-2 h-4 w-4" /> Decline
-          </DropdownMenuItem>
-          {/* <DropdownMenuItem
-            onClick={() => {
               router.push(`/dashboard/sales/${data.id}`);
             }}
           >
-            <View className="mr-2 h-4 w-4" /> Consult
-          </DropdownMenuItem> */}
+            <View className="mr-2 h-4 w-4" /> Voir les détails
+          </DropdownMenuItem>
+          {isPending && (
+            <>
+              <DropdownMenuItem onClick={() => onVerify("Accepted")}>
+                <CheckSquare className="mr-2 h-4 w-4" /> Accepter
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setOpen(true)}>
+                <XSquare className="mr-2 h-4 w-4" /> Refuser
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -120,7 +117,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           />
           <Button
             onClick={() => {
-              onVerify("Declined" as string);
+              onVerify("Declined");
               setOpen(false);
             }}
           >

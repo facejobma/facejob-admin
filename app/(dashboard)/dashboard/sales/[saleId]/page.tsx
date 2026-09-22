@@ -64,11 +64,10 @@ import { PaymentDetail } from "@/types";
 
 export default function Page() {
   const [payments, setPayments] = useState<PaymentDetail | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { saleId } = useParams();
 
-  const breadcrumbItems = [
-    { title: "Paiement", link: "/dashboard/sales" },
-  ];
+  const breadcrumbItems = [{ title: "Paiement", link: "/dashboard/sales" }];
 
   useEffect(() => {
     if (saleId) {
@@ -86,11 +85,22 @@ export default function Page() {
               },
             },
           );
+
+          if (!response.ok) {
+            throw new Error(
+              `Impossible de charger la demande (${response.status}).`,
+            );
+          }
+
           const data = await response.json();
 
           setPayments(data);
         } catch (error) {
-          console.log(error);
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Impossible de charger la demande.",
+          );
         }
       };
 
@@ -98,16 +108,20 @@ export default function Page() {
     }
   }, [saleId]);
 
-
-
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-5">
         <BreadCrumb items={breadcrumbItems} />
-        {payments ? (
+        {error ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        ) : payments ? (
           <PaymentForm initialData={payments} key={saleId as string} />
         ) : (
-          <p>Loading...</p>
+          <p className="text-sm text-muted-foreground">
+            Chargement de la demande...
+          </p>
         )}
       </div>
     </ScrollArea>

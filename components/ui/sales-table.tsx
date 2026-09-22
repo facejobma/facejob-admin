@@ -1,11 +1,12 @@
+"use client";
+
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,139 +18,104 @@ import {
 import { Input } from "./input";
 import { Button } from "./button";
 import { ScrollArea, ScrollBar } from "./scroll-area";
+import { Sales } from "@/types";
+import { Loader2, Search } from "lucide-react";
 
-
-
- interface Sector {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string;
+interface SalesDataTableProps<TValue> {
+  columns: ColumnDef<Sales, TValue>[];
+  data: Sales[];
+  isLoading?: boolean;
 }
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  searchKey: string;
-}
+const normalize = (value: unknown) =>
+  String(value ?? "").toLocaleLowerCase("fr");
 
-export function SalesDataTable<TData, TValue>({
+export function SalesDataTable<TValue>({
   columns,
   data,
-  searchKey,
-}: DataTableProps<TData, TValue>) {
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [selectValue, setSelectValue] = useState<string>("");
-  const [selectPanValue, setSelectPanValue] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(20);
-  const [sectors, setSectors] = useState<Sector[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  isLoading = false,
+}: SalesDataTableProps<TValue>) {
+  const [searchValue, setSearchValue] = useState("");
+  const [planFilter, setPlanFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const pageSize = 20;
+
+  const planOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(data.map((payment) => payment.plan?.name).filter(Boolean)),
+      ).sort(),
+    [data],
+  );
+
+  const filteredData = useMemo(() => {
+    const query = normalize(searchValue.trim());
+
+    return data.filter((payment) => {
+      const matchesSearch =
+        !query ||
+        [
+          payment.id,
+          payment.entreprise?.company_name,
+          payment.entreprise?.email,
+          payment.entreprise?.phone,
+          payment.entreprise?.sector?.name,
+          payment.plan?.name,
+        ].some((value) => normalize(value).includes(query));
+
+      const matchesPlan = !planFilter || payment.plan?.name === planFilter;
+
+      return matchesSearch && matchesPlan;
+    });
+  }, [data, planFilter, searchValue]);
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
   useEffect(() => {
-    setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/sectors`)
-      .then((response) => response.json())
-      .then((result) => {
-        // Handle both array and object responses
-        const sectorsData = Array.isArray(result) ? result : (result.data || []);
-        setSectors(sectorsData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.error("Error fetching secteur options:", error);
-        setSectors([]); // Set empty array on error
-      });
-  }, []);
+    setCurrentPage(0);
+  }, [data, searchValue, planFilter]);
 
-  const planOptions = [
-    "Pannel gratuit",
-    "Pannel de base",
-    "Pannel Intérmédiare",
-    "Pannel Essentiel",
-    "Pannel premium",
-  ];
-
-  useEffect(() => {
-    table.getColumn(searchKey)?.setFilterValue(searchValue);
-  }, [searchKey, searchValue, selectPanValue, table]);
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
-    setSelectValue(selectedValue);
-
-    table.setGlobalFilter(selectedValue);
-  };
-
-  const handleSelectPannelChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const selectedValue = event.target.value;
-    setSelectPanValue(selectedValue);
-
-    table.setGlobalFilter(selectedValue);
-  };
-
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) =>
-      Math.min(prevPage + 1, Math.ceil(data.length / pageSize) - 1),
-    );
-  };
-
+  const pageCount = Math.max(1, Math.ceil(filteredData.length / pageSize));
   const startIndex = currentPage * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, data.length);
+  const endIndex = Math.min(startIndex + pageSize, filteredData.length);
+  const visibleRows = table.getRowModel().rows.slice(startIndex, endIndex);
 
   return (
-    <>
-      <div className="flex space-x-2">
-        <Input
-          placeholder={`Search ${searchKey}...`}
-          value={searchValue}
-          onChange={(event) => setSearchValue(event.target.value)}
-          className="w-full md:max-w-sm"
-        />
+    <div className="space-y-4">
+      <div className="grid gap-2 md:grid-cols-[minmax(260px,1fr)_220px]">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            aria-label="Rechercher une demande"
+            placeholder="Entreprise, email, téléphone, secteur ou plan..."
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            className="pl-9"
+          />
+        </div>
+
         <select
-          value={selectPanValue || ""}
-          onChange={handleSelectPannelChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
+          aria-label="Filtrer par plan"
+          value={planFilter}
+          onChange={(event) => setPlanFilter(event.target.value)}
+          className="rounded-md border bg-white p-2 text-sm text-gray-700 focus:border-accent focus:outline-none focus:ring focus:ring-accent"
         >
-          <option value="">Pannel</option>
-          {planOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <select
-          value={selectValue || ""}
-          onChange={handleSelectChange}
-          className="border bg-white text-gray-500  p-2 rounded-md focus:outline-none focus:border-accent focus:ring focus:ring-accent disabled:opacity-50"
-        >
-          <option value="">Tous les secteurs</option>
-          {Array.isArray(sectors) && sectors.map((sector) => (
-            <option key={sector.id} value={sector.name}>
-              {sector.name}
+          <option value="">Tous les plans</option>
+          {planOptions.map((planName) => (
+            <option key={planName} value={planName}>
+              {planName}
             </option>
           ))}
         </select>
       </div>
 
-      <ScrollArea className="rounded-md border h-[calc(80vh-220px)]">
-        <Table className="relative">
+      <ScrollArea className="h-[calc(80vh-220px)] min-h-[360px] rounded-md border">
+        <Table className="relative min-w-[1050px]">
           <TableHeader>
-            {/* Header rows */}
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -166,15 +132,21 @@ export function SalesDataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {/* Render rows for the current page */}
-            {table
-              .getFilteredRowModel()
-              .rows.slice(startIndex, endIndex)
-              .map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-40 text-center"
                 >
+                  <Loader2 className="mx-auto mb-2 h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Chargement des demandes...
+                  </span>
+                </TableCell>
+              </TableRow>
+            ) : visibleRows.length ? (
+              visibleRows.map((row) => (
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -184,21 +156,36 @@ export function SalesDataTable<TData, TValue>({
                     </TableCell>
                   ))}
                 </TableRow>
-              ))}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-40 text-center text-muted-foreground"
+                >
+                  Aucune demande ne correspond aux filtres sélectionnés.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} sur{" "}
-          {table.getFilteredRowModel().rows.length} colonnes sélectionnée(s).
-        </div>
-        <div className="space-x-2">
+
+      <div className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <span>
+          {filteredData.length === 0
+            ? "0 résultat"
+            : `${startIndex + 1}–${endIndex} sur ${filteredData.length} demande(s)`}
+        </span>
+        <div className="flex items-center gap-2">
+          <span>
+            Page {Math.min(currentPage + 1, pageCount)} sur {pageCount}
+          </span>
           <Button
             variant="outline"
             size="sm"
-            onClick={handlePreviousPage}
+            onClick={() => setCurrentPage((page) => Math.max(page - 1, 0))}
             disabled={currentPage === 0}
           >
             Précédent
@@ -206,13 +193,15 @@ export function SalesDataTable<TData, TValue>({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleNextPage}
-            disabled={currentPage === Math.ceil(data.length / pageSize) - 1}
+            onClick={() =>
+              setCurrentPage((page) => Math.min(page + 1, pageCount - 1))
+            }
+            disabled={currentPage >= pageCount - 1}
           >
             Suivant
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
